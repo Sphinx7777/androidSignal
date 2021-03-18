@@ -1,0 +1,17 @@
+{
+    "extends": [
+        "tslint:latest"
+    ],
+    "rules": {
+        "jsx-wrap-multiline": false,
+        "quotemark": [true, "single", "jsx-single"],
+        "max-classes-per-file": [false, 1],
+        "ordered-imports": [false],
+        "object-literal-sort-keys": [false],
+        "no-string-literal": [false],
+        "member-ordering": [false],
+        "no-empty-interface": [false],
+        "no-implicit-dependencies": [false],
+        "no-submodule-imports": [false]
+    }
+}
