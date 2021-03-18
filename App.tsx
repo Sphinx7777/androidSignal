@@ -1,12 +1,5 @@
 
-
-// How to Detect Call States in React Native App
-// https://aboutreact.com/detect-call-states/
-
-// Import React
 import React, { useState } from 'react';
-
-// Import required component
 import {
 	StyleSheet,
 	Text,
@@ -17,27 +10,10 @@ import {
 	SafeAreaView,
 	Image, Button, PermissionsAndroid
 } from 'react-native';
-
-
-// Import Call Detector
 import CallDetectorManager from 'react-native-call-detection';
 
-// import * as Permissions from 'expo-permissions';
-// const [permission, askForPermission] = Permissions.usePermissions(Permissions.REMINDERS, { ask: true });
-
-// console.log('permission', permission, 'askForPermission', askForPermission);
-// const { status, expires, permissions } = await Permissions.getAsync(
-//   Permissions.CALENDAR,
-// );
-// if (status !== 'granted') {
-//   alert('Hey! You have not enabled selected permissions');
-// }
-
 const App = () => {
-
-	// to keep callDetector reference
 	let callDetector = undefined;
-
 	const [callStates, setCallStates] = useState([]);
 	const [isStart, setIsStart] = useState(false);
 	const [flatListItems, setFlatListItems] = useState([]);
@@ -77,28 +53,22 @@ const App = () => {
 	const startStopListener = async () => {
 		if (isStart) {
 			console.log('Stop');
-			callDetector && callDetector.dispose();
+			if (callDetector) {
+				callDetector.dispose();
+			}
 		} else {
 			console.log('Start', 'stateGranted===', stateGranted);
 			callDetector = new CallDetectorManager(
-				(event, number) => {
+				(event, num) => {
 					console.log('event -> ',
-						event + (number ? ' - ' + number : '')
+						event + (num ? ' - ' + num : '')
 					);
-					var updatedCallStates = callStates;
+					const updatedCallStates = callStates;
 					updatedCallStates.push(
-						event + (number ? ' - ' + number : '')
+						event + (num ? ' - ' + num : '')
 					);
 					setFlatListItems(updatedCallStates);
 					setCallStates(updatedCallStates);
-
-					// For iOS event will be either "Connected",
-					// "Disconnected","Dialing" and "Incoming"
-
-					// For Android event will be either "Offhook",
-					// "Disconnected", "Incoming" or "Missed"
-					// phoneNumber should store caller/called number
-
 					if (event === 'Disconnected') {
 						console.log('Disconnected');
 						// Do something call got disconnected
@@ -115,7 +85,7 @@ const App = () => {
 						// This clause will only be executed for iOS
 					} else if (event === 'Offhook') {
 						console.log('Offhook');
-						//Device call state: Off-hook.
+						// Device call state: Off-hook.
 						// At least one call exists that is dialing,
 						// active, or on hold,
 						// and no calls are ringing or waiting.
