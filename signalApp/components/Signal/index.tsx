@@ -12,6 +12,7 @@ import { EntityList } from '../../models/entity';
 import ContactList from './ContactList';
 import CallDetectorManager from 'react-native-call-detection';
 import CallLogs from 'react-native-call-log';
+import SendSMS from 'react-native-sms';
 
 interface ICallLog {
     dateTime: string;
@@ -130,6 +131,60 @@ class Signal extends React.Component<ISignalProps> {
         } else {
             console.log(
                 'Sorry! You can’t get call logs in iOS devices because of the security concern',
+            );
+        }
+    };
+
+    // sendAllSMS = () => {
+    // const { dataItems } = this.props;
+    // let dataSmsArray = [];
+    // if (dataItems && dataItems.size > 0) {
+    //     dataSmsArray = dataItems.valueSeq().filter(obj => obj.get('smsBody'))?.toJS() || []
+    // }
+    // console.log('sendAllSMS===', dataSmsArray)
+    // for (let i = 0; i < dataSmsArray.length; i++) {
+    //     const element = dataSmsArray[i];
+    //     SendSMS.send(
+    //         {
+    //         body: String(element['smsBody']),
+    //         recipients: [String(element['phone'])],
+    //         // @ts-ignore
+    //         successTypes: ['sent', 'queued']
+    //         },
+    //         (completed, cancelled, error) => {
+    //             if (completed) {
+    //             console.log('SMS Sent Completed');
+    //         } else if (cancelled) {
+    //             console.log('SMS Sent Cancelled');
+    //         } else if (error) {
+    //             console.log('Some error occured');
+    //         }
+    //         },
+    //     );
+    // }
+    // };
+
+    sendSMS = () => {
+        const { currentElement } = this.state;
+        const body = currentElement?.get('smsBody')?.toString();
+        const recipient = currentElement?.get('phone')?.toString();
+        if (body && recipient) {
+            SendSMS.send(
+                {
+                body,
+                recipients: [recipient],
+                // @ts-ignore
+                successTypes: ['sent', 'queued']
+                },
+                (completed, cancelled, error) => {
+                    if (completed) {
+                    console.log('SMS Sent Completed');
+                    } else if (cancelled) {
+                        console.log('SMS Sent Cancelled');
+                    } else if (error) {
+                        console.log('Some error occured');
+                    }
+                },
             );
         }
     };
@@ -279,13 +334,17 @@ class Signal extends React.Component<ISignalProps> {
 
     render() {
         const { currentItemIndex, currentElement, listData } = this.state
+        const { dataItems, user, navigation } = this.props
         // const sortedData = listData.sort((a, b) => Number(b.timestamp) - Number(a.timestamp))
         let lastCallData = null as ICallLog | null;
         if (listData.length > 0) {
             lastCallData = listData[0];
         }
-        console.log('lastCallData===', lastCallData)
-        const { dataItems, user, navigation } = this.props
+        const dataSms = currentElement.get('smsBody')
+        // let dataSmsArray = null;
+        // if (dataItems && dataItems.size > 0) {
+        //     dataSmsArray = dataItems.filter(obj => obj.get('smsBody'))
+        // }
         const validUser = user && user?.token && user?.token?.length > 0
         if (!validUser && navigation) {
             navigation.navigate('Login')
@@ -330,7 +389,7 @@ class Signal extends React.Component<ISignalProps> {
                         setCurrentElement={this.setCurrentElement}
                     />
                     <ScrollView style={styles.container}>
-                        <CustomInput currentElement={currentElement} makeCall={this.makeCall} />
+                        <CustomInput currentElement={currentElement} makeCall={this.makeCall} sendAllSMS={this.sendSMS} dataSmsArray={dataSms}/>
                         <CallMenu
                             setCurrentItemIndex={this.setCurrentItemIndex}
                             currentItemIndex={currentItemIndex}

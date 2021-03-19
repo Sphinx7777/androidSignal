@@ -22,7 +22,8 @@ const dataTest: any = [
     },
     {
         id: '2',
-        phone: '22222222',
+        phone: '2222222222',
+        smsBody: null,
         email: 'spamoglot222@gmail.com',
         name: 'Sergei222',
         date: '20-02-02',
@@ -31,7 +32,8 @@ const dataTest: any = [
     },
     {
         id: '3',
-        phone: '33333333',
+        phone: '3333333333',
+        smsBody: null,
         email: 'spamoglot333@gmail.com',
         name: 'Sergei333',
         date: '20-03-03',
@@ -41,7 +43,8 @@ const dataTest: any = [
     ,
     {
         id: '4',
-        phone: '44444444',
+        phone: '4444444444',
+        smsBody: null,
         email: 'spamoglot444@gmail.com',
         name: 'Sergei444',
         date: '20-04-04',
@@ -50,7 +53,8 @@ const dataTest: any = [
     },
     {
         id: '5',
-        phone: '55555555',
+        phone: '5555555555',
+        smsBody: null,
         email: 'spamoglot555@gmail.com',
         name: 'Sergei555',
         date: '20-05-05',
@@ -59,12 +63,33 @@ const dataTest: any = [
     },
     {
         id: '6',
-        phone: '66666666',
+        phone: '6666666666',
+        smsBody: null,
         email: 'spamoglot666@gmail.com',
         name: 'Sergei666',
         date: '20-06-06',
         dbType: 'C',
         details: 'details 666666666666666'
+    },
+    {
+        id: '7',
+        phone: '0668848072',
+        smsBody: 'Test sms Ira',
+        email: 'kaktus1977@gmail.com',
+        name: 'Ira',
+        date: '20-01-01',
+        dbType: 'asana',
+        details: 'details 77777777'
+    },
+    {
+        id: '8',
+        phone: '0953302725',
+        smsBody: 'Test sms Arhip',
+        email: 'arhip@gmail.com',
+        name: 'Arhip',
+        date: '20-01-01',
+        dbType: 'asana',
+        details: 'details 88888888'
     }
 ]
 

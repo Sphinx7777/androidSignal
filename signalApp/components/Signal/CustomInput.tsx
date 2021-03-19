@@ -8,13 +8,15 @@ import { getStringDate } from '../../utils';
 interface ICustomInputProps {
     currentElement: ISingleDataItem | undefined;
     makeCall: (num: string) => Promise<any>;
+    sendAllSMS: () => void;
+    dataSmsArray: any;
 }
 interface ICustomInputState {
     date: string;
     details: string | undefined;
 }
 const CustomInput = (props: ICustomInputProps) => {
-    const { currentElement, makeCall } = props;
+    const { currentElement, makeCall, dataSmsArray, sendAllSMS} = props;
     const dispatch = useDispatch()
     const currentElDate = currentElement ? currentElement?.get('date') : ''
     const currentElDetails = currentElement && currentElement?.get('details') ? currentElement?.get('details') : ''
@@ -146,6 +148,14 @@ const CustomInput = (props: ICustomInputProps) => {
                     </View>
                 </View>
                 <View style={styles.sendButtonContainer}>
+                <TouchableOpacity
+                        style={(dataSmsArray)
+                            ? { ...styles.button, ...styles.sendButton }
+                            : { ...styles.button, ...styles.sendButton, ...styles.disabled }}
+                        disabled={dataSmsArray ? false : true}
+                        onPress={sendAllSMS}>
+                        <Text style={styles.buttonText}>Sent sms</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity
                         style={(!cancelDetailsDis || !cancelDateDis)
                             ? { ...styles.button, ...styles.sendButton }
@@ -239,13 +249,13 @@ const styles = StyleSheet.create({
     sendButtonContainer: {
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
         width: '100%'
     },
     sendButton: {
         marginBottom: 0,
         marginTop: 15,
-        width: 100,
+        width: 130,
         paddingVertical: 5
     },
     disabled: {
