@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
     drawerStyle: {
         backgroundColor: '#fff',
         width: 240,
+        paddingTop: 50
     }
 });
 
