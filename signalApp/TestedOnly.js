@@ -1,4 +1,174 @@
+// How to Access Call Logs of Android Devices from React Native App
+// https://aboutreact.com/access-call-logs-of-android-devices/
 
+// import React in our code
+import React, {useState, useEffect} from 'react';
+
+// import all the components we are going to use
+import {
+    SafeAreaView,
+    Platform,
+    StyleSheet,
+    Text,
+    View,
+    PermissionsAndroid,
+    FlatList,
+	Button
+} from 'react-native';
+
+// import CallLogs API
+import CallLogs from 'react-native-call-log';
+
+const App = () => {
+    const [listData, setListDate] = useState([]);
+
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         if (Platform.OS != 'ios') {
+    //             try {
+    //                 //Ask for runtime permission
+    //                 const granted = await PermissionsAndroid.request(
+    //                     PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
+    //                     {
+    //                         title: 'Call Log Example',
+    //                         message: 'Access your call logs',
+    //                         buttonNeutral: 'Ask Me Later',
+    //                         buttonNegative: 'Cancel',
+    //                         buttonPositive: 'OK',
+    //                     },
+    //                 );
+    //                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+    //                     CallLogs.loadAll().then(c => setListDate(c));
+    //                     CallLogs.load(3).then(c => console.log(c));
+    //                 } else {
+    //                     alert('Call Log permission denied');
+    //                 }
+    //             } catch (e) {
+    //                 alert(e);
+    //             }
+    //         } else {
+    //             alert(
+    //                 'Sorry! You can’t get call logs in iOS devices because of the security concern',
+    //             );
+    //         }
+    //     };
+    //     fetchData();
+    // }, []);
+
+	const fetchData = async () => {
+		if (Platform.OS != 'ios') {
+			try {
+				//Ask for runtime permission
+				const granted = await PermissionsAndroid.request(
+					PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
+					{
+						title: 'Call Log Example',
+						message: 'Access your call logs',
+						buttonNeutral: 'Ask Me Later',
+						buttonNegative: 'Cancel',
+						buttonPositive: 'OK',
+					},
+				);
+				if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+					CallLogs.loadAll().then(c => setListDate(listData.concat(c)));
+					CallLogs.load(3).then(c => console.log(c));
+				} else {
+					alert('Call Log permission denied');
+				}
+			} catch (e) {
+				alert(e);
+			}
+		} else {
+			alert(
+				'Sorry! You can’t get call logs in iOS devices because of the security concern',
+			);
+		}
+	};
+
+	const sortedData = listData.sort((a, b) => Number(b.timestamp) - Number(a.timestamp))
+	console.log('sortedData', sortedData)
+
+    const ItemView = ({item}) => {
+        return (
+            // FlatList Item
+            <View>
+                <Text style={styles.textStyle}>
+                    Name : {item.name ? item.name : 'NA'}
+                    {'\n'}
+                    DateTime : {item.dateTime}
+                    {'\n'}
+                    Duration : {item.duration}
+                    {'\n'}
+                    PhoneNumber : {item.phoneNumber}
+                    {'\n'}
+                    RawType : {item.rawType}
+                    {'\n'}
+                    Timestamp : {item.timestamp}
+                    {'\n'}
+                    Type : {item.type}
+                </Text>
+            </View>
+        );
+    };
+
+    const ItemSeparatorView = () => {
+        return (
+            // FlatList Item Separator
+            <View
+                style={{
+                    height: 0.5,
+                    width: '100%',
+                    backgroundColor: '#C8C8C8',
+                }}
+            />
+        );
+    };
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <View >
+                <Text>Try call log</Text>
+                <Button
+                    title="request call log"
+                    onPress={fetchData}
+                />
+            </View>
+            <View>
+                <Text style={styles.titleText}>
+                    How to Access Call Logs of Android Devices from React Native
+                    App
+                </Text>
+                <FlatList
+                    data={sortedData}
+                    //data defined in constructor
+                    ItemSeparatorComponent={ItemSeparatorView}
+                    //Item Separator View
+                    renderItem={ItemView}
+                    keyExtractor={(item, index) => index.toString()}
+                />
+            </View>
+        </SafeAreaView>
+    );
+};
+
+export default App;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: 'white',
+        padding: 10,
+    },
+    titleText: {
+        fontSize: 22,
+        textAlign: 'center',
+        fontWeight: 'bold',
+    },
+    textStyle: {
+        fontSize: 16,
+        marginVertical: 10,
+    },
+});
 
 // // How to Detect Call States in React Native App
 // // https://aboutreact.com/detect-call-states/
@@ -15,16 +185,14 @@
 //   Linking,
 //   FlatList,
 //   SafeAreaView,
-//   Image, Button, PermissionsAndroid 
+//   Image, Button, PermissionsAndroid
 // } from 'react-native';
-
 
 // //Import Call Detector
 // import CallDetectorManager from 'react-native-call-detection';
 
-
 // const App = () => {
- 
+
 //   //to keep callDetector reference
 //   let callDetector = undefined;
 
@@ -32,7 +200,7 @@
 //   let [isStart, setIsStart] = useState(false);
 //   let [flatListItems, setFlatListItems] = useState([]);
 //   let [stateGranted, setStateGranted] = useState(null);
-  
+
 //   const requestPhoneStatePermission = async () => {
 //     try {
 //       const granted = await PermissionsAndroid.request(
@@ -57,10 +225,8 @@
 //     }
 //   };
 
-
-
 //   const callFriendTapped = () => {
-    
+
 //     Linking.openURL('tel:5555555555').catch((err) => {
 //       console.log(err);
 //     });
@@ -124,7 +290,7 @@
 //           // Only if you want to read incoming number
 //           // Default: console.error
 //           console.log('Permission Denied by User');
-//         }, 
+//         },
 //         {
 //           title: 'Phone State Permission',
 //           message:
@@ -199,7 +365,7 @@
 // };
 
 // export default App;
-export default {};
+// export default {};
 
 // const styles = StyleSheet.create({
 //   container: {
@@ -257,14 +423,6 @@ export default {};
 //   },
 // });
 
-
-
-
-
-
-
-
-
 // // Example to Send Text SMS on Button Click in React Native
 // // https://aboutreact.com/send-text-sms-in-react-native/
 
@@ -303,7 +461,7 @@ export default {};
 //         body: bodySMS,
 //         // Recipients Number
 //         recipients: [mobileNumber],
-//         // An array of types 
+//         // An array of types
 //         // "completed" response when using android
 //         successTypes: ['sent', 'queued'],
 //       },
@@ -396,22 +554,6 @@ export default {};
 //   },
 // });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // import { Text, View, StyleSheet, TouchableOpacity } from 'react-native'
 // import React from 'react';
 
@@ -420,7 +562,6 @@ export default {};
 // import CallDetectorManager from 'react-native-call-detection'
 
 // import SendSMS from 'react-native-sms'
-
 
 // import CallLogs from 'react-native-call-log'
 
@@ -460,7 +601,6 @@ export default {};
 //     }
 // })
 
-
 // const requestCameraPermission = async () => {
 //     try {
 //         const granted = await PermissionsAndroid.request(
@@ -494,7 +634,6 @@ export default {};
 //         allowAndroidSendWithoutReadPermission: true
 //     }, (completed, cancelled, error) => console.log('SMS Callback: completed: ' + completed + ' cancelled: ' + cancelled + 'error: ' + error));
 // }
-
 
 // const log = async () => {
 
@@ -603,12 +742,11 @@ export default {};
 //     this.callDetector = new CallDetectorManager((event, phoneNumber)=> {
 //     // For iOS event will be either "Connected",
 //     // "Disconnected","Dialing" and "Incoming"
-     
+
 //     // For Android event will be either "Offhook",
 //     // "Disconnected", "Incoming" or "Missed"
 //     // phoneNumber should store caller/called number
-     
-     
+
 //     if (event === 'Disconnected') {
 //     // Do something call got disconnected
 //     }
@@ -643,7 +781,7 @@ export default {};
 // } // a custom permission request message to explain to your user, why you need the permission [recommended] - this is the default one
 // )
 // }
-     
+
 // stopListenerTapped() {
 //     this.callDetector && this.callDetector.dispose();
 // }
@@ -655,7 +793,6 @@ export default {};
 //           console.log(err)
 //         });
 //     }
-
 
 //     makeCall = async () => {
 //         const args = {
