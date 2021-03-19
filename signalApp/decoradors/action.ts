@@ -1,5 +1,5 @@
-import Entity from '../../src/models/entity';
-import * as actions from '../../src/redux/actions';
+import Entity from '../models/entity';
+import * as actions from '../redux/actions';
 
 /*
  * Decoractor for saga functions (watchers) to link them with redux and actions that users sends from components.

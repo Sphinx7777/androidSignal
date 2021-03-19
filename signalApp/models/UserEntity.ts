@@ -1,9 +1,9 @@
-import saga from '../../src/decoradors/saga';
-import action from '../../src/decoradors/action';
+
+import action from '../decoradors/action';
 import Entity, { EntityMap } from './entity';
 import { call, put } from 'redux-saga/effects';
-import { ENTITY, HTTP_METHOD, IPagerParams, PostContentType } from '../../src/constants';
-import { setFlagger } from '../../src/redux/actions';
+import { ENTITY, HTTP_METHOD, IPagerParams } from '../constants';
+import { setFlagger } from '../redux/actions';
 import { List } from 'immutable';
 
 interface IUserMap {
@@ -13,7 +13,7 @@ interface IUserMap {
     userEmail?: string;
     phone: string;
     overview?: string;
-    friends?:IFriendsMapType;
+    friends?: IFriendsMapType;
     token?: string;
     current?: any;
     secrets?: any;
@@ -83,7 +83,7 @@ class UserEntity extends Entity {
     public * fetchUserFriends(data: any) {
         yield call(this.xRead, '/user/userFriends', data, HTTP_METHOD.GET);
     }
-    
+
     @action()
     public * unfriendFriend(data: any) {
         yield call(this.xSave, '/user/unfriendFriend', data);
@@ -108,7 +108,6 @@ class UserEntity extends Entity {
     public * deleteFriendRequest(data: any) {
         yield call(this.xSave, '/user/deleteFriendRequest', data);
     }
-    
 
 }
 

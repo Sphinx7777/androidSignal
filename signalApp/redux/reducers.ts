@@ -6,7 +6,7 @@ export interface AppState {
     requestResult: any;
     form: any;
     message: any;
-    pagination: any;    
+    pagination: any;
     flagger: any;
     identity: any;
     ssrData: any;
@@ -53,6 +53,7 @@ function entities(state = initialEntities, action: any) {
         default:
         case IMethod.UPDATE:
             if (action.response && action.response.entities) {
+                // tslint:disable-next-line: no-shadowed-variable
                 const { response: { entities } } = action;
                 if (entities) {
                     Object.keys(entities).map((entityName) => {
@@ -76,6 +77,7 @@ const initialRequestResult = fromJS({
 
 function requestResult(state = initialRequestResult, action: any) {
     if ('glob' in action) {
+        // tslint:disable-next-line: no-shadowed-variable
         const { glob: { method, crud, entity } } = action;
         if (action.response && action.response.result) {
             const { response: { result } } = action;
@@ -139,7 +141,7 @@ const initialIdentity: StateIdentity = {
 function identity(state: StateIdentity = initialIdentity, action: any) {
     switch (action.type) {
     case GET_IDENTITY:
-            return { 
+            return {
                 user: action.identity.user,
                 roles: action.identity.roles,
                 rules: action.identity.rules,
@@ -147,7 +149,7 @@ function identity(state: StateIdentity = initialIdentity, action: any) {
             case SET_DEFAULT_IDENTITY:
             return { ...initialIdentity};
     }
-    return state;   
+    return state;
 }
 
 const appReducer = combineReducers({

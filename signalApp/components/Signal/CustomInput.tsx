@@ -91,7 +91,7 @@ const CustomInput = (props: ICustomInputProps) => {
                         <Text style={styles.text}>{currentElement?.get('name')}</Text>
                         <Text style={styles.text}>{currentElement?.get('phone')}</Text>
                         {currentElement?.get('dbType') === 'asana'
-                            ? <Image style={{ width: 25, height: 25, marginRight: 5 }} source={require('../../../../../assets/asana.png')} />
+                            ? <Image style={{ width: 25, height: 25, marginRight: 5 }} source={require('../../../assets/asana.png')} />
                             : <Text style={{...styles.text, color: '#de471d', fontWeight: '700', marginRight: 5}}>{currentElement?.get('dbType')}</Text>
                         }
                     </View>

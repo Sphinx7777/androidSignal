@@ -1,9 +1,9 @@
 
-import action from '../../src/decoradors/action';
+import action from '../decoradors/action';
 import Entity from './entity';
 import { take, put, call, cancelled } from 'redux-saga/effects';
-import { getIdentity, SEND_MESSAGE, toastMessage, resetMessage, sendMessage, logoutUserAction } from '../../src/redux/actions';
-import { HTTP_METHOD, ResCode, MessageType, TOAST_TIME, ENTITY } from '../../src/constants';
+import { getIdentity, SEND_MESSAGE, toastMessage, resetMessage, sendMessage, logoutUserAction } from '../redux/actions';
+import { HTTP_METHOD, ResCode, MessageType, TOAST_TIME, ENTITY } from '../constants';
 
 export interface ILoginData {
     userEmail: string,
@@ -73,7 +73,6 @@ class Identity extends Entity {
                 case ResCode.DEBUG:
                     switch (msgType) {
                         case MessageType.ERROR:
-                            // tslint:disable-next-line: no-console
                             console.error(text);
                             break;
                         default:
@@ -83,7 +82,9 @@ class Identity extends Entity {
                     break;
                 case ResCode.TOAST:
                     const response = yield put(toastMessage(text, msgType));
-                    response && setTimeout(() => Entity.store.dispatch(resetMessage()), TOAST_TIME);
+                    if (response) {
+                        setTimeout(() => Entity.store.dispatch(resetMessage()), TOAST_TIME);
+                    }
                     break;
                 default:
                     break;

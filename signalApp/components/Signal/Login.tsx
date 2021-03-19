@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'reac
 import { connect } from 'react-redux';
 import Identity from '../../models/identity';
 import saga from '../../decoradors/saga';
-import { MAIL_REGEX } from '../../../src/utils';
+import { MAIL_REGEX } from '../../utils';
 interface ICustomInputProps {
     loginUser?: (data: any) => void;
     logoutUser?: () => void;
@@ -86,7 +86,7 @@ class Login extends React.Component<ICustomInputProps, ICustomInputState> {
                 }
             })
         }
-    } 
+    }
 
     logOut = () => this.props.logoutUser()
     render() {

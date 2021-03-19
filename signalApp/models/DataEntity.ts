@@ -13,7 +13,7 @@ export type ISingleDataItem = EntityMap<{
     details: string;
     }>;
 
-    export interface IDataItem {
+export interface IDataItem {
     id: string;
     phone: string;
     email: string;

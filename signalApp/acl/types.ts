@@ -1,5 +1,4 @@
 
-
 export enum ROLE {
     GUEST = 'guest',
     LEAD = 'lead',
@@ -8,12 +7,9 @@ export enum ROLE {
 }
 
 export enum GRANT {
-    // for buisness logic
     READ = 'read',
     WRITE = 'write',
     EXECUTE = 'execute',
-
-    // for http requests
     GET = 'GET',
     POST = 'POST',
     PUT = 'PUT',

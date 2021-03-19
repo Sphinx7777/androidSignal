@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { ISingleDataItem } from '../../models/DataEntity';
 import { EntityList } from '../../models/entity';
 interface ICallMenuProps {
@@ -75,7 +75,7 @@ const CallMenu = (props: ICallMenuProps) => {
                         style={{ ...styles.button, marginBottom: 1, marginTop: 5, paddingVertical: 2 }}
                         onPress={handleNextPress}
                     >
-                        <Text style={styles.buttonText}>Next <Image style={{width: 20, height: 20}} source={require('../../../../../assets/phone-volume-solid.png')} /></Text>
+                        <Text style={styles.buttonText}>Next <Image style={{width: 20, height: 20}} source={require('../../../assets/phone-volume-solid.png')} /></Text>
                     </TouchableOpacity>
                 </View>
             </View>

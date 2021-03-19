@@ -3,13 +3,13 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
-import makeStore from './android/app/src/redux/store';
-import TestedOnly from './android/app/src/TestedOnly';
+import makeStore from './signalApp/redux/store';
+import TestedOnly from './signalApp/TestedOnly';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { StyleSheet } from 'react-native';
 import { PersistGate } from 'redux-persist/integration/react'
-import Signal from './android/app/src/components/Signal/index';
-import Login from './android/app/src/components/Signal/Login';
+import Signal from './signalApp/components/Signal/index';
+import Login from './signalApp/components/Signal/Login';
 
 const App = () => {
     const store = makeStore()

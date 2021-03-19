@@ -1,14 +1,14 @@
 import { camelizeKeys } from 'humps';
-import { IIdentity } from '../../src/acl/types';
+import { IIdentity } from '../acl/types';
 import { Store, AnyAction } from 'redux';
 import { fromJS, Map, List } from 'immutable';
 import fetch from 'cross-fetch';
 import { normalize, Schema, schema } from 'normalizr';
 import { select, put, call, fork } from 'redux-saga/effects';
 
-import { action , pageFetching, sendMessage, entityRequest, IMethod, MODEL_CLEAR, clearSSRData, IActionRequest, pageSetFilter } from '../../src/redux/actions';
-import { MessageType, HTTP_METHOD, IPagerParams, ResCode, IMessageBlock } from '../../src/constants';
-import { isEmpty } from '../../src/utils';
+import { action , pageFetching, sendMessage, entityRequest, IMethod, MODEL_CLEAR, clearSSRData, IActionRequest, pageSetFilter } from '../redux/actions';
+import { MessageType, HTTP_METHOD, IPagerParams, ResCode, IMessageBlock } from '../constants';
+import { isEmpty } from '../utils';
 
 const dataTest: any = [
     {
@@ -178,7 +178,7 @@ export default class Entity {
             params['body'] = JSON.stringify(data);
         } else {
             const opts = Object.entries(data).map(([key, val]) => key + '=' + val).join('&');
-            fullUrl += (opts.length > 0?'?' + opts:'');
+            fullUrl += (opts.length > 0 ? '?' + opts : '');
         }
 
         return fetch(fullUrl, params).then((response) => {
@@ -199,6 +199,7 @@ export default class Entity {
     public async fetch(uri: string, data?: any, method: HTTP_METHOD = HTTP_METHOD.POST) {
         const dispatch = Entity && Entity.store && Entity.store.dispatch;
 
+        // tslint:disable-next-line: no-shadowed-variable
         const action = this.getAction(CRUD.READ);
         dispatch(action.request(data));
 
@@ -206,6 +207,7 @@ export default class Entity {
         const token = identity && identity.user && identity.user.token;
         const query = await this.xFetch(uri, method, data, token);
         const success =  query.success;
+        // tslint:disable-next-line: no-object-literal-type-assertion
         let message = {} as IMessageBlock;
         if (query.response.message && !isEmpty(query.response.message)) {
             const msgType =  success ? MessageType.INFO : MessageType.ERROR;
@@ -231,9 +233,11 @@ export default class Entity {
     }
 
     protected * actionRequest(uri: string, crud: CRUD, method: HTTP_METHOD, data?: any) {
+        // tslint:disable-next-line: no-shadowed-variable
         const action = this.getAction(crud);
         yield put(action.request(data));
         let success = true;
+        // tslint:disable-next-line: no-object-literal-type-assertion
         let message = {} as IMessageBlock;
         let pager = null;
         const token = yield select((state: any) => state.identity && state.identity.user && state.identity.user.token || null);
@@ -249,6 +253,7 @@ export default class Entity {
         yield put(clearSSRData(this.entityName));
 
         // ignoring fetch request on the server (SSR mode)
+        // @ts-ignore
         const isServer = typeof window === 'undefined';
         if (!isServer) {
             const result = yield call(this.xFetch, uri, method, data, token);
@@ -268,7 +273,7 @@ export default class Entity {
         if (success && this.mSchema && query) {
             response = normalize(camelizeKeys(JSON.parse(JSON.stringify(dataTest))), this.mSchema);
             response['pager'] = pager ? pager : null;
-        } else if (query ) {
+        } else if (query) {
             response = query.data;
         }
         if (success) {
@@ -291,6 +296,7 @@ export default class Entity {
 
 
     private getAction(crud: any = null): IActionRequest {
+        // tslint:disable-next-line: no-shadowed-variable
         let action: IActionRequest = entityRequest(this)[CRUD.READ];
         switch (crud) {
         case CRUD.CREATE:
@@ -350,7 +356,7 @@ export default class Entity {
             }
             // set filter to paginator, in case fetch from getInitProps()
             const pFilter = params.filter ? params.filter : {};
-            const pSort = params.sort? params.sort : {};
+            const pSort = params.sort ? params.sort : {};
             yield put(pageSetFilter(pageName, pFilter, pSort));
 
             yield call(this.xRead, uri, {

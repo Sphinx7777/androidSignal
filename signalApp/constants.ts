@@ -174,10 +174,10 @@ export interface IUser {
 }
 
 export interface IFriends {
-    requests?: Array<string>;
-    approved?: Array<string>;
-    followings?: Array<string>;
-    subscribers?: Array<string>;
+    requests?: string[];
+    approved?: string[];
+    followings?: string[];
+    subscribers?: string[];
 }
 
 export enum Actions {View = 1, Edit = 2, Delete = 3, Request = 4, Add = 5 }

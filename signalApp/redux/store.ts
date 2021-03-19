@@ -2,7 +2,7 @@ import { all } from 'redux-saga/effects';
 import {createStore, applyMiddleware, compose, Store} from 'redux';
 import createSagaMiddleware, {Task} from 'redux-saga';
 import rootReducer from './reducers';
-import Entity from '../../src/models/entity';
+import Entity from '../models/entity';
 import { persistStore, persistReducer } from 'redux-persist'
 import AsyncStorage from '@react-native-community/async-storage';
 

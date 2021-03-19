@@ -1,4 +1,4 @@
-import Entity from '../../src/models/entity';
+import Entity from '../models/entity';
 import { take, fork } from 'redux-saga/effects';
 // @ts-ignore
 const saga = (entity: Entity = null, actions: string[] = []) => (constructor: Function = null) => {
@@ -23,6 +23,7 @@ const saga = (entity: Entity = null, actions: string[] = []) => (constructor: Fu
                             }
                         };
                         // set name to above function. use for debug goals
+                        // tslint:disable-next-line: function-constructor
                         func = (new Function(
                             'return function (call) { return function ' + entityName + '_' + actionName +
                             ' () { return call(this, arguments) }; };')())(Function.apply.bind(func));

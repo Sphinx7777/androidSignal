@@ -32,7 +32,7 @@ const App = () => {
   let [isStart, setIsStart] = useState(false);
   let [flatListItems, setFlatListItems] = useState([]);
   let [stateGranted, setStateGranted] = useState(null);
-
+  
   const requestPhoneStatePermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(

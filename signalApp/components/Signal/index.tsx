@@ -40,9 +40,9 @@ class Signal extends React.Component<ISignalProps> {
         })
     }
 
-    makeCall = async (number?: string) => {
+    makeCall = async (num?: string) => {
         const args = {
-            number,
+            number: num,
             prompt: false
         }
         return call(args)
@@ -120,7 +120,7 @@ class Signal extends React.Component<ISignalProps> {
         if (!dataItems || dataItems.size === 0) {
             return (<View style={styles.loadContainer}>
                 <Text style={{ ...styles.loadContainer, height: 100 }}>
-                    <ActivityIndicator size="large" color="green" />
+                    <ActivityIndicator size='large' color='green' />
                 </Text>
             </View>)
         }

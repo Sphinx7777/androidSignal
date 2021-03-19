@@ -1,6 +1,6 @@
 import { Action } from 'redux';
 import Entity, { CRUD } from '../models/entity';
-import { MessageType, IMessageBlock, ENTITY } from '../../src/constants';
+import { MessageType, IMessageBlock, ENTITY } from '../constants';
 
 export const SEND_MESSAGE       = 'SEND_MESSAGE';
 export const TOAST_MESSAGE      = 'TOAST_MESSAGE';
@@ -81,7 +81,7 @@ export const logoutUserAction = () => action(SET_DEFAULT_IDENTITY, {});
 export const clearIdentity = () => action(CLEAR_IDENTITY, {});
 
 export const pageClear = (pageName: string) => action(PAGE_CLEAR, { pageName });
-export const pageFetching = (pageName: string, page: number, isFetching: boolean, force = false) => 
+export const pageFetching = (pageName: string, page: number, isFetching: boolean, force = false) =>
     action(PAGE_FETCHING, { pageName, page, isFetching, force });
 export const pageSelectItem = (pageName: string, id: string) => action(PAGE_SELECT_ITEM, { pageName, id });
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, FlatList, TouchableOpacity, GestureResponderEvent, Image, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, GestureResponderEvent, Image, ActivityIndicator } from 'react-native';
 import { ISingleDataItem, IDataItem } from '../../models/DataEntity';
 import { EntityList } from '../../models/entity';
 interface IContactListProps {
@@ -50,7 +50,7 @@ const ContactList = (props: IContactListProps) => {
                     <Text style={styles.text}>{item?.name}</Text>
                     <Text style={styles.text}>{item?.phone}</Text>
                     {item?.dbType === 'asana'
-                        ? <Image style={{ width: 25, height: 25 }} source={require('../../../../../assets/asana.png')} />
+                        ? <Image style={{ width: 25, height: 25 }} source={require('../../../assets/asana.png')} />
                         : <Text style={{ ...styles.text, color: '#de471d', fontWeight: '700' }}>{item?.dbType}</Text>
                     }
                 </View>
@@ -68,7 +68,7 @@ const ContactList = (props: IContactListProps) => {
     if (!callData || callData.size === 0) {
         return (<View style={styles.loadContainer}>
             <Text style={{ ...styles.loadContainer, height: 100 }}>
-                <ActivityIndicator size="large" color="green" />
+                <ActivityIndicator size='large' color='green' />
             </Text>
         </View>)
     }
