@@ -1,260 +1,261 @@
 
 
-// How to Detect Call States in React Native App
-// https://aboutreact.com/detect-call-states/
+// // How to Detect Call States in React Native App
+// // https://aboutreact.com/detect-call-states/
 
-//Import React
-import React, {useState} from 'react';
+// //Import React
+// import React, {useState} from 'react';
 
-//Import required component
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Linking,
-  FlatList,
-  SafeAreaView,
-  Image, Button, PermissionsAndroid 
-} from 'react-native';
-
-
-//Import Call Detector
-import CallDetectorManager from 'react-native-call-detection';
+// //Import required component
+// import {
+//   StyleSheet,
+//   Text,
+//   View,
+//   TouchableOpacity,
+//   Linking,
+//   FlatList,
+//   SafeAreaView,
+//   Image, Button, PermissionsAndroid 
+// } from 'react-native';
 
 
-const App = () => {
+// //Import Call Detector
+// import CallDetectorManager from 'react-native-call-detection';
+
+
+// const App = () => {
  
-  //to keep callDetector reference
-  let callDetector = undefined;
+//   //to keep callDetector reference
+//   let callDetector = undefined;
 
-  let [callStates, setCallStates] = useState([]);
-  let [isStart, setIsStart] = useState(false);
-  let [flatListItems, setFlatListItems] = useState([]);
-  let [stateGranted, setStateGranted] = useState(null);
+//   let [callStates, setCallStates] = useState([]);
+//   let [isStart, setIsStart] = useState(false);
+//   let [flatListItems, setFlatListItems] = useState([]);
+//   let [stateGranted, setStateGranted] = useState(null);
   
-  const requestPhoneStatePermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE,
-        {
-          title: "Cool READ_PHONE_STATE Permission",
-          message:
-            "Listener needs access to your READ_PHONE_STATE",
-          buttonNeutral: "Ask Me Later",
-          buttonNegative: "Cancel",
-          buttonPositive: "OK"
-        }
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        setStateGranted(PermissionsAndroid.RESULTS.GRANTED)
-        console.log("You can use the READ_PHONE_STATE");
-      } else {
-        console.log("READ_PHONE_STATE permission denied");
-      }
-    } catch (err) {
-      console.warn(err);
-    }
-  };
+//   const requestPhoneStatePermission = async () => {
+//     try {
+//       const granted = await PermissionsAndroid.request(
+//         PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE,
+//         {
+//           title: "Cool READ_PHONE_STATE Permission",
+//           message:
+//             "Listener needs access to your READ_PHONE_STATE",
+//           buttonNeutral: "Ask Me Later",
+//           buttonNegative: "Cancel",
+//           buttonPositive: "OK"
+//         }
+//       );
+//       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+//         setStateGranted(PermissionsAndroid.RESULTS.GRANTED)
+//         console.log("You can use the READ_PHONE_STATE");
+//       } else {
+//         console.log("READ_PHONE_STATE permission denied");
+//       }
+//     } catch (err) {
+//       console.warn(err);
+//     }
+//   };
 
 
 
-  const callFriendTapped = () => {
+//   const callFriendTapped = () => {
     
-    Linking.openURL('tel:5555555555').catch((err) => {
-      console.log(err);
-    });
-  };
+//     Linking.openURL('tel:5555555555').catch((err) => {
+//       console.log(err);
+//     });
+//   };
 
-  const startStopListener = async () => {
-    if (isStart) {
-      console.log('Stop');
-      callDetector && callDetector.dispose();
-    } else {
-      console.log('Start', 'stateGranted===', stateGranted);
-      callDetector = new CallDetectorManager(
-        (event, number) => {
-          console.log('event -> ',
-            event + (number ? ' - ' + number : '')
-          );
-          var updatedCallStates = callStates;
-          updatedCallStates.push(
-            event + (number ? ' - ' + number : '')
-          );
-          setFlatListItems(updatedCallStates);
-          setCallStates(updatedCallStates);
+//   const startStopListener = async () => {
+//     if (isStart) {
+//       console.log('Stop');
+//       callDetector && callDetector.dispose();
+//     } else {
+//       console.log('Start', 'stateGranted===', stateGranted);
+//       callDetector = new CallDetectorManager(
+//         (event, number) => {
+//           console.log('event -> ',
+//             event + (number ? ' - ' + number : '')
+//           );
+//           var updatedCallStates = callStates;
+//           updatedCallStates.push(
+//             event + (number ? ' - ' + number : '')
+//           );
+//           setFlatListItems(updatedCallStates);
+//           setCallStates(updatedCallStates);
 
-          // For iOS event will be either "Connected",
-          // "Disconnected","Dialing" and "Incoming"
+//           // For iOS event will be either "Connected",
+//           // "Disconnected","Dialing" and "Incoming"
 
-          // For Android event will be either "Offhook",
-          // "Disconnected", "Incoming" or "Missed"
-          // phoneNumber should store caller/called number
+//           // For Android event will be either "Offhook",
+//           // "Disconnected", "Incoming" or "Missed"
+//           // phoneNumber should store caller/called number
 
-          if (event === 'Disconnected') {
-            console.log('Disconnected');
-            // Do something call got disconnected
-          } else if (event === 'Connected') {
-            console.log('Connected');
-            // Do something call got connected
-            // This clause will only be executed for iOS
-          } else if (event === 'Incoming') {
-            console.log('Incoming');
-            // Do something call got incoming
-          } else if (event === 'Dialing') {
-            console.log('Dialing');
-            // Do something call got dialing
-            // This clause will only be executed for iOS
-          } else if (event === 'Offhook') {
-            console.log('Offhook');
-            //Device call state: Off-hook.
-            // At least one call exists that is dialing,
-            // active, or on hold,
-            // and no calls are ringing or waiting.
-            // This clause will only be executed for Android
-          } else if (event === 'Missed') {
-            console.log('Missed');
-            // Do something call got missed
-            // This clause will only be executed for Android
-          }
-        },
-        true, // To detect incoming calls [ANDROID]
-        () => {
-          // If your permission got denied [ANDROID]
-          // Only if you want to read incoming number
-          // Default: console.error
-          console.log('Permission Denied by User');
-        }, 
-        {
-          title: 'Phone State Permission',
-          message:
-            'This app needs access to your phone state in order to react and/or to adapt to incoming calls.',
-        },
-      );
-    }
-    setIsStart(!isStart);
-  };
+//           if (event === 'Disconnected') {
+//             console.log('Disconnected');
+//             // Do something call got disconnected
+//           } else if (event === 'Connected') {
+//             console.log('Connected');
+//             // Do something call got connected
+//             // This clause will only be executed for iOS
+//           } else if (event === 'Incoming') {
+//             console.log('Incoming');
+//             // Do something call got incoming
+//           } else if (event === 'Dialing') {
+//             console.log('Dialing');
+//             // Do something call got dialing
+//             // This clause will only be executed for iOS
+//           } else if (event === 'Offhook') {
+//             console.log('Offhook');
+//             //Device call state: Off-hook.
+//             // At least one call exists that is dialing,
+//             // active, or on hold,
+//             // and no calls are ringing or waiting.
+//             // This clause will only be executed for Android
+//           } else if (event === 'Missed') {
+//             console.log('Missed');
+//             // Do something call got missed
+//             // This clause will only be executed for Android
+//           }
+//         },
+//         true, // To detect incoming calls [ANDROID]
+//         () => {
+//           // If your permission got denied [ANDROID]
+//           // Only if you want to read incoming number
+//           // Default: console.error
+//           console.log('Permission Denied by User');
+//         }, 
+//         {
+//           title: 'Phone State Permission',
+//           message:
+//             'This app needs access to your phone state in order to react and/or to adapt to incoming calls.',
+//         },
+//       );
+//     }
+//     setIsStart(!isStart);
+//   };
 
-  const listSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 0.5,
-          width: '100%',
-          backgroundColor: '#ebebeb'
-        }} />
-    );
-  };
-console.log('flatListItems', flatListItems, 'callStates', callStates)
-  return (
-    <SafeAreaView style={{flex: 1, paddingTop: 30}}>
-       <View style={styles.container}>
-    <Text style={styles.item}>Try permissions</Text>
-    <Button title="request permissions" onPress={requestPhoneStatePermission} />
-  </View>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTextLarge}>
-            Example to detect call states
-          </Text>
-          <Text style={styles.headerText}>
-            www.aboutreact.com
-          </Text>
-        </View>
-        <FlatList
-          style={{flex: 1}}
-          data={flatListItems}
-          ItemSeparatorComponent={listSeparator}
-          renderItem={({item}) => (
-            <View style={{flex: 1}}>
-              <Text style={styles.callLogs}>
-                {JSON.stringify(item)}
-              </Text>
-            </View>
-          )}
-          keyExtractor={(item, index) => index.toString()}
-        />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={startStopListener}>
-          <Text style={styles.buttonText}>
-            {isStart ? 'Stop Listner' : 'Start Listener'}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={callFriendTapped}
-          style={styles.fabStyle}>
-          <Image
-            source={{
-              uri:
-                'https://raw.githubusercontent.com/AboutReact/sampleresource/master/input_phone.png',
-            }}
-            style={styles.fabImageStyle}
-          />
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
-};
+//   const listSeparator = () => {
+//     return (
+//       <View
+//         style={{
+//           height: 0.5,
+//           width: '100%',
+//           backgroundColor: '#ebebeb'
+//         }} />
+//     );
+//   };
+// console.log('flatListItems', flatListItems, 'callStates', callStates)
+//   return (
+//     <SafeAreaView style={{flex: 1, paddingTop: 30}}>
+//        <View style={styles.container}>
+//     <Text style={styles.item}>Try permissions</Text>
+//     <Button title="request permissions" onPress={requestPhoneStatePermission} />
+//   </View>
+//       <View style={styles.container}>
+//         <View style={styles.header}>
+//           <Text style={styles.headerTextLarge}>
+//             Example to detect call states
+//           </Text>
+//           <Text style={styles.headerText}>
+//             www.aboutreact.com
+//           </Text>
+//         </View>
+//         <FlatList
+//           style={{flex: 1}}
+//           data={flatListItems}
+//           ItemSeparatorComponent={listSeparator}
+//           renderItem={({item}) => (
+//             <View style={{flex: 1}}>
+//               <Text style={styles.callLogs}>
+//                 {JSON.stringify(item)}
+//               </Text>
+//             </View>
+//           )}
+//           keyExtractor={(item, index) => index.toString()}
+//         />
+//         <TouchableOpacity
+//           style={styles.button}
+//           onPress={startStopListener}>
+//           <Text style={styles.buttonText}>
+//             {isStart ? 'Stop Listner' : 'Start Listener'}
+//           </Text>
+//         </TouchableOpacity>
+//         <TouchableOpacity
+//           activeOpacity={0.7}
+//           onPress={callFriendTapped}
+//           style={styles.fabStyle}>
+//           <Image
+//             source={{
+//               uri:
+//                 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/input_phone.png',
+//             }}
+//             style={styles.fabImageStyle}
+//           />
+//         </TouchableOpacity>
+//       </View>
+//     </SafeAreaView>
+//   );
+// };
 
-export default App;
+// export default App;
+export default {};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5FCFF',
-  },
-  header: {
-    backgroundColor: '#ff8c21',
-    padding: 10,
-  },
-  headerTextLarge: {
-    textAlign: 'center',
-    fontSize: 20,
-    color: 'white',
-  },
-  headerText: {
-    marginTop: 5,
-    textAlign: 'center',
-    fontSize: 18,
-    color: 'white',
-  },
-  button: {
-    alignItems: 'center',
-    backgroundColor: '#ff8c21',
-    padding: 10,
-    justifyContent: 'center',
-    height: 60,
-    width: '100%',
-  },
-  buttonText: {
-    textAlign: 'center',
-    fontSize: 18,
-    color: 'white',
-  },
-  callLogs: {
-    padding: 16,
-    fontSize: 16,
-    color: '#333333',
-  },
-  fabStyle: {
-    position: 'absolute',
-    width: 60,
-    height: 60,
-    borderRadius: 60 / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    right: 30,
-    bottom: 30,
-    backgroundColor: 'yellow',
-  },
-  fabImageStyle: {
-    resizeMode: 'contain',
-    width: 20,
-    height: 20,
-  },
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#F5FCFF',
+//   },
+//   header: {
+//     backgroundColor: '#ff8c21',
+//     padding: 10,
+//   },
+//   headerTextLarge: {
+//     textAlign: 'center',
+//     fontSize: 20,
+//     color: 'white',
+//   },
+//   headerText: {
+//     marginTop: 5,
+//     textAlign: 'center',
+//     fontSize: 18,
+//     color: 'white',
+//   },
+//   button: {
+//     alignItems: 'center',
+//     backgroundColor: '#ff8c21',
+//     padding: 10,
+//     justifyContent: 'center',
+//     height: 60,
+//     width: '100%',
+//   },
+//   buttonText: {
+//     textAlign: 'center',
+//     fontSize: 18,
+//     color: 'white',
+//   },
+//   callLogs: {
+//     padding: 16,
+//     fontSize: 16,
+//     color: '#333333',
+//   },
+//   fabStyle: {
+//     position: 'absolute',
+//     width: 60,
+//     height: 60,
+//     borderRadius: 60 / 2,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     right: 30,
+//     bottom: 30,
+//     backgroundColor: 'yellow',
+//   },
+//   fabImageStyle: {
+//     resizeMode: 'contain',
+//     width: 20,
+//     height: 20,
+//   },
+// });
 
 
 
@@ -426,234 +427,234 @@ const styles = StyleSheet.create({
 // import call from 'react-native-phone-call'
 
 // class TestedOnly extends React.Component {
-    //componentWillMount() {
-    // Telephony.addEventListener(Telephony.LISTEN_CALL_STATE | Telephony.LISTEN_DATA_ACTIVITY,
-    //     (event: any) => {
-    //         if (event.type === 'LISTEN_CALL_STATE') {
-    //             console.log(event.data)
-    //         } else {
-    //             console.log(event.data)
-    //         }
-    //     })
+//componentWillMount() {
+// Telephony.addEventListener(Telephony.LISTEN_CALL_STATE | Telephony.LISTEN_DATA_ACTIVITY,
+//     (event: any) => {
+//         if (event.type === 'LISTEN_CALL_STATE') {
+//             console.log(event.data)
+//         } else {
+//             console.log(event.data)
+//         }
+//     })
 
-    // Telephony.isNetworkRoaming((roaming: any) => {
-    //     if (roaming) {
-    //         // ...
-    //     }
-    // })
+// Telephony.isNetworkRoaming((roaming: any) => {
+//     if (roaming) {
+//         // ...
+//     }
+// })
 
-    // Telephony.getNetworkClass((network: any) => {
-    //     switch (network) {
-    //         case "2G":
-    //             // ...
-    //             break;
-    //         case "3G":
-    //             // ...
-    //             break;
-    //         case "4G":
-    //             // ...
-    //             break;
-    //         default:
-    //             // ...
-    //             break;
-    //     }
-    // })
-
-
-    // const requestCameraPermission = async () => {
-    //     try {
-    //         const granted = await PermissionsAndroid.request(
-    //             PermissionsAndroid.PERMISSIONS.CAMERA,
-    //             {
-    //                 title: "Cool Photo App Camera Permission",
-    //                 message:
-    //                     "Cool Photo App needs access to your camera " +
-    //                     "so you can take awesome pictures.",
-    //                 buttonNeutral: "Ask Me Later",
-    //                 buttonNegative: "Cancel",
-    //                 buttonPositive: "OK"
-    //             }
-    //         );
-    //         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-    //             console.log("You can use the camera");
-    //         } else {
-    //             console.log("Camera permission denied");
-    //         }
-    //     } catch (err) {
-    //         console.warn(err);
-    //     }
-    // };
-
-    // const sendSms = async () => {
-    //     return SendSMS.send({
-    //         body: 'The default body of the SMS!',
-    //         recipients: ['0663952488', '0668848072'],
-    //         // @ts-ignore
-    //         successTypes: ['sent', 'queued'],
-    //         allowAndroidSendWithoutReadPermission: true
-    //     }, (completed, cancelled, error) => console.log('SMS Callback: completed: ' + completed + ' cancelled: ' + cancelled + 'error: ' + error));
-    // }
+// Telephony.getNetworkClass((network: any) => {
+//     switch (network) {
+//         case "2G":
+//             // ...
+//             break;
+//         case "3G":
+//             // ...
+//             break;
+//         case "4G":
+//             // ...
+//             break;
+//         default:
+//             // ...
+//             break;
+//     }
+// })
 
 
-    // const log = async () => {
+// const requestCameraPermission = async () => {
+//     try {
+//         const granted = await PermissionsAndroid.request(
+//             PermissionsAndroid.PERMISSIONS.CAMERA,
+//             {
+//                 title: "Cool Photo App Camera Permission",
+//                 message:
+//                     "Cool Photo App needs access to your camera " +
+//                     "so you can take awesome pictures.",
+//                 buttonNeutral: "Ask Me Later",
+//                 buttonNegative: "Cancel",
+//                 buttonPositive: "OK"
+//             }
+//         );
+//         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+//             console.log("You can use the camera");
+//         } else {
+//             console.log("Camera permission denied");
+//         }
+//     } catch (err) {
+//         console.warn(err);
+//     }
+// };
 
-    //     try {
-    //         const granted = await PermissionsAndroid.request(
-    //             PermissionsAndroid.PERMISSIONS.CALL_PHONE,
-    //             {
-    //                 title: 'Call Log Example',
-    //                 message: 'Access your call logs',
-    //                 buttonNeutral: 'Ask Me Later',
-    //                 buttonNegative: 'Cancel',
-    //                 buttonPositive: 'OK',
-    //             }
-    //         )
-    //         const check = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.CALL_PHONE)
-    //         console.log('check===', check, 'granted===', granted)
-    //         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+// const sendSms = async () => {
+//     return SendSMS.send({
+//         body: 'The default body of the SMS!',
+//         recipients: ['0663952488', '0668848072'],
+//         // @ts-ignore
+//         successTypes: ['sent', 'queued'],
+//         allowAndroidSendWithoutReadPermission: true
+//     }, (completed, cancelled, error) => console.log('SMS Callback: completed: ' + completed + ' cancelled: ' + cancelled + 'error: ' + error));
+// }
 
-    //             // const log = CallLogs.load().then((c: any) => c);
-    //             // const json  = await log.json()
-    //             console.log('json')
-    //         } else {
-    //             console.log('Call Log permission denied');
-    //         }
 
-    //     }
-    //     catch (e) {
-    //         console.log(e);
-    //     }
-    // }
+// const log = async () => {
 
-    // const handlePress = async () => {
-    //     const rrr = await sendSms();
-    //     await makeCall('0663952488')
-    //     log()
-    //     sendSms()
-    //     console.log('handlePress', rrr)
-    //     requestCameraPermission()
-    // }
+//     try {
+//         const granted = await PermissionsAndroid.request(
+//             PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+//             {
+//                 title: 'Call Log Example',
+//                 message: 'Access your call logs',
+//                 buttonNeutral: 'Ask Me Later',
+//                 buttonNegative: 'Cancel',
+//                 buttonPositive: 'OK',
+//             }
+//         )
+//         const check = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.CALL_PHONE)
+//         console.log('check===', check, 'granted===', granted)
+//         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
 
-    // const log = async () => {
+//             // const log = CallLogs.load().then((c: any) => c);
+//             // const json  = await log.json()
+//             console.log('json')
+//         } else {
+//             console.log('Call Log permission denied');
+//         }
 
-    //     try {
-    //         const granted = await PermissionsAndroid.request(
-    //             PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
-    //             {
-    //                 title: 'Call Log Example',
-    //                 message: 'Access your call logs',
-    //                 buttonNeutral: 'Ask Me Later',
-    //                 buttonNegative: 'Cancel',
-    //                 buttonPositive: 'OK',
-    //             }
-    //         )
-    //         console.log('granted', granted)
-    //         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+//     }
+//     catch (e) {
+//         console.log(e);
+//     }
+// }
 
-    //             const log = CallLogs.load().then((c: any) => c);
-    //             const json  = await log.json()
-    //             console.log('json', json)
-    //         } else {
-    //             console.log('Call Log permission denied');
-    //         }
+// const handlePress = async () => {
+//     const rrr = await sendSms();
+//     await makeCall('0663952488')
+//     log()
+//     sendSms()
+//     console.log('handlePress', rrr)
+//     requestCameraPermission()
+// }
 
-    //     }
-    //     catch (e) {
-    //         console.log(e);
-    //     }
-    // }
-    // useEffect(() => {
-    //     log()
+// const log = async () => {
 
-    // }, [])
+//     try {
+//         const granted = await PermissionsAndroid.request(
+//             PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
+//             {
+//                 title: 'Call Log Example',
+//                 message: 'Access your call logs',
+//                 buttonNeutral: 'Ask Me Later',
+//                 buttonNegative: 'Cancel',
+//                 buttonPositive: 'OK',
+//             }
+//         )
+//         console.log('granted', granted)
+//         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
 
-    // Telephony.getCellInfo((cellInfos: any) => {
-    //     cellInfos.map((info: any) => {
-    //         switch (info.connectionType) {
-    //             case "CDMA":
-    //                 console.log(info.cellIdentity)
-    //                 console.log(info.cellSignalStrength)
-    //                 break;
-    //             case "WCDMA":
-    //                 console.log(info.cellIdentity)
-    //                 console.log(info.cellSignalStrength)
-    //                 break;
-    //             case "GSM":
-    //                 console.log(info.cellIdentity)
-    //                 console.log(info.cellSignalStrength)
-    //                 break;
-    //             case "LTE":
-    //                 console.log(info.cellIdentity)
-    //                 console.log(info.cellSignalStrength)
-    //                 break;
-    //             default:
-    //                 // ...
-    //                 break;
-    //         }
-    //     })
-    // })
-    //}
+//             const log = CallLogs.load().then((c: any) => c);
+//             const json  = await log.json()
+//             console.log('json', json)
+//         } else {
+//             console.log('Call Log permission denied');
+//         }
 
-    // componentWillUnmount() {
-    //     Telephony.removeEventListener()
-    // }
+//     }
+//     catch (e) {
+//         console.log(e);
+//     }
+// }
+// useEffect(() => {
+//     log()
 
-    // startListenerTapped() {
-    //     this.callDetector = new CallDetectorManager((event, phoneNumber)=> {
-    //     // For iOS event will be either "Connected",
-    //     // "Disconnected","Dialing" and "Incoming"
+// }, [])
+
+// Telephony.getCellInfo((cellInfos: any) => {
+//     cellInfos.map((info: any) => {
+//         switch (info.connectionType) {
+//             case "CDMA":
+//                 console.log(info.cellIdentity)
+//                 console.log(info.cellSignalStrength)
+//                 break;
+//             case "WCDMA":
+//                 console.log(info.cellIdentity)
+//                 console.log(info.cellSignalStrength)
+//                 break;
+//             case "GSM":
+//                 console.log(info.cellIdentity)
+//                 console.log(info.cellSignalStrength)
+//                 break;
+//             case "LTE":
+//                 console.log(info.cellIdentity)
+//                 console.log(info.cellSignalStrength)
+//                 break;
+//             default:
+//                 // ...
+//                 break;
+//         }
+//     })
+// })
+//}
+
+// componentWillUnmount() {
+//     Telephony.removeEventListener()
+// }
+
+// startListenerTapped() {
+//     this.callDetector = new CallDetectorManager((event, phoneNumber)=> {
+//     // For iOS event will be either "Connected",
+//     // "Disconnected","Dialing" and "Incoming"
      
-    //     // For Android event will be either "Offhook",
-    //     // "Disconnected", "Incoming" or "Missed"
-    //     // phoneNumber should store caller/called number
+//     // For Android event will be either "Offhook",
+//     // "Disconnected", "Incoming" or "Missed"
+//     // phoneNumber should store caller/called number
      
      
-    //     if (event === 'Disconnected') {
-    //     // Do something call got disconnected
-    //     }
-    //     else if (event === 'Connected') {
-    //     // Do something call got connected
-    //     // This clause will only be executed for iOS
-    //     }
-    //     else if (event === 'Incoming') {
-    //     // Do something call got incoming
-    //     }
-    //     else if (event === 'Dialing') {
-    //     // Do something call got dialing
-    //     // This clause will only be executed for iOS
-    //     }
-    //     else if (event === 'Offhook') {
-    //     //Device call state: Off-hook.
-    //     // At least one call exists that is dialing,
-    //     // active, or on hold,
-    //     // and no calls are ringing or waiting.
-    //     // This clause will only be executed for Android
-    //     }
-    //     else if (event === 'Missed') {
-    //         // Do something call got missed
-    //         // This clause will only be executed for Android
-    //   }
-    // },
-    // false, // if you want to read the phone number of the incoming call [ANDROID], otherwise false
-    // ()=>{}, // callback if your permission got denied [ANDROID] [only if you want to read incoming number] default: console.error
-    // {
-    // title: 'Phone State Permission',
-    // message: 'This app needs access to your phone state in order to react and/or to adapt to incoming calls.'
-    // } // a custom permission request message to explain to your user, why you need the permission [recommended] - this is the default one
-    // )
-    // }
+//     if (event === 'Disconnected') {
+//     // Do something call got disconnected
+//     }
+//     else if (event === 'Connected') {
+//     // Do something call got connected
+//     // This clause will only be executed for iOS
+//     }
+//     else if (event === 'Incoming') {
+//     // Do something call got incoming
+//     }
+//     else if (event === 'Dialing') {
+//     // Do something call got dialing
+//     // This clause will only be executed for iOS
+//     }
+//     else if (event === 'Offhook') {
+//     //Device call state: Off-hook.
+//     // At least one call exists that is dialing,
+//     // active, or on hold,
+//     // and no calls are ringing or waiting.
+//     // This clause will only be executed for Android
+//     }
+//     else if (event === 'Missed') {
+//         // Do something call got missed
+//         // This clause will only be executed for Android
+//   }
+// },
+// false, // if you want to read the phone number of the incoming call [ANDROID], otherwise false
+// ()=>{}, // callback if your permission got denied [ANDROID] [only if you want to read incoming number] default: console.error
+// {
+// title: 'Phone State Permission',
+// message: 'This app needs access to your phone state in order to react and/or to adapt to incoming calls.'
+// } // a custom permission request message to explain to your user, why you need the permission [recommended] - this is the default one
+// )
+// }
      
-    // stopListenerTapped() {
-    //     this.callDetector && this.callDetector.dispose();
-    // }
+// stopListenerTapped() {
+//     this.callDetector && this.callDetector.dispose();
+// }
 
-    // callFriendTapped() {
-    //     // Add the telephone num to call
-    //       Linking.openURL('tel:5555555555')
-    //         .catch(err => {
-    //           console.log(err)
-    //         });
-    //     }
+// callFriendTapped() {
+//     // Add the telephone num to call
+//       Linking.openURL('tel:5555555555')
+//         .catch(err => {
+//           console.log(err)
+//         });
+//     }
 
 
 //     makeCall = async () => {

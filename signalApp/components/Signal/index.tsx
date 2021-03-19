@@ -10,6 +10,7 @@ import DataEntity, { ISingleDataItem } from '../../models/DataEntity';
 import saga from '../../decoradors/saga';
 import { EntityList } from '../../models/entity';
 import ContactList from './ContactList';
+import CallDetectorManager from 'react-native-call-detection';
 
 interface ISignalProps {
     dataItems?: EntityList<ISingleDataItem>;
@@ -23,7 +24,11 @@ class Signal extends React.Component<ISignalProps> {
     state = {
         response: null,
         currentItemIndex: 0,
-        currentElement: this.props.dataItems && this.props.dataItems?.valueSeq()?.get(0)
+        currentElement: this.props.dataItems && this.props.dataItems?.valueSeq()?.get(0),
+        callDetector: undefined,
+        callStates: [],
+        isStart: false,
+        flatListItems: []
     }
 
     getSignalData = async () => {
@@ -39,6 +44,99 @@ class Signal extends React.Component<ISignalProps> {
             }
         })
     }
+    setCallStates = (callStates: any[]) => {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                callStates
+            }
+        })
+    }
+    setIsStart = (isStart: boolean) => {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                isStart
+            }
+        })
+    }
+
+    setFlatListItems = (flatListItems: any[]) => {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                flatListItems
+            }
+        })
+    }
+
+    startStopListener = async () => {
+        if (this.state.isStart) {
+            if (this.state.callDetector) {
+                console.log('Phone_State_listener_Stop');
+                this.state.callDetector.dispose();
+            }
+        } else {
+            console.log('Phone_State_listener_Start');
+            this.state.callDetector = new CallDetectorManager(
+                (event: string, num: string) => {
+                    console.log('event -> ',
+                        event + (num ? ' - ' + num : '')
+                    );
+                    const updatedCallStates = this.state.callStates;
+                    updatedCallStates.push(
+                        event + (num ? ' - ' + num : '')
+                    );
+                    this.setFlatListItems(updatedCallStates);
+                    this.setCallStates(updatedCallStates);
+                    // For iOS event will be either "Connected",
+                    // "Disconnected","Dialing" and "Incoming"
+                    // For Android event will be either "Offhook",
+                    // "Disconnected", "Incoming" or "Missed"
+                    // phoneNumber should store caller/called number
+                    if (event === 'Disconnected') {
+                        console.log('Disconnected');
+                        // Do something call got disconnected
+                    } else if (event === 'Connected') {
+                        console.log('Connected');
+                        // Do something call got connected
+                        // This clause will only be executed for iOS
+                    } else if (event === 'Incoming') {
+                        console.log('Incoming');
+                        // Do something call got incoming
+                    } else if (event === 'Dialing') {
+                        console.log('Dialing');
+                        // Do something call got dialing
+                        // This clause will only be executed for iOS
+                    } else if (event === 'Offhook') {
+                        console.log('Offhook');
+                        // Device call state: Off-hook.
+                        // At least one call exists that is dialing,
+                        // active, or on hold,
+                        // and no calls are ringing or waiting.
+                        // This clause will only be executed for Android
+                    } else if (event === 'Missed') {
+                        console.log('Missed');
+                        // Do something call got missed
+                        // This clause will only be executed for Android
+                    }
+                },
+                true, // To detect incoming calls [ANDROID]
+                () => {
+                    // If your permission got denied [ANDROID]
+                    // Only if you want to read incoming number
+                    // Default: console.error
+                    console.log('Permission Denied by User');
+                },
+                {
+                    title: 'Phone State Permission',
+                    message:
+                        'This app needs access to your phone state in order to react and/or to adapt to incoming calls.',
+                },
+            );
+        }
+        this.setIsStart(!this.state.isStart);
+    };
 
     makeCall = async (num?: string) => {
         const args = {
@@ -74,10 +172,15 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     componentDidMount() {
+        this.startStopListener()
         const validUser = this.props.user && this.props.user?.token && this.props.user?.token?.length > 0
         if (validUser) {
             this.getSignalData();
         }
+    }
+
+    componentWillUnmount() {
+        this.startStopListener()
     }
 
     componentDidUpdate(prevProps: any) {
@@ -106,7 +209,7 @@ class Signal extends React.Component<ISignalProps> {
         const onLoginPress = () => {
             if (navigation) {
                 navigation.navigate('Login')
-            } else{
+            } else {
                 console.log('onLoginPress_error')
             }
         }
