@@ -103,6 +103,13 @@ class Signal extends React.Component<ISignalProps> {
         if (!validUser && navigation) {
             navigation.navigate('Login')
         }
+        const onLoginPress = () => {
+            if (navigation) {
+                navigation.navigate('Login')
+            } else{
+                console.log('onLoginPress_error')
+            }
+        }
         if (!validUser) {
             return (
                 <View style={styles.loadContainer}>
@@ -111,7 +118,7 @@ class Signal extends React.Component<ISignalProps> {
                         <TouchableOpacity
                             activeOpacity={0.5}
                             style={{}}
-                            onPress={() => console.log('Login')}>
+                            onPress={onLoginPress}>
                             <Text style={{ color: '#62aee5', fontSize: 20, marginTop: 30 }}>Go to login</Text>
                         </TouchableOpacity>
                     </View>
