@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { StyleSheet, View, ScrollView, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, ScrollView, Text, TouchableOpacity, ActivityIndicator, PermissionsAndroid, Platform } from 'react-native';
 import { connect } from 'react-redux';
 import CallMenu from './CallMenu';
 import CustomInput from './CustomInput';
@@ -11,7 +11,17 @@ import saga from '../../decoradors/saga';
 import { EntityList } from '../../models/entity';
 import ContactList from './ContactList';
 import CallDetectorManager from 'react-native-call-detection';
+import CallLogs from 'react-native-call-log';
 
+interface ICallLog {
+    dateTime: string;
+    duration: number;
+    name: any;
+    phoneNumber: string;
+    rawType: number;
+    timestamp: string;
+    type: string;
+}
 interface ISignalProps {
     dataItems?: EntityList<ISingleDataItem>;
     user?: any;
@@ -28,7 +38,8 @@ class Signal extends React.Component<ISignalProps> {
         callDetector: undefined,
         callStates: [],
         isStart: false,
-        flatListItems: []
+        flatListItems: [],
+        listData: []
     }
 
     getSignalData = async () => {
@@ -71,6 +82,15 @@ class Signal extends React.Component<ISignalProps> {
         })
     }
 
+    setFlatListCallData = (listData: any[]) => {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                listData
+            }
+        })
+    }
+
     setNextElement = () => {
         const { dataItems } = this.props;
         const { currentItemIndex } = this.state;
@@ -83,9 +103,40 @@ class Signal extends React.Component<ISignalProps> {
         }
     }
 
+    fetchData = async () => {
+        // const { listData } = this.state;
+        if (Platform.OS !== 'ios') {
+            try {
+                // Ask for runtime permission
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
+                    {
+                        title: 'Call Log Example',
+                        message: 'Access your call logs',
+                        buttonNeutral: 'Ask Me Later',
+                        buttonNegative: 'Cancel',
+                        buttonPositive: 'OK',
+                    },
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    // CallLogs.loadAll().then(c => this.setFlatListCallData(listData.concat(c)));
+                    CallLogs.load(1).then(lastCallArr => this.setFlatListCallData(lastCallArr));
+                } else {
+                    console.log('Call Log permission denied');
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        } else {
+            console.log(
+                'Sorry! You can’t get call logs in iOS devices because of the security concern',
+            );
+        }
+    };
+
     startStopListener = async () => {
         const { callStates, isStart, currentItemIndex } = this.state;
-        const { dataItems} = this.props;
+        const { dataItems } = this.props;
         const currentPhone = dataItems?.valueSeq()?.getIn([currentItemIndex, 'phone'])
         let { callDetector } = this.state;
         if (isStart) {
@@ -113,7 +164,11 @@ class Signal extends React.Component<ISignalProps> {
                     // phoneNumber should store caller/called number
                     if (event === 'Disconnected') {
                         console.log('Disconnected');
-                        this.setNextElement()
+
+                        this.fetchData();
+
+                        // this.setNextElement()
+
                         // Do something call got disconnected
                     } else if (event === 'Connected') {
                         console.log('Connected');
@@ -135,6 +190,9 @@ class Signal extends React.Component<ISignalProps> {
                         // This clause will only be executed for Android
                     } else if (event === 'Missed') {
                         console.log('Missed');
+
+                        this.fetchData()
+
                         // Do something call got missed
                         // This clause will only be executed for Android
                     }
@@ -144,7 +202,7 @@ class Signal extends React.Component<ISignalProps> {
                     // If your permission got denied [ANDROID]
                     // Only if you want to read incoming number
                     // Default: console.error
-                    console.log('Permission Denied by User');
+                    console.log('Permission');
                 },
                 {
                     title: 'Phone State Permission',
@@ -220,7 +278,13 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     render() {
-        const { currentItemIndex, currentElement } = this.state
+        const { currentItemIndex, currentElement, listData } = this.state
+        // const sortedData = listData.sort((a, b) => Number(b.timestamp) - Number(a.timestamp))
+        let lastCallData = null as ICallLog | null;
+        if (listData.length > 0) {
+            lastCallData = listData[0];
+        }
+        console.log('lastCallData===', lastCallData)
         const { dataItems, user, navigation } = this.props
         const validUser = user && user?.token && user?.token?.length > 0
         if (!validUser && navigation) {

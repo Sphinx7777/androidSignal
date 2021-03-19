@@ -2,173 +2,140 @@
 // https://aboutreact.com/access-call-logs-of-android-devices/
 
 // import React in our code
-import React, {useState, useEffect} from 'react';
+// import React, {useState, useEffect} from 'react';
 
-// import all the components we are going to use
-import {
-    SafeAreaView,
-    Platform,
-    StyleSheet,
-    Text,
-    View,
-    PermissionsAndroid,
-    FlatList,
-	Button
-} from 'react-native';
+// // import all the components we are going to use
+// import {
+//     SafeAreaView,
+//     Platform,
+//     StyleSheet,
+//     Text,
+//     View,
+//     PermissionsAndroid,
+//     FlatList,
+// 	Button
+// } from 'react-native';
 
-// import CallLogs API
-import CallLogs from 'react-native-call-log';
+// // import CallLogs API
+// import CallLogs from 'react-native-call-log';
 
-const App = () => {
-    const [listData, setListDate] = useState([]);
+// const App = () => {
+//     const [listData, setListDate] = useState([]);
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         if (Platform.OS != 'ios') {
-    //             try {
-    //                 //Ask for runtime permission
-    //                 const granted = await PermissionsAndroid.request(
-    //                     PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
-    //                     {
-    //                         title: 'Call Log Example',
-    //                         message: 'Access your call logs',
-    //                         buttonNeutral: 'Ask Me Later',
-    //                         buttonNegative: 'Cancel',
-    //                         buttonPositive: 'OK',
-    //                     },
-    //                 );
-    //                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-    //                     CallLogs.loadAll().then(c => setListDate(c));
-    //                     CallLogs.load(3).then(c => console.log(c));
-    //                 } else {
-    //                     alert('Call Log permission denied');
-    //                 }
-    //             } catch (e) {
-    //                 alert(e);
-    //             }
-    //         } else {
-    //             alert(
-    //                 'Sorry! You can’t get call logs in iOS devices because of the security concern',
-    //             );
-    //         }
-    //     };
-    //     fetchData();
-    // }, []);
+// 	const fetchData = async () => {
+// 		if (Platform.OS != 'ios') {
+// 			try {
+// 				//Ask for runtime permission
+// 				const granted = await PermissionsAndroid.request(
+// 					PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
+// 					{
+// 						title: 'Call Log Example',
+// 						message: 'Access your call logs',
+// 						buttonNeutral: 'Ask Me Later',
+// 						buttonNegative: 'Cancel',
+// 						buttonPositive: 'OK',
+// 					},
+// 				);
+// 				if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+// 					CallLogs.loadAll().then(c => setListDate(listData.concat(c)));
+// 					CallLogs.load(3).then(c => console.log(c));
+// 				} else {
+// 					alert('Call Log permission denied');
+// 				}
+// 			} catch (e) {
+// 				alert(e);
+// 			}
+// 		} else {
+// 			alert(
+// 				'Sorry! You can’t get call logs in iOS devices because of the security concern',
+// 			);
+// 		}
+// 	};
 
-	const fetchData = async () => {
-		if (Platform.OS != 'ios') {
-			try {
-				//Ask for runtime permission
-				const granted = await PermissionsAndroid.request(
-					PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
-					{
-						title: 'Call Log Example',
-						message: 'Access your call logs',
-						buttonNeutral: 'Ask Me Later',
-						buttonNegative: 'Cancel',
-						buttonPositive: 'OK',
-					},
-				);
-				if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-					CallLogs.loadAll().then(c => setListDate(listData.concat(c)));
-					CallLogs.load(3).then(c => console.log(c));
-				} else {
-					alert('Call Log permission denied');
-				}
-			} catch (e) {
-				alert(e);
-			}
-		} else {
-			alert(
-				'Sorry! You can’t get call logs in iOS devices because of the security concern',
-			);
-		}
-	};
+// 	const sortedData = listData.sort((a, b) => Number(b.timestamp) - Number(a.timestamp))
+// 	console.log('sortedData', sortedData)
 
-	const sortedData = listData.sort((a, b) => Number(b.timestamp) - Number(a.timestamp))
-	console.log('sortedData', sortedData)
+//     const ItemView = ({item}) => {
+//         return (
+//             // FlatList Item
+//             <View>
+//                 <Text style={styles.textStyle}>
+//                     Name : {item.name ? item.name : 'NA'}
+//                     {'\n'}
+//                     DateTime : {item.dateTime}
+//                     {'\n'}
+//                     Duration : {item.duration}
+//                     {'\n'}
+//                     PhoneNumber : {item.phoneNumber}
+//                     {'\n'}
+//                     RawType : {item.rawType}
+//                     {'\n'}
+//                     Timestamp : {item.timestamp}
+//                     {'\n'}
+//                     Type : {item.type}
+//                 </Text>
+//             </View>
+//         );
+//     };
 
-    const ItemView = ({item}) => {
-        return (
-            // FlatList Item
-            <View>
-                <Text style={styles.textStyle}>
-                    Name : {item.name ? item.name : 'NA'}
-                    {'\n'}
-                    DateTime : {item.dateTime}
-                    {'\n'}
-                    Duration : {item.duration}
-                    {'\n'}
-                    PhoneNumber : {item.phoneNumber}
-                    {'\n'}
-                    RawType : {item.rawType}
-                    {'\n'}
-                    Timestamp : {item.timestamp}
-                    {'\n'}
-                    Type : {item.type}
-                </Text>
-            </View>
-        );
-    };
+//     const ItemSeparatorView = () => {
+//         return (
+//             // FlatList Item Separator
+//             <View
+//                 style={{
+//                     height: 0.5,
+//                     width: '100%',
+//                     backgroundColor: '#C8C8C8',
+//                 }}
+//             />
+//         );
+//     };
 
-    const ItemSeparatorView = () => {
-        return (
-            // FlatList Item Separator
-            <View
-                style={{
-                    height: 0.5,
-                    width: '100%',
-                    backgroundColor: '#C8C8C8',
-                }}
-            />
-        );
-    };
+//     return (
+//         <SafeAreaView style={styles.container}>
+//             <View >
+//                 <Text>Try call log</Text>
+//                 <Button
+//                     title="request call log"
+//                     onPress={fetchData}
+//                 />
+//             </View>
+//             <View>
+//                 <Text style={styles.titleText}>
+//                     How to Access Call Logs of Android Devices from React Native
+//                     App
+//                 </Text>
+//                 <FlatList
+//                     data={sortedData}
+//                     //data defined in constructor
+//                     ItemSeparatorComponent={ItemSeparatorView}
+//                     //Item Separator View
+//                     renderItem={ItemView}
+//                     keyExtractor={(item, index) => index.toString()}
+//                 />
+//             </View>
+//         </SafeAreaView>
+//     );
+// };
 
-    return (
-        <SafeAreaView style={styles.container}>
-            <View >
-                <Text>Try call log</Text>
-                <Button
-                    title="request call log"
-                    onPress={fetchData}
-                />
-            </View>
-            <View>
-                <Text style={styles.titleText}>
-                    How to Access Call Logs of Android Devices from React Native
-                    App
-                </Text>
-                <FlatList
-                    data={sortedData}
-                    //data defined in constructor
-                    ItemSeparatorComponent={ItemSeparatorView}
-                    //Item Separator View
-                    renderItem={ItemView}
-                    keyExtractor={(item, index) => index.toString()}
-                />
-            </View>
-        </SafeAreaView>
-    );
-};
+// export default App;
 
-export default App;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: 'white',
-        padding: 10,
-    },
-    titleText: {
-        fontSize: 22,
-        textAlign: 'center',
-        fontWeight: 'bold',
-    },
-    textStyle: {
-        fontSize: 16,
-        marginVertical: 10,
-    },
-});
+// const styles = StyleSheet.create({
+//     container: {
+//         flex: 1,
+//         backgroundColor: 'white',
+//         padding: 10,
+//     },
+//     titleText: {
+//         fontSize: 22,
+//         textAlign: 'center',
+//         fontWeight: 'bold',
+//     },
+//     textStyle: {
+//         fontSize: 16,
+//         marginVertical: 10,
+//     },
+// });
 
 // // How to Detect Call States in React Native App
 // // https://aboutreact.com/detect-call-states/
