@@ -32,10 +32,11 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     getSignalData = async () => {
+        const { getData } = this.props;
         const res = await fetch(`http://neologic.golden-team.org/api/page/url/process`)
         const response: any = await res.json()
         if (response) {
-            this.props.getData()
+            getData()
         }
         this.setState((prevState) => {
             return {
@@ -70,20 +71,34 @@ class Signal extends React.Component<ISignalProps> {
         })
     }
 
+    setNextElement = () => {
+        const { dataItems } = this.props;
+        const { currentItemIndex } = this.state;
+        if (dataItems) {
+            const arrLength = dataItems.size;
+            const nextIndex = currentItemIndex < arrLength - 1 ? currentItemIndex + 1 : 0;
+            const nextElement = dataItems?.valueSeq()?.get(nextIndex);
+            this.setCurrentElement(nextElement);
+            this.setCurrentItemIndex(nextIndex);
+        }
+    }
+
     startStopListener = async () => {
-        if (this.state.isStart) {
-            if (this.state.callDetector) {
+        const { callStates, isStart } = this.state;
+        let { callDetector } = this.state;
+        if (isStart) {
+            if (callDetector) {
                 console.log('Phone_State_listener_Stop');
-                this.state.callDetector.dispose();
+                callDetector.dispose();
             }
         } else {
             console.log('Phone_State_listener_Start');
-            this.state.callDetector = new CallDetectorManager(
+            callDetector = new CallDetectorManager(
                 (event: string, num: string) => {
                     console.log('event -> ',
                         event + (num ? ' - ' + num : '')
                     );
-                    const updatedCallStates = this.state.callStates;
+                    const updatedCallStates = callStates;
                     updatedCallStates.push(
                         event + (num ? ' - ' + num : '')
                     );
@@ -96,6 +111,7 @@ class Signal extends React.Component<ISignalProps> {
                     // phoneNumber should store caller/called number
                     if (event === 'Disconnected') {
                         console.log('Disconnected');
+                        this.setNextElement()
                         // Do something call got disconnected
                     } else if (event === 'Connected') {
                         console.log('Connected');
@@ -135,7 +151,7 @@ class Signal extends React.Component<ISignalProps> {
                 },
             );
         }
-        this.setIsStart(!this.state.isStart);
+        this.setIsStart(!isStart);
     };
 
     makeCall = async (num?: string) => {
@@ -172,8 +188,9 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     componentDidMount() {
+        const { user } = this.props
         this.startStopListener()
-        const validUser = this.props.user && this.props.user?.token && this.props.user?.token?.length > 0
+        const validUser = user && user?.token && user?.token?.length > 0
         if (validUser) {
             this.getSignalData();
         }
@@ -184,12 +201,13 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     componentDidUpdate(prevProps: any) {
-        const validUser = this.props.user && prevProps.user !== this.props.user && this.props.user?.token && this.props.user?.token?.length > 0 && !this.props.dataItems
+        const { user, dataItems } = this.props
+        const validUser = user && prevProps.user !== user && user?.token && user?.token?.length > 0 && !dataItems
         if (validUser) {
             this.getSignalData();
         }
-        if (prevProps.dataItems !== this.props.dataItems) {
-            const currentElement = this.props.dataItems && this.props.dataItems?.valueSeq()?.get(0)
+        if (prevProps.dataItems !== dataItems) {
+            const currentElement = dataItems && dataItems?.valueSeq()?.get(0)
             this.setState((prevState) => {
                 return {
                     ...prevState,
