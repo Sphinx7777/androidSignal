@@ -303,16 +303,16 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     componentDidMount() {
-        const { user } = this.props
-        this.startStopListener()
-        const validUser = user && user?.token && user?.token?.length > 0
+        const { user } = this.props;
+        this.startStopListener();
+        const validUser = user && user?.token && user?.token?.length > 0;
         if (validUser) {
             this.getSignalData();
         }
     }
 
     componentWillUnmount() {
-        this.startStopListener()
+        this.startStopListener();
     }
 
     componentDidUpdate(prevProps: any) {
@@ -322,32 +322,33 @@ class Signal extends React.Component<ISignalProps> {
             this.getSignalData();
         }
         if (prevProps.dataItems !== dataItems) {
-            const currentElement = dataItems && dataItems?.valueSeq()?.get(0)
+            const currentElement = dataItems && dataItems?.valueSeq()?.get(0);
             this.setState((prevState) => {
                 return {
                     ...prevState,
                     currentElement
                 }
-            })
+            });
         }
     }
 
     render() {
-        const { currentItemIndex, currentElement, listData } = this.state
-        const { dataItems, user, navigation } = this.props
+        const { currentItemIndex, currentElement, listData } = this.state;
+        const { dataItems, user, navigation } = this.props;
         // const sortedData = listData.sort((a, b) => Number(b.timestamp) - Number(a.timestamp))
         let lastCallData = null as ICallLog | null;
         if (listData.length > 0) {
             lastCallData = listData[0];
         }
-        const dataSms = currentElement.get('smsBody')
+        const dataSms = currentElement?.get('smsBody');
         // let dataSmsArray = null;
         // if (dataItems && dataItems.size > 0) {
         //     dataSmsArray = dataItems.filter(obj => obj.get('smsBody'))
         // }
-        const validUser = user && user?.token && user?.token?.length > 0
+        console.log('lastCallData===', lastCallData)
+        const validUser = user && user?.token && user?.token?.length > 0;
         if (!validUser && navigation) {
-            navigation.navigate('Login')
+            navigation.navigate('Login');
         }
         const onLoginPress = () => {
             if (navigation) {
