@@ -1,4 +1,5 @@
 import React from 'react';
+import * as RNLocalize from 'react-native-localize';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import { connect } from 'react-redux';
 import Identity from '../../models/identity';
@@ -74,7 +75,7 @@ class Login extends React.Component<ICustomInputProps, ICustomInputState> {
             })
         }
         if (emailValid && passValid) {
-            const data = {password: this.state.password, userEmail: this.state.userEmail, timezone: 'Europe/Kiev'}
+            const data = {password: this.state.password, userEmail: this.state.userEmail, timezone: RNLocalize.getTimeZone()}
             this.props.loginUser(data)
             this.setState((prevState) => {
                 return {
@@ -94,7 +95,6 @@ class Login extends React.Component<ICustomInputProps, ICustomInputState> {
         const emailDis = !userEmail || userEmail.search(MAIL_REGEX) < 0
         const passDis = !password || password.length < 8 || this.state.password.length > 50
         const isUser = this.props.user && this.props.user?.userId && this.props.user?.token?.length > 0
-
         return (
             <>
                 <View style={styles.container}>
