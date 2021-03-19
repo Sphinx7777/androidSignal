@@ -84,7 +84,9 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     startStopListener = async () => {
-        const { callStates, isStart } = this.state;
+        const { callStates, isStart, currentItemIndex } = this.state;
+        const { dataItems} = this.props;
+        const currentPhone = dataItems?.valueSeq()?.getIn([currentItemIndex, 'phone'])
         let { callDetector } = this.state;
         if (isStart) {
             if (callDetector) {
@@ -154,7 +156,7 @@ class Signal extends React.Component<ISignalProps> {
         this.setIsStart(!isStart);
     };
 
-    makeCall = async (num?: string) => {
+    makeCall = async (num: string) => {
         const args = {
             number: num,
             prompt: false
