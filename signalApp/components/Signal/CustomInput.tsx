@@ -154,7 +154,7 @@ const CustomInput = (props: ICustomInputProps) => {
                             : { ...styles.button, ...styles.sendButton, ...styles.disabled }}
                         disabled={dataSmsArray ? false : true}
                         onPress={sendAllSMS}>
-                        <Text style={styles.buttonText}>Sent sms</Text>
+                        <Text style={styles.buttonText}>Send sms</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={(!cancelDetailsDis || !cancelDateDis)

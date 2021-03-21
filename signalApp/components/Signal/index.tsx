@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { StyleSheet, View, ScrollView, Text, TouchableOpacity, ActivityIndicator, PermissionsAndroid, Platform } from 'react-native';
+import { StyleSheet, View, ScrollView, Text, TouchableOpacity, ActivityIndicator, PermissionsAndroid, Platform, NativeModules } from 'react-native';
 import { connect } from 'react-redux';
 import CallMenu from './CallMenu';
 import CustomInput from './CustomInput';
@@ -13,6 +13,7 @@ import ContactList from './ContactList';
 import CallDetectorManager from 'react-native-call-detection';
 import CallLogs from 'react-native-call-log';
 import SendSMS from 'react-native-sms';
+const DirectSms = NativeModules.DirectSms;
 
 interface ICallLog {
     dateTime: string;
@@ -164,30 +165,57 @@ class Signal extends React.Component<ISignalProps> {
     // }
     // };
 
-    sendSMS = () => {
+    // sendSMS = () => {
+    //     const { currentElement } = this.state;
+    //     const body = currentElement?.get('smsBody')?.toString();
+    //     const recipient = currentElement?.get('phone')?.toString();
+    //     if (body && recipient) {
+    //         SendSMS.send(
+    //             {
+    //             body,
+    //             recipients: [recipient],
+    //             // @ts-ignore
+    //             successTypes: ['sent', 'queued']
+    //             },
+    //             (completed, cancelled, error) => {
+    //                 if (completed) {
+    //                 console.log('SMS Sent Completed');
+    //                 } else if (cancelled) {
+    //                     console.log('SMS Sent Cancelled');
+    //                 } else if (error) {
+    //                     console.log('Some error occured');
+    //                 }
+    //             },
+    //         );
+    //     }
+    // };
+
+    sendDirectSms = async  () => {
         const { currentElement } = this.state;
         const body = currentElement?.get('smsBody')?.toString();
         const recipient = currentElement?.get('phone')?.toString();
-        if (body && recipient) {
-            SendSMS.send(
+        try {
+            const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.SEND_SMS,
                 {
-                body,
-                recipients: [recipient],
-                // @ts-ignore
-                successTypes: ['sent', 'queued']
-                },
-                (completed, cancelled, error) => {
-                    if (completed) {
-                    console.log('SMS Sent Completed');
-                    } else if (cancelled) {
-                        console.log('SMS Sent Cancelled');
-                    } else if (error) {
-                        console.log('Some error occured');
-                    }
+                    title: 'YourProject App Sms Permission',
+                    message:
+                    'YourProject App needs access to your inbox ' +
+                    'so you can send messages in background.',
+                    buttonNeutral: 'Ask Me Later',
+                    buttonNegative: 'Cancel',
+                    buttonPositive: 'OK',
                 },
             );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                DirectSms.sendDirectSms(recipient, body);
+            } else {
+                console.log('SMS permission denied');
+            }
+        } catch (err) {
+            console.warn('SMS permission_ERROR', err);
         }
-    };
+    }
 
     startStopListener = async () => {
         const { callStates, isStart, currentItemIndex } = this.state;
@@ -390,7 +418,7 @@ class Signal extends React.Component<ISignalProps> {
                         setCurrentElement={this.setCurrentElement}
                     />
                     <ScrollView style={styles.container}>
-                        <CustomInput currentElement={currentElement} makeCall={this.makeCall} sendAllSMS={this.sendSMS} dataSmsArray={dataSms}/>
+                        <CustomInput currentElement={currentElement} makeCall={this.makeCall} sendAllSMS={this.sendDirectSms} dataSmsArray={dataSms}/>
                         <CallMenu
                             setCurrentItemIndex={this.setCurrentItemIndex}
                             currentItemIndex={currentItemIndex}
@@ -408,9 +436,9 @@ class Signal extends React.Component<ISignalProps> {
 const styles = StyleSheet.create({
     viewContainer: {
         flex: 1,
-        backgroundColor: '#d7dbd7',
+        backgroundColor: '#47f56a',
         paddingHorizontal: 5,
-        paddingTop: 30
+        paddingTop: 5
     },
     container: {
         flex: 2
