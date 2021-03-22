@@ -122,7 +122,10 @@ class Signal extends React.Component<ISignalProps> {
                 );
                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                     // CallLogs.loadAll().then(c => this.setFlatListCallData(listData.concat(c)));
-                    CallLogs.load(1).then(lastCallArr => this.setFlatListCallData(lastCallArr));
+                    return CallLogs.load(1).then(lastCallArr => {
+                        this.setFlatListCallData(lastCallArr);
+                        return lastCallArr
+                    });
                 } else {
                     console.log('Call Log permission denied');
                 }
@@ -246,7 +249,7 @@ class Signal extends React.Component<ISignalProps> {
         } else {
             console.log('Phone_State_listener_Start');
             callDetector = new CallDetectorManager(
-                (event: string, num: string) => {
+                async (event: string, num: string) => {
                     console.log('event -> ',
                         event + (num ? ' - ' + num : '')
                     );
@@ -264,7 +267,8 @@ class Signal extends React.Component<ISignalProps> {
                     if (event === 'Disconnected') {
                         console.log('Disconnected');
 
-                        this.fetchData();
+                        const response = await this.fetchData();
+                        console.log('response', response)
 
                         // this.setNextElement()
 
@@ -375,6 +379,11 @@ class Signal extends React.Component<ISignalProps> {
         }
     }
 
+    testDial = async () => {
+        // const res = await DirectSms.createDial('7777777777')
+        console.log('testDial')
+    }
+
     render() {
         const { currentItemIndex, currentElement, listData } = this.state;
         const { dataItems, user, navigation } = this.props;
@@ -434,6 +443,7 @@ class Signal extends React.Component<ISignalProps> {
                     <ScrollView style={styles.container}>
                         <CustomInput currentElement={currentElement} makeCall={this.makeCall}/>
                         <CallMenu
+                            testDial={this.testDial}
                             sendAllSMS={this.sendDirectSms}
                             dataSmsArray={dataSmsArray}
                             setCurrentItemIndex={this.setCurrentItemIndex}

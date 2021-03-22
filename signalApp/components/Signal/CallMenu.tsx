@@ -10,12 +10,13 @@ interface ICallMenuProps {
     setCurrentElement: (currentElement: ISingleDataItem) => void;
     sendAllSMS: () => void;
     dataSmsArray: any;
+    testDial: any;
 }
 interface ICallMenuState {
     callStart: boolean;
 }
 const CallMenu = (props: ICallMenuProps) => {
-    const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS } = props;
+    const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, testDial } = props;
 
     const [state, setState] = useState<ICallMenuState>({
         callStart: false
@@ -55,7 +56,7 @@ const CallMenu = (props: ICallMenuProps) => {
         }
     }
 
-    const handlePausePress = () => console.log('handlePausePress')
+    const handlePausePress = () => testDial()
 
     return (
         <>
