@@ -226,6 +226,8 @@ class Signal extends React.Component<ISignalProps> {
                 );
             if (grantedSendSms === PermissionsAndroid.RESULTS.GRANTED && grantedReadSms === PermissionsAndroid.RESULTS.GRANTED) {
                 for await (const one of dataSmsArray) {
+                    console.log('send_sms_to', one.phone, one.smsBody)
+                    console.log('--------------------------------------')
                     await DirectSms.sendDirectSms(one.phone, one.smsBody);
                 }
             } else {
