@@ -191,11 +191,13 @@ class Signal extends React.Component<ISignalProps> {
     // };
 
     sendDirectSms = async  () => {
-        const { currentElement } = this.state;
-        const body = currentElement?.get('smsBody')?.toString();
-        const recipient = currentElement?.get('phone')?.toString();
+        const { dataItems } = this.props;
+        let dataSmsArray = [];
+        if (dataItems && dataItems.size > 0) {
+        dataSmsArray = dataItems.valueSeq().filter(obj => obj.get('smsBody'))?.toJS() || []
+        }
         try {
-            const granted = await PermissionsAndroid.request(
+            const grantedSendSms = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.SEND_SMS,
                 {
                     title: 'YourProject App Sms Permission',
@@ -207,8 +209,22 @@ class Signal extends React.Component<ISignalProps> {
                     buttonPositive: 'OK',
                 },
             );
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                DirectSms.sendDirectSms(recipient, body);
+            const grantedReadSms = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.READ_SMS,
+                    {
+                        title: 'YourProject App Sms Permission',
+                        message:
+                        'YourProject App needs access to your inbox ' +
+                        'so you can send messages in background.',
+                        buttonNeutral: 'Ask Me Later',
+                        buttonNegative: 'Cancel',
+                        buttonPositive: 'OK',
+                    },
+                );
+            if (grantedSendSms === PermissionsAndroid.RESULTS.GRANTED && grantedReadSms === PermissionsAndroid.RESULTS.GRANTED) {
+                for await (const one of dataSmsArray) {
+                    await DirectSms.sendDirectSms(one.phone, one.smsBody);
+                }
             } else {
                 console.log('SMS permission denied');
             }
@@ -284,8 +300,7 @@ class Signal extends React.Component<ISignalProps> {
                 () => {
                     // If your permission got denied [ANDROID]
                     // Only if you want to read incoming number
-                    // Default: console.error
-                    console.log('Permission');
+                    // Default: console.error'
                 },
                 {
                     title: 'Phone State Permission',
@@ -369,11 +384,10 @@ class Signal extends React.Component<ISignalProps> {
             lastCallData = listData[0];
         }
         const dataSms = currentElement?.get('smsBody');
-        // let dataSmsArray = null;
-        // if (dataItems && dataItems.size > 0) {
-        //     dataSmsArray = dataItems.filter(obj => obj.get('smsBody'))
-        // }
-        console.log('lastCallData===', lastCallData)
+        let dataSmsArray = null;
+        if (dataItems && dataItems.size > 0) {
+            dataSmsArray = dataItems.filter(obj => obj.get('smsBody'))
+        }
         const validUser = user && user?.token && user?.token?.length > 0;
         if (!validUser && navigation) {
             navigation.navigate('Login');
@@ -418,8 +432,10 @@ class Signal extends React.Component<ISignalProps> {
                         setCurrentElement={this.setCurrentElement}
                     />
                     <ScrollView style={styles.container}>
-                        <CustomInput currentElement={currentElement} makeCall={this.makeCall} sendAllSMS={this.sendDirectSms} dataSmsArray={dataSms}/>
+                        <CustomInput currentElement={currentElement} makeCall={this.makeCall}/>
                         <CallMenu
+                            sendAllSMS={this.sendDirectSms}
+                            dataSmsArray={dataSmsArray}
                             setCurrentItemIndex={this.setCurrentItemIndex}
                             currentItemIndex={currentItemIndex}
                             callData={dataItems}

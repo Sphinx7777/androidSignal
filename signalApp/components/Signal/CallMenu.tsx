@@ -8,12 +8,14 @@ interface ICallMenuProps {
     callData: EntityList<ISingleDataItem> | undefined;
     makeCall: (phone: string) => Promise<any>;
     setCurrentElement: (currentElement: ISingleDataItem) => void;
+    sendAllSMS: () => void;
+    dataSmsArray: any;
 }
 interface ICallMenuState {
     callStart: boolean;
 }
 const CallMenu = (props: ICallMenuProps) => {
-    const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement } = props;
+    const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS } = props;
 
     const [state, setState] = useState<ICallMenuState>({
         callStart: false
@@ -76,6 +78,15 @@ const CallMenu = (props: ICallMenuProps) => {
                         onPress={handleNextPress}
                     >
                         <Text style={styles.buttonText}>Next <Image style={{width: 20, height: 20}} source={require('../../../assets/phone-volume-solid.png')} /></Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={{ ...styles.button, marginBottom: 1, marginTop: 10, paddingVertical: 2 }}
+                        // style={(dataSmsArray)
+                        //     ? { ...styles.button, ...styles.sendButton }
+                        //     : { ...styles.button, ...styles.sendButton, ...styles.disabled }}
+                        disabled={dataSmsArray ? false : true}
+                        onPress={sendAllSMS}>
+                        <Text style={styles.buttonText}>Send all sms</Text>
                     </TouchableOpacity>
                 </View>
             </View>
