@@ -14,6 +14,7 @@ import CallDetectorManager from 'react-native-call-detection';
 import CallLogs from 'react-native-call-log';
 import SendSMS from 'react-native-sms';
 const DirectSms = NativeModules.DirectSms;
+const DirectDial = NativeModules.DirectDial;
 
 interface ICallLog {
     dateTime: string;
@@ -226,7 +227,7 @@ class Signal extends React.Component<ISignalProps> {
                 );
             if (grantedSendSms === PermissionsAndroid.RESULTS.GRANTED && grantedReadSms === PermissionsAndroid.RESULTS.GRANTED) {
                 for await (const one of dataSmsArray) {
-                    console.log('send_sms_to', one.phone, one.smsBody)
+                    console.log('send_sms_to ', one.phone, one.smsBody)
                     console.log('--------------------------------------')
                     await DirectSms.sendDirectSms(one.phone, one.smsBody);
                 }
@@ -270,7 +271,7 @@ class Signal extends React.Component<ISignalProps> {
                         console.log('Disconnected');
 
                         const response = await this.fetchData();
-                        console.log('response', response)
+                        console.log('Disconnected_response', response)
 
                         // this.setNextElement()
 
@@ -296,7 +297,8 @@ class Signal extends React.Component<ISignalProps> {
                     } else if (event === 'Missed') {
                         console.log('Missed');
 
-                        this.fetchData()
+                        const response = await this.fetchData();
+                        console.log('Missed_response', response)
 
                         // Do something call got missed
                         // This clause will only be executed for Android
@@ -382,8 +384,24 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     testDial = async () => {
-        // const res = await DirectSms.createDial('7777777777')
-        console.log('testDial')
+        const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+                {
+                    title: 'YourProject App Sms Permission',
+                    message:
+                    'YourProject App needs access to call your phone ' +
+                    'so you can call in background.',
+                    buttonNeutral: 'Ask Me Later',
+                    buttonNegative: 'Cancel',
+                    buttonPositive: 'OK',
+                },
+            );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            const res = await DirectDial.createDial('7777777777')
+            console.log('testDial', res)
+        } else {
+            console.log('SMS permission denied');
+        }
     }
 
     render() {
