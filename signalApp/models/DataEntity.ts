@@ -3,7 +3,7 @@ import Entity, { EntityMap } from './entity';
 import { call, put } from 'redux-saga/effects';
 import { ENTITY } from '../constants';
 import { setSubmitData, defaultSubmitData } from '../redux/actions';
-import { showToastWithGravityAndOffset } from 'signalApp/utils';
+import { showToastWithGravityAndOffset, NetworkUtils } from 'signalApp/utils';
 
 export type ISingleDataItem = EntityMap<{
     id: string;
@@ -40,6 +40,7 @@ class DataEntity extends Entity {
 
     @action()
     public * setSubmitData(submitData: any) {
+        // const isConnected = yield NetworkUtils.isNetworkAvailable()
         console.log('setSubmitData', submitData)
         showToastWithGravityAndOffset('Successfully submit !');
         // yield put(setSubmitData({ submitData }));

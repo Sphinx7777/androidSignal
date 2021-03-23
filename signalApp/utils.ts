@@ -1,4 +1,12 @@
 import { ToastAndroid } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
+
+export class NetworkUtils {
+    static async isNetworkAvailable() {
+    const response = await NetInfo.fetch();
+    return Promise.resolve(response);
+}}
+
 export const getStringDate: (date: Date) => string = (date: Date) => {
     const m = date.getMonth() + 1;
     const d = date.getDate()
