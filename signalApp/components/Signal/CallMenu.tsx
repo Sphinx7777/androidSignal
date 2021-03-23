@@ -10,13 +10,14 @@ interface ICallMenuProps {
     setCurrentElement: (currentElement: ISingleDataItem) => void;
     sendAllSMS: () => void;
     dataSmsArray: any;
-    testDial: any;
+    pausePress: (pause?: boolean) => void;
+    pause: boolean;
 }
 interface ICallMenuState {
     callStart: boolean;
 }
 const CallMenu = (props: ICallMenuProps) => {
-    const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, testDial } = props;
+    const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, pausePress, pause } = props;
 
     const [state, setState] = useState<ICallMenuState>({
         callStart: false
@@ -56,7 +57,14 @@ const CallMenu = (props: ICallMenuProps) => {
         }
     }
 
-    const handlePausePress = () => testDial()
+    const handlePausePress = () => pausePress()
+    const handleContinuePress = () => {
+        if (callData) {
+            const phone = callData?.valueSeq()?.getIn([currentItemIndex, 'phone'])
+            pausePress(false)
+            makeCall(phone)
+        }
+    }
 
     return (
         <>
@@ -70,9 +78,9 @@ const CallMenu = (props: ICallMenuProps) => {
                 <View style={styles.buttonsBlock}>
                     <TouchableOpacity
                         style={{ ...styles.button, marginTop: 1, marginBottom: 5 }}
-                        onPress={handlePausePress}
+                        onPress={!pause ? handlePausePress : handleContinuePress}
                     >
-                        <Text style={styles.buttonText}>Pause</Text>
+                        <Text style={{...styles.buttonText, marginTop: 5}}>{!pause ? 'Pause' : 'Continue'}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={{ ...styles.button, marginBottom: 1, marginTop: 5, paddingVertical: 2 }}
@@ -110,7 +118,8 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontSize: 18,
-        paddingBottom: 8
+        paddingBottom: 8,
+        paddingTop: 3
     },
     container: {
         display: 'flex',
@@ -119,7 +128,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '100%',
         marginTop: 5,
-        height: 150,
         borderColor: '#a5a8a5',
         backgroundColor: '#f7faf7',
         borderWidth: 2,

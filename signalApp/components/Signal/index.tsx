@@ -41,7 +41,8 @@ class Signal extends React.Component<ISignalProps> {
         callDetector: undefined,
         callStates: [],
         isStart: false,
-        listData: []
+        listData: [],
+        pause: false
     }
 
     getSignalData = async () => {
@@ -229,8 +230,28 @@ class Signal extends React.Component<ISignalProps> {
         }
     }
 
-    makeNextDialogLogic = (event: string, num: string, response: any[]) => {
-        console.log('event -> ', event, 'num -> ', num, 'response -> ', response);
+    makeNextDialogLogic = (event: string, num: string, res: any[]) => {
+        const { currentElement, currentItemIndex } = this.state;
+        const { dataItems } = this.props;
+        const response = res && res.length > 0 && res[0] || null;
+        let nextElement = null;
+        if (dataItems) {
+            const arrLength = dataItems.size;
+            const nextIndex = currentItemIndex < arrLength - 1 ? currentItemIndex + 1 : 0;
+            nextElement = dataItems?.valueSeq()?.get(nextIndex);
+        }
+        if (nextElement && response && response['phoneNumber'] === currentElement?.get('phone') && response['duration'] === 0) {
+            console.log('--------------------------------------------------------------------------------');
+            console.log('event -> ', event, 'num -> ', num, 'response -> ', response);
+            console.log('--------------------------------------------------------------------------------');
+            console.log('currentElement -> ', currentElement);
+            console.log('--------------------------------------------------------------------------------');
+            this.setNextElement()
+            setTimeout(() => this.makeCall(nextElement?.get('phone')), 6000)
+        }
+        // if (nextElement && response && response['phoneNumber'] === currentElement?.get('phone') && response['duration'] > 0) {
+        //     this.setDialogDate()
+        // }
     }
 
     startStopListener = async () => {
@@ -252,9 +273,9 @@ class Signal extends React.Component<ISignalProps> {
                     });
                     this.setCallStates(updatedCallStates);
                     if (event === 'Disconnected') {
-                        const response = await this.fetchData();
-                        if (response && response.length > 0 && response[0]['type'] === 'OUTGOING') {
-                            this.makeNextDialogLogic(event, num, response);
+                        const res = await this.fetchData();
+                        if (res && res.length > 0 && res[0]['type'] === 'OUTGOING') {
+                            this.makeNextDialogLogic(event, num, res);
                         }
                     } else if (event === 'Connected') {
                     console.log('event -> ',
@@ -312,8 +333,8 @@ class Signal extends React.Component<ISignalProps> {
                 buttonPositive: 'OK',
             },
         );
-        if (grantedCall === PermissionsAndroid.RESULTS.GRANTED && grantedLog === PermissionsAndroid.RESULTS.GRANTED) {
-            const response = await DirectDial.createDial(num)
+        if (grantedCall === PermissionsAndroid.RESULTS.GRANTED && grantedLog === PermissionsAndroid.RESULTS.GRANTED && !this.state.pause) {
+            await DirectDial.createDial(num)
         } else {
             console.log('SMS permission denied');
         }
@@ -379,29 +400,14 @@ class Signal extends React.Component<ISignalProps> {
         }
     }
 
-    testDial = async () => {
-        const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.CALL_PHONE,
-                {
-                    title: 'YourProject App Sms Permission',
-                    message:
-                    'YourProject App needs access to call your phone ' +
-                    'so you can call in background.',
-                    buttonNeutral: 'Ask Me Later',
-                    buttonNegative: 'Cancel',
-                    buttonPositive: 'OK',
-                },
-            );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            const res = await DirectDial.createDial('7777777777')
-            console.log('testDial', res)
-        } else {
-            console.log('SMS permission denied');
-        }
+    pausePress = (pause: boolean = !this.state.pause) => {
+        this.setState({
+            pause
+        })
     }
 
     render() {
-        const { currentItemIndex, currentElement, listData } = this.state;
+        const { currentItemIndex, currentElement, listData, pause } = this.state;
         const { dataItems, user, navigation } = this.props;
         // const sortedData = listData.sort((a, b) => Number(b.timestamp) - Number(a.timestamp))
         let lastCallData = null as ICallLog | null;
@@ -459,7 +465,8 @@ class Signal extends React.Component<ISignalProps> {
                     <ScrollView style={styles.container}>
                         <CustomInput currentElement={currentElement} makeCall={this.makeCall}/>
                         <CallMenu
-                            testDial={this.testDial}
+                            pause={pause}
+                            pausePress={this.pausePress}
                             sendAllSMS={this.sendDirectSms}
                             dataSmsArray={dataSmsArray}
                             setCurrentItemIndex={this.setCurrentItemIndex}
