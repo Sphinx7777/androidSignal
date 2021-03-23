@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 // import { useDispatch } from 'react-redux';
 import { ISingleDataItem } from '../../models/DataEntity';
-import { getStringDate, NetworkUtils } from '../../utils';
+import { getStringDate, isNetworkAvailable } from '../../utils';
 
 
 interface ICustomInputProps {
@@ -111,8 +111,8 @@ const CustomInput = (props: ICustomInputProps) => {
         sendSMS(sms)
     }
     const submit = async () => {
-        const isConnected = await NetworkUtils.isNetworkAvailable()
-        console.log('isConnected', isConnected)
+        const isConnected = await isNetworkAvailable()
+        console.log('submit_isConnected', isConnected)
         const data = { ...state, id: currentElement?.get('id') }
         if (state.smsBody.length === 0) {
             data.smsBody = null
