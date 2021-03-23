@@ -90,6 +90,16 @@ const dataTest: any = [
         date: '20-01-01',
         dbType: 'asana',
         details: 'details 88888888'
+    },
+    {
+        id: '9',
+        phone: '0964290414',
+        smsBody: 'Test sms Kostya',
+        email: 'kostya@gmail.com',
+        name: 'Kostya',
+        date: '20-01-01',
+        dbType: 'DBX',
+        details: 'details 9999999999'
     }
 ]
 

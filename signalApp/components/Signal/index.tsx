@@ -41,7 +41,6 @@ class Signal extends React.Component<ISignalProps> {
         callDetector: undefined,
         callStates: [],
         isStart: false,
-        flatListItems: [],
         listData: []
     }
 
@@ -72,15 +71,6 @@ class Signal extends React.Component<ISignalProps> {
             return {
                 ...prevState,
                 isStart
-            }
-        })
-    }
-
-    setFlatListItems = (flatListItems: any[]) => {
-        this.setState((prevState) => {
-            return {
-                ...prevState,
-                flatListItems
             }
         })
     }
@@ -239,10 +229,12 @@ class Signal extends React.Component<ISignalProps> {
         }
     }
 
+    makeNextDialogLogic = (event: string, num: string, response: any[]) => {
+        console.log('event -> ', event, 'num -> ', num, 'response -> ', response);
+    }
+
     startStopListener = async () => {
-        const { callStates, isStart, currentItemIndex } = this.state;
-        const { dataItems } = this.props;
-        const currentPhone = dataItems?.valueSeq()?.getIn([currentItemIndex, 'phone'])
+        const { callStates, isStart} = this.state;
         let { callDetector } = this.state;
         if (isStart) {
             if (callDetector) {
@@ -253,55 +245,32 @@ class Signal extends React.Component<ISignalProps> {
             console.log('Phone_State_listener_Start');
             callDetector = new CallDetectorManager(
                 async (event: string, num: string) => {
-                    console.log('event -> ',
-                        event + (num ? ' - ' + num : '')
-                    );
                     const updatedCallStates = callStates;
-                    updatedCallStates.push(
-                        event + (num ? ' - ' + num : '')
-                    );
-                    this.setFlatListItems(updatedCallStates);
+                    updatedCallStates.push({
+                        event,
+                        num
+                    });
                     this.setCallStates(updatedCallStates);
-                    // For iOS event will be either "Connected",
-                    // "Disconnected","Dialing" and "Incoming"
-                    // For Android event will be either "Offhook",
-                    // "Disconnected", "Incoming" or "Missed"
-                    // phoneNumber should store caller/called number
                     if (event === 'Disconnected') {
-                        console.log('Disconnected');
-
                         const response = await this.fetchData();
-                        console.log('Disconnected_response', response)
-
-                        // this.setNextElement()
-
-                        // Do something call got disconnected
+                        if (response && response.length > 0 && response[0]['type'] === 'OUTGOING') {
+                            this.makeNextDialogLogic(event, num, response);
+                        }
                     } else if (event === 'Connected') {
-                        console.log('Connected');
-                        // Do something call got connected
-                        // This clause will only be executed for iOS
+                    console.log('event -> ',
+                    event + (num ? ' - ' + num : ''));
                     } else if (event === 'Incoming') {
-                        console.log('Incoming');
-                        // Do something call got incoming
+                        console.log('event -> ',
+                        event + (num ? ' - ' + num : ''));
                     } else if (event === 'Dialing') {
-                        console.log('Dialing');
-                        // Do something call got dialing
-                        // This clause will only be executed for iOS
+                        console.log('event -> ',
+                        event + (num ? ' - ' + num : ''));
                     } else if (event === 'Offhook') {
-                        console.log('Offhook');
-                        // Device call state: Off-hook.
-                        // At least one call exists that is dialing,
-                        // active, or on hold,
-                        // and no calls are ringing or waiting.
-                        // This clause will only be executed for Android
+                        console.log('event -> ',
+                        event + (num ? ' - ' + num : ''));
                     } else if (event === 'Missed') {
-                        console.log('Missed');
-
-                        const response = await this.fetchData();
-                        console.log('Missed_response', response)
-
-                        // Do something call got missed
-                        // This clause will only be executed for Android
+                        console.log('event -> ',
+                        event + (num ? ' - ' + num : ''));
                     }
                 },
                 true, // To detect incoming calls [ANDROID]
@@ -321,18 +290,45 @@ class Signal extends React.Component<ISignalProps> {
     };
 
     makeCall = async (num: string) => {
-        const args = {
-            number: num,
-            prompt: false
+        const grantedCall = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+                {
+                    title: 'Your project app dialog permission',
+                    message:
+                    'YourProject App needs access to dialog your phone ' +
+                    'so you can dialog in background.',
+                    buttonNeutral: 'Ask Me Later',
+                    buttonNegative: 'Cancel',
+                    buttonPositive: 'OK',
+                },
+            );
+        const grantedLog = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
+            {
+                title: 'Call Log Example',
+                message: 'Access your call logs',
+                buttonNeutral: 'Ask Me Later',
+                buttonNegative: 'Cancel',
+                buttonPositive: 'OK',
+            },
+        );
+        if (grantedCall === PermissionsAndroid.RESULTS.GRANTED && grantedLog === PermissionsAndroid.RESULTS.GRANTED) {
+            const response = await DirectDial.createDial(num)
+        } else {
+            console.log('SMS permission denied');
         }
-        return call(args)
-            .then((r: any) => {
-                console.log('call', r)
-                return r;
-            })
-            .catch((err: any) => {
-                return err
-            })
+        // const args = {
+        //     number: num,
+        //     prompt: false
+        // }
+        // return call(args)
+        //     .then((r: any) => {
+        //         console.log('call', r)
+        //         return r;
+        //     })
+        //     .catch((err: any) => {
+        //         return err
+        //     })
     }
 
     setCurrentItemIndex = (currentItemIndex: number) => {

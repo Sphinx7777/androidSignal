@@ -9,12 +9,17 @@ import android.content.Intent;
 import android.net.Uri;
 import android.app.Activity;
 import android.content.Context;
-
+import com.facebook.react.bridge.ReactContext;
+import android.content.Context;
 
 public class DirectDialModule extends ReactContextBaseJavaModule {
+    private ReactApplicationContext reactContext;
+    private Activity reactActivity;
 
     public DirectDialModule(ReactApplicationContext reactContext) {
         super(reactContext); //required by React Native
+            this.reactContext = reactContext;
+            this.reactActivity = this.getCurrentActivity();
     }
 
     @Override
@@ -28,10 +33,11 @@ public class DirectDialModule extends ReactContextBaseJavaModule {
         try {    
         Intent call = new Intent(Intent.ACTION_CALL);
         call.setData(Uri.parse("tel:" + number));
-        // startActivity(call);
-        res.resolve(call.toString());
+        call.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        this.reactContext.startActivity(call);
+        res.resolve(true);
         } catch (Exception ex) {
-            res.resolve(false);
+            res.resolve(ex.toString());
             //System.out.println("couldn't send message.");
         }
     }
