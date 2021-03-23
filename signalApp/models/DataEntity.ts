@@ -6,6 +6,7 @@ import { ENTITY } from '../constants';
 export type ISingleDataItem = EntityMap<{
     id: string;
     phone: string;
+    smsBody: string | null;
     email: string;
     name: string;
     date: number;
@@ -16,6 +17,7 @@ export type ISingleDataItem = EntityMap<{
 export interface IDataItem {
     id: string;
     phone: string;
+    smsBody: string | null;
     email: string;
     name: string;
     date: number;

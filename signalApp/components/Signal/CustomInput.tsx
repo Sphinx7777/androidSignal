@@ -2,27 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { ISingleDataItem } from '../../models/DataEntity';
-import { getStringDate } from '../../utils';
+import { getStringDate, showToastWithGravityAndOffset } from '../../utils';
 
 
 interface ICustomInputProps {
     currentElement: ISingleDataItem | undefined;
     makeCall: (num: string) => Promise<any>;
-    sendSMS: () => void;
+    sendSMS: (data: { phone: string, smsBody: string }) => void;
 }
 interface ICustomInputState {
     date: number;
     details: string | undefined;
+    smsBody: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
-    const { currentElement, makeCall, sendSMS} = props;
-    const dispatch = useDispatch()
-    const currentElDate = currentElement ? currentElement?.get('date') : null
-    const currentElDetails = currentElement && currentElement?.get('details') ? currentElement?.get('details') : ''
+    const { currentElement, makeCall, sendSMS } = props;
+    const dispatch = useDispatch();
+    const currentElDate = currentElement ? currentElement?.get('date') : null;
+    const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
+    const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
 
     const [state, setState] = useState<ICustomInputState>({
         date: currentElDate,
-        details: currentElDetails
+        details: currentElDetails,
+        smsBody: currentElSmsBody
     })
 
     const cancelDate = () => {
@@ -39,10 +42,11 @@ const CustomInput = (props: ICustomInputProps) => {
             return {
                 ...prevState,
                 date: currentElDate,
-                details: currentElDetails
+                details: currentElDetails,
+                smsBody: currentElSmsBody
             }
         })
-    }, [currentElDate, currentElDetails])
+    }, [currentElDate, currentElDetails, currentElSmsBody])
 
     const addNewDate = () => {
         setState((prevState) => {
@@ -79,8 +83,41 @@ const CustomInput = (props: ICustomInputProps) => {
             }
         })
     }
-    const submit = () => console.log('Submit=', { ...state, id: currentElement?.get('id') })
+
+    const handleSMSChange = (smsBody: string) => {
+        setState((prevState) => {
+            return {
+                ...prevState,
+                smsBody
+            }
+        })
+    }
+    const cancelSMSBody = () => {
+        setState((prevState) => {
+            return {
+                ...prevState,
+                smsBody: currentElSmsBody
+            }
+        })
+    }
+
+    const handleSendSms = () => {
+        const sms = {
+            phone: currentElement?.get('phone'),
+            smsBody: state.smsBody
+        }
+        sendSMS(sms)
+    }
+    const submit = () => {
+        showToastWithGravityAndOffset('Successfully!');
+        const data = { ...state, id: currentElement?.get('id') }
+        if (state.smsBody.length === 0) {
+            data.smsBody = null
+        }
+        console.log('Submit=', data);
+    };
     const cancelDetailsDis = currentElDetails === state.details
+    const cancelSMSDis = currentElSmsBody === state.smsBody
     const cancelDateDis = currentElDate === state.date
     return (
         <>
@@ -93,24 +130,24 @@ const CustomInput = (props: ICustomInputProps) => {
                         <Text style={styles.text}>{currentElement?.get('phone')}</Text>
                         {currentElement?.get('dbType') === 'asana'
                             ? <Image style={{ width: 25, height: 25, marginRight: 5 }} source={require('../../../assets/asana.png')} />
-                            : <Text style={{...styles.text, color: '#de471d', fontWeight: '700', marginRight: 5}}>{currentElement?.get('dbType')}</Text>
+                            : <Text style={{ ...styles.text, color: '#de471d', fontWeight: '700', marginRight: 5 }}>{currentElement?.get('dbType')}</Text>
                         }
                     </View>
                     <View style={styles.nameLine}>
                         <Text style={styles.text}>{currentElement?.get('email')}</Text>
                     </View>
                     <View style={styles.nameLine}>
-                        <Text style={styles.text}>{currentElement?.get('date')}</Text>
+                        <Text style={styles.text}>{getStringDate(new Date(currentElement?.get('date') * 1000))}</Text>
                         <Text style={styles.text}>Calling Status</Text>
                     </View>
                 </TouchableOpacity>}
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={{ ...styles.textInput, ...styles.dateInput }}
-                        placeholder='enter date'
+                        placeholder='set date'
                         value={getStringDate(new Date(state.date * 1000))}
                         editable={false}
-                        // onChangeText={handleDateChange}
+                    // onChangeText={handleDateChange}
                     />
                     <View style={styles.dateButtons}>
                         <TouchableOpacity
@@ -128,6 +165,7 @@ const CustomInput = (props: ICustomInputProps) => {
                         </TouchableOpacity>
                     </View>
                 </View>
+                <Text style={styles.label}>details</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.textInput}
@@ -147,10 +185,33 @@ const CustomInput = (props: ICustomInputProps) => {
                         </TouchableOpacity>
                     </View>
                 </View>
+                <Text style={styles.label}>sms body</Text>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.textInput}
+                        placeholder='sms body'
+                        value={state.smsBody}
+                        onChangeText={handleSMSChange}
+                        multiline={true}
+                    />
+                    <View style={styles.detailsButtons}>
+                        <TouchableOpacity
+                            style={!cancelSMSDis
+                                ? styles.button
+                                : { ...styles.button, ...styles.disabled }}
+                            disabled={cancelSMSDis}
+                            onPress={cancelSMSBody}>
+                            <Text style={styles.buttonText}>Cancel</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
                 <View style={styles.sendButtonContainer}>
-                <TouchableOpacity
-                        style={{ ...styles.button, ...styles.sendButton }}
-                        onPress={sendSMS}>
+                    <TouchableOpacity
+                        style={(state.smsBody.length !== 0)
+                            ? { ...styles.button, ...styles.sendButton }
+                            : { ...styles.button, ...styles.sendButton, ...styles.disabled }}
+                        disabled={state.smsBody.length === 0}
+                        onPress={handleSendSms}>
                         <Text style={styles.buttonText}>Send sms</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -196,6 +257,11 @@ const styles = StyleSheet.create({
         padding: 1,
         width: '100%',
         borderRadius: 10,
+    },
+    label: {
+        color: 'black',
+        fontSize: 12,
+        fontWeight: '700'
     },
     nameLine: {
         display: 'flex',
@@ -247,7 +313,8 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        width: '100%'
+        width: '100%',
+        marginBottom: 5
     },
     sendButton: {
         marginBottom: 0,

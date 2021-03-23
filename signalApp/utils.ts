@@ -1,8 +1,18 @@
-
+import { ToastAndroid } from 'react-native';
 export const getStringDate: (date: Date) => string = (date: Date) => {
     const m = date.getMonth() + 1;
     const d = date.getDate()
     return `${(d < 10 ? '0' : '') + d}/${(m < 10 ? '0' : '') + m}/${date.getFullYear()}`;
+}
+
+export const showToastWithGravityAndOffset = (text: string) => {
+    ToastAndroid.showWithGravityAndOffset(
+        text,
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM,
+        50,
+        150
+    );
 }
 
 export function isEmpty(obj: any) {

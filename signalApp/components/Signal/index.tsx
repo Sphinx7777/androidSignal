@@ -12,7 +12,7 @@ import { EntityList } from '../../models/entity';
 import ContactList from './ContactList';
 import CallDetectorManager from 'react-native-call-detection';
 import CallLogs from 'react-native-call-log';
-import SendSMS from 'react-native-sms';
+import {showToastWithGravityAndOffset} from '../../utils';
 const DirectSms = NativeModules.DirectSms;
 const DirectDial = NativeModules.DirectDial;
 
@@ -131,31 +131,6 @@ class Signal extends React.Component<ISignalProps> {
         }
     };
 
-    sendSMS = () => {
-        const { currentElement } = this.state;
-        const body = currentElement?.get('smsBody')?.toString() || '';
-        const recipient = currentElement?.get('phone')?.toString();
-        if (recipient) {
-            SendSMS.send(
-                {
-                body,
-                recipients: [recipient],
-                // @ts-ignore
-                successTypes: ['sent', 'queued']
-                },
-                (completed, cancelled, error) => {
-                    if (completed) {
-                        console.log('SMS Sent Completed');
-                    } else if (cancelled) {
-                        console.log('SMS Sent Cancelled');
-                    } else if (error) {
-                        console.log('Some error occured');
-                    }
-                },
-            );
-        }
-    };
-
     sendDirectSms = async (data: {phone: string, smsBody: string} | null = null) => {
         const { dataItems } = this.props;
         console.log('data', data)
@@ -200,6 +175,7 @@ class Signal extends React.Component<ISignalProps> {
                     console.log('--------------------------------------')
                     await DirectSms.sendDirectSms(one.phone, one.smsBody);
                 }
+                showToastWithGravityAndOffset(dataSmsArray.length > 1 ? 'All messages sent' : 'Message sent')
             } else {
                 console.log('SMS permission denied');
             }
@@ -441,7 +417,7 @@ class Signal extends React.Component<ISignalProps> {
                         setCurrentElement={this.setCurrentElement}
                     />
                     <ScrollView style={styles.container}>
-                        <CustomInput currentElement={currentElement} makeCall={this.makeCall} sendSMS={this.sendSMS}/>
+                        <CustomInput currentElement={currentElement} makeCall={this.makeCall} sendSMS={this.sendDirectSms}/>
                         <CallMenu
                             pause={pause}
                             pausePress={this.pausePress}
