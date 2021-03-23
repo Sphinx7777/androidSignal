@@ -131,65 +131,43 @@ class Signal extends React.Component<ISignalProps> {
         }
     };
 
-    // sendAllSMS = () => {
-    // const { dataItems } = this.props;
-    // let dataSmsArray = [];
-    // if (dataItems && dataItems.size > 0) {
-    //     dataSmsArray = dataItems.valueSeq().filter(obj => obj.get('smsBody'))?.toJS() || []
-    // }
-    // console.log('sendAllSMS===', dataSmsArray)
-    // for (let i = 0; i < dataSmsArray.length; i++) {
-    //     const element = dataSmsArray[i];
-    //     SendSMS.send(
-    //         {
-    //         body: String(element['smsBody']),
-    //         recipients: [String(element['phone'])],
-    //         // @ts-ignore
-    //         successTypes: ['sent', 'queued']
-    //         },
-    //         (completed, cancelled, error) => {
-    //             if (completed) {
-    //             console.log('SMS Sent Completed');
-    //         } else if (cancelled) {
-    //             console.log('SMS Sent Cancelled');
-    //         } else if (error) {
-    //             console.log('Some error occured');
-    //         }
-    //         },
-    //     );
-    // }
-    // };
+    sendSMS = () => {
+        const { currentElement } = this.state;
+        const body = currentElement?.get('smsBody')?.toString() || '';
+        const recipient = currentElement?.get('phone')?.toString();
+        if (recipient) {
+            SendSMS.send(
+                {
+                body,
+                recipients: [recipient],
+                // @ts-ignore
+                successTypes: ['sent', 'queued']
+                },
+                (completed, cancelled, error) => {
+                    if (completed) {
+                        console.log('SMS Sent Completed');
+                    } else if (cancelled) {
+                        console.log('SMS Sent Cancelled');
+                    } else if (error) {
+                        console.log('Some error occured');
+                    }
+                },
+            );
+        }
+    };
 
-    // sendSMS = () => {
-    //     const { currentElement } = this.state;
-    //     const body = currentElement?.get('smsBody')?.toString();
-    //     const recipient = currentElement?.get('phone')?.toString();
-    //     if (body && recipient) {
-    //         SendSMS.send(
-    //             {
-    //             body,
-    //             recipients: [recipient],
-    //             // @ts-ignore
-    //             successTypes: ['sent', 'queued']
-    //             },
-    //             (completed, cancelled, error) => {
-    //                 if (completed) {
-    //                 console.log('SMS Sent Completed');
-    //                 } else if (cancelled) {
-    //                     console.log('SMS Sent Cancelled');
-    //                 } else if (error) {
-    //                     console.log('Some error occured');
-    //                 }
-    //             },
-    //         );
-    //     }
-    // };
-
-    sendDirectSms = async  () => {
+    sendDirectSms = async (data: {phone: string, smsBody: string} | null = null) => {
         const { dataItems } = this.props;
+        console.log('data', data)
         let dataSmsArray = [];
-        if (dataItems && dataItems.size > 0) {
+        if (dataItems && dataItems.size > 0 && !data) {
         dataSmsArray = dataItems.valueSeq().filter(obj => obj.get('smsBody'))?.toJS() || []
+        }
+        if (data) {
+            dataSmsArray = [{
+                phone: data.phone,
+                smsBody: data.smsBody
+            }]
         }
         try {
             const grantedSendSms = await PermissionsAndroid.request(
@@ -216,7 +194,7 @@ class Signal extends React.Component<ISignalProps> {
                         buttonPositive: 'OK',
                     },
                 );
-            if (grantedSendSms === PermissionsAndroid.RESULTS.GRANTED && grantedReadSms === PermissionsAndroid.RESULTS.GRANTED) {
+            if (grantedSendSms === PermissionsAndroid.RESULTS.GRANTED && grantedReadSms === PermissionsAndroid.RESULTS.GRANTED && dataSmsArray.length > 0) {
                 for await (const one of dataSmsArray) {
                     console.log('send_sms_to ', one.phone, one.smsBody)
                     console.log('--------------------------------------')
@@ -463,7 +441,7 @@ class Signal extends React.Component<ISignalProps> {
                         setCurrentElement={this.setCurrentElement}
                     />
                     <ScrollView style={styles.container}>
-                        <CustomInput currentElement={currentElement} makeCall={this.makeCall}/>
+                        <CustomInput currentElement={currentElement} makeCall={this.makeCall} sendSMS={this.sendSMS}/>
                         <CallMenu
                             pause={pause}
                             pausePress={this.pausePress}

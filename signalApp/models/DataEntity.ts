@@ -8,7 +8,7 @@ export type ISingleDataItem = EntityMap<{
     phone: string;
     email: string;
     name: string;
-    date: string;
+    date: number;
     dbType: string;
     details: string;
     }>;
@@ -18,7 +18,7 @@ export interface IDataItem {
     phone: string;
     email: string;
     name: string;
-    date: string;
+    date: number;
     dbType: string;
     details: string;
 }

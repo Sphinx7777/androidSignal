@@ -65,6 +65,7 @@ const CallMenu = (props: ICallMenuProps) => {
             makeCall(phone)
         }
     }
+    const handleSendAllSMS = () => sendAllSMS()
 
     return (
         <>
@@ -94,7 +95,7 @@ const CallMenu = (props: ICallMenuProps) => {
                         //     ? { ...styles.button, ...styles.sendButton }
                         //     : { ...styles.button, ...styles.sendButton, ...styles.disabled }}
                         disabled={dataSmsArray ? false : true}
-                        onPress={sendAllSMS}>
+                        onPress={handleSendAllSMS}>
                         <Text style={styles.buttonText}>Send all sms</Text>
                     </TouchableOpacity>
                 </View>

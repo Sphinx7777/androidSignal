@@ -16,7 +16,7 @@ const dataTest: any = [
         phone: '0663952488',
         email: 'spamoglot1111@gmail.com',
         name: 'Sergei111',
-        date: '20-01-01',
+        date: 1573044606,
         dbType: 'asana',
         details: 'details 111111111'
     },
@@ -26,7 +26,7 @@ const dataTest: any = [
         smsBody: null,
         email: 'spamoglot222@gmail.com',
         name: 'Sergei222',
-        date: '20-02-02',
+        date: 1573044606,
         dbType: 'DBX',
         details: 'details 2222222222'
     },
@@ -36,7 +36,7 @@ const dataTest: any = [
         smsBody: null,
         email: 'spamoglot333@gmail.com',
         name: 'Sergei333',
-        date: '20-03-03',
+        date: 1573044606,
         dbType: 'C',
         details: 'details 3333333333333'
     }
@@ -47,7 +47,7 @@ const dataTest: any = [
         smsBody: null,
         email: 'spamoglot444@gmail.com',
         name: 'Sergei444',
-        date: '20-04-04',
+        date: 1573044606,
         dbType: 'asana',
         details: 'details 4444444444444'
     },
@@ -57,7 +57,7 @@ const dataTest: any = [
         smsBody: null,
         email: 'spamoglot555@gmail.com',
         name: 'Sergei555',
-        date: '20-05-05',
+        date: 1567884606,
         dbType: 'DBX',
         details: 'details 5555555555'
     },
@@ -67,7 +67,7 @@ const dataTest: any = [
         smsBody: null,
         email: 'spamoglot666@gmail.com',
         name: 'Sergei666',
-        date: '20-06-06',
+        date: 1570049606,
         dbType: 'C',
         details: 'details 666666666666666'
     },
@@ -77,7 +77,7 @@ const dataTest: any = [
         smsBody: 'Test sms Ira',
         email: 'kaktus1977@gmail.com',
         name: 'Ira',
-        date: '20-01-01',
+        date: 1571044606,
         dbType: 'asana',
         details: 'details 77777777'
     },
@@ -87,7 +87,7 @@ const dataTest: any = [
         smsBody: 'Test sms Arhip',
         email: 'arhip@gmail.com',
         name: 'Arhip',
-        date: '20-01-01',
+        date: 1572044606,
         dbType: 'asana',
         details: 'details 88888888'
     },
@@ -97,7 +97,7 @@ const dataTest: any = [
         smsBody: 'Test sms Kostya',
         email: 'kostya@gmail.com',
         name: 'Kostya',
-        date: '20-01-01',
+        date: 1576044606,
         dbType: 'DBX',
         details: 'details 9999999999'
     }

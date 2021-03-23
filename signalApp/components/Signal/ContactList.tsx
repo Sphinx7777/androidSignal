@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, GestureResponderEvent, Image, ActivityIndicator } from 'react-native';
+import { getStringDate } from 'signalApp/utils';
 import { ISingleDataItem, IDataItem } from '../../models/DataEntity';
 import { EntityList } from '../../models/entity';
 interface IContactListProps {
@@ -56,7 +57,7 @@ const ContactList = (props: IContactListProps) => {
                 </View>
                 <Text style={styles.text}>{item?.email}</Text>
                 <View style={styles.nameLine}>
-                    <Text style={styles.text}>{item?.date}</Text>
+                    <Text style={styles.text}>{getStringDate(new Date(item?.date * 1000))}</Text>
                     <Text style={styles.text}>Calling Status</Text>
                 </View>
             </TouchableOpacity>

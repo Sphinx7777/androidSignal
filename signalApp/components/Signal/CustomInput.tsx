@@ -8,15 +8,16 @@ import { getStringDate } from '../../utils';
 interface ICustomInputProps {
     currentElement: ISingleDataItem | undefined;
     makeCall: (num: string) => Promise<any>;
+    sendSMS: () => void;
 }
 interface ICustomInputState {
-    date: string;
+    date: number;
     details: string | undefined;
 }
 const CustomInput = (props: ICustomInputProps) => {
-    const { currentElement, makeCall} = props;
+    const { currentElement, makeCall, sendSMS} = props;
     const dispatch = useDispatch()
-    const currentElDate = currentElement ? currentElement?.get('date') : ''
+    const currentElDate = currentElement ? currentElement?.get('date') : null
     const currentElDetails = currentElement && currentElement?.get('details') ? currentElement?.get('details') : ''
 
     const [state, setState] = useState<ICustomInputState>({
@@ -47,21 +48,21 @@ const CustomInput = (props: ICustomInputProps) => {
         setState((prevState) => {
             return {
                 ...prevState,
-                date: getStringDate(new Date())
+                date: Math.round(new Date().getTime() / 1000)
             }
         })
     }
 
     const calling = () => currentElement && makeCall(currentElement?.get('phone'))
 
-    const handleDateChange = (data: string) => {
-        setState((prevState) => {
-            return {
-                ...prevState,
-                date: data
-            }
-        })
-    }
+    // const handleDateChange = (data: string) => {
+    //     setState((prevState) => {
+    //         return {
+    //             ...prevState,
+    //             date: data
+    //         }
+    //     })
+    // }
     const handleDetailsChange = (details: string) => {
         setState((prevState) => {
             return {
@@ -107,8 +108,9 @@ const CustomInput = (props: ICustomInputProps) => {
                     <TextInput
                         style={{ ...styles.textInput, ...styles.dateInput }}
                         placeholder='enter date'
-                        value={state.date}
-                        onChangeText={handleDateChange}
+                        value={getStringDate(new Date(state.date * 1000))}
+                        editable={false}
+                        // onChangeText={handleDateChange}
                     />
                     <View style={styles.dateButtons}>
                         <TouchableOpacity
@@ -146,6 +148,11 @@ const CustomInput = (props: ICustomInputProps) => {
                     </View>
                 </View>
                 <View style={styles.sendButtonContainer}>
+                <TouchableOpacity
+                        style={{ ...styles.button, ...styles.sendButton }}
+                        onPress={sendSMS}>
+                        <Text style={styles.buttonText}>Send sms</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity
                         style={(!cancelDetailsDis || !cancelDateDis)
                             ? { ...styles.button, ...styles.sendButton }
@@ -239,7 +246,7 @@ const styles = StyleSheet.create({
     sendButtonContainer: {
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
         width: '100%'
     },
     sendButton: {
