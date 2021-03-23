@@ -6,7 +6,7 @@ interface ICallMenuProps {
     setCurrentItemIndex: (currentItemIndex: number) => void;
     currentItemIndex: number;
     callData: EntityList<ISingleDataItem> | undefined;
-    makeCall: (phone: string) => Promise<any>;
+    makeCall: (phone: string, pauseDisable: string) => Promise<any>;
     setCurrentElement: (currentElement: ISingleDataItem) => void;
     sendAllSMS: () => void;
     dataSmsArray: any;
@@ -27,7 +27,7 @@ const CallMenu = (props: ICallMenuProps) => {
         if (callData && currentItemIndex < callData?.size - 1) {
             const phone = callData?.valueSeq()?.getIn([currentItemIndex + 1, 'phone'])
             const element = callData?.valueSeq()?.get(currentItemIndex + 1)
-            const res = await makeCall(phone)
+            const res = await makeCall(phone, 'disable')
             if (res) {
                 setState((prevState) => {
                     return {
@@ -42,7 +42,7 @@ const CallMenu = (props: ICallMenuProps) => {
             if (callData) {
                 const phone = callData?.valueSeq()?.getIn([0, 'phone'])
                 const element = callData?.valueSeq()?.get(0)
-                const res = await makeCall(phone)
+                const res = await makeCall(phone, 'disable')
                 if (res) {
                     setState((prevState) => {
                         return {
@@ -62,7 +62,7 @@ const CallMenu = (props: ICallMenuProps) => {
         if (callData) {
             const phone = callData?.valueSeq()?.getIn([currentItemIndex, 'phone'])
             pausePress(false)
-            makeCall(phone)
+            makeCall(phone, 'disable')
         }
     }
     const handleSendAllSMS = () => sendAllSMS()

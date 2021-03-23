@@ -4,8 +4,6 @@ import { StyleSheet, View, ScrollView, Text, TouchableOpacity, ActivityIndicator
 import { connect } from 'react-redux';
 import CallMenu from './CallMenu';
 import CustomInput from './CustomInput';
-// @ts-ignore
-import call from 'react-native-phone-call'
 import DataEntity, { ISingleDataItem } from '../../models/DataEntity';
 import saga from '../../decoradors/saga';
 import { EntityList } from '../../models/entity';
@@ -29,9 +27,12 @@ interface ISignalProps {
     dataItems?: EntityList<ISingleDataItem>;
     user?: any;
     getData?: () => void;
+    setSubmitData?: (data: any) => void;
+    clearSubmitData?: () => void;
     navigation?: any;
+    submitData: any;
 }
-@saga(DataEntity, ['getData'])
+@saga(DataEntity, ['getData', 'setSubmitData', 'clearSubmitData'])
 class Signal extends React.Component<ISignalProps> {
 
     state = {
@@ -98,7 +99,6 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     fetchData = async () => {
-        // const { listData } = this.state;
         if (Platform.OS !== 'ios') {
             try {
                 // Ask for runtime permission
@@ -113,7 +113,6 @@ class Signal extends React.Component<ISignalProps> {
                     },
                 );
                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                    // CallLogs.loadAll().then(c => this.setFlatListCallData(listData.concat(c)));
                     return CallLogs.load(1).then(lastCallArr => {
                         this.setFlatListCallData(lastCallArr);
                         return lastCallArr
@@ -201,7 +200,7 @@ class Signal extends React.Component<ISignalProps> {
             console.log('currentElement -> ', currentElement);
             console.log('--------------------------------------------------------------------------------');
             this.setNextElement()
-            setTimeout(() => this.makeCall(nextElement?.get('phone')), 6000)
+            setTimeout(() => this.makeCall(nextElement?.get('phone')), 10000)
         }
         // if (nextElement && response && response['phoneNumber'] === currentElement?.get('phone') && response['duration'] > 0) {
         //     this.setDialogDate()
@@ -264,7 +263,12 @@ class Signal extends React.Component<ISignalProps> {
         this.setIsStart(!isStart);
     };
 
-    makeCall = async (num: string) => {
+    makeCall = async (num: string, pause: boolean | string = this.state.pause) => {
+        let currentPause = this.state.pause
+        if (pause === 'disable') {
+            this.pausePress(false);
+            currentPause = false;
+        }
         const grantedCall = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.CALL_PHONE,
                 {
@@ -287,7 +291,7 @@ class Signal extends React.Component<ISignalProps> {
                 buttonPositive: 'OK',
             },
         );
-        if (grantedCall === PermissionsAndroid.RESULTS.GRANTED && grantedLog === PermissionsAndroid.RESULTS.GRANTED && !this.state.pause) {
+        if (grantedCall === PermissionsAndroid.RESULTS.GRANTED && grantedLog === PermissionsAndroid.RESULTS.GRANTED && !currentPause) {
             await DirectDial.createDial(num)
         } else {
             console.log('SMS permission denied');
@@ -362,8 +366,7 @@ class Signal extends React.Component<ISignalProps> {
 
     render() {
         const { currentItemIndex, currentElement, listData, pause } = this.state;
-        const { dataItems, user, navigation } = this.props;
-        // const sortedData = listData.sort((a, b) => Number(b.timestamp) - Number(a.timestamp))
+        const { dataItems, user, navigation, submitData, setSubmitData, clearSubmitData } = this.props;
         let lastCallData = null as ICallLog | null;
         if (listData.length > 0) {
             lastCallData = listData[0];
@@ -417,7 +420,13 @@ class Signal extends React.Component<ISignalProps> {
                         setCurrentElement={this.setCurrentElement}
                     />
                     <ScrollView style={styles.container}>
-                        <CustomInput currentElement={currentElement} makeCall={this.makeCall} sendSMS={this.sendDirectSms}/>
+                        <CustomInput
+                        submitData={submitData}
+                        setSubmitData={setSubmitData}
+                        clearSubmitData={clearSubmitData}
+                        currentElement={currentElement}
+                        makeCall={this.makeCall}
+                        sendSMS={this.sendDirectSms}/>
                         <CallMenu
                             pause={pause}
                             pausePress={this.pausePress}
@@ -458,9 +467,11 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: any) => {
     const dataItems = state.entities.get('signalData')
     const user = state.identity.user || null
+    const submitData = state.submitData.data || []
     return {
         dataItems,
-        user
+        user,
+        submitData
     };
 }
 

@@ -16,6 +16,8 @@ export const MODEL_CLEAR = 'MODEL_CLEAR';
 export const PAGE_SET_FILTER = 'PAGE_SET_FILTER';
 export const GET_IDENTITY = 'GET_IDENTITY';
 export const SET_DEFAULT_IDENTITY = 'SET_DEFAULT_IDENTITY';
+export const SET_SUBMIT_DATA = 'SET_SUBMIT_DATA';
+export const SET_DEFAULT_SUBMIT_DATA = 'SET_DEFAULT_SUBMIT_DATA';
 export const CLEAR_IDENTITY = 'CLEAR_IDENTITY';
 export const SET_SSR_DATA = 'QUERY_DATA';
 export const CLEAR_SSR_DATA = 'CLEAR_QUERY';
@@ -73,20 +75,22 @@ export const sendMessage = (data: IMessageBlock) => action(SEND_MESSAGE, data);
 export const resetMessage = () => action(RESET_MESSAGE, {});
 export const resetAllMessage = () => action(RESET_ALL_MESSAGE, {});
 export const toastMessage = (text: string, msgType: MessageType) => action(TOAST_MESSAGE, { text, msgType });
-
 export const setSSRData = (data: any = null) => action(SET_SSR_DATA, data);
 export const clearSSRData = (name: string) => action(CLEAR_SSR_DATA, { name });
+
+
 export const getIdentity = (data: any) => action(GET_IDENTITY, data);
 export const logoutUserAction = () => action(SET_DEFAULT_IDENTITY, {});
 export const clearIdentity = () => action(CLEAR_IDENTITY, {});
+
+export const setSubmitData = (data: any) => action(SET_SUBMIT_DATA, data);
+export const defaultSubmitData = () => action(SET_DEFAULT_SUBMIT_DATA, {});
 
 export const pageClear = (pageName: string) => action(PAGE_CLEAR, { pageName });
 export const pageFetching = (pageName: string, page: number, isFetching: boolean, force = false) =>
     action(PAGE_FETCHING, { pageName, page, isFetching, force });
 export const pageSelectItem = (pageName: string, id: string) => action(PAGE_SELECT_ITEM, { pageName, id });
-
 export const setFlagger = (key: string, value: any) => action(SET_FLAGGER, {key, value});
 export const clearRequestResult = (entity: ENTITY) => action(CLEAR_REQUEST_RESULT, { entity });
-
 export const pageSetFilter =
     (pageName: string, filter: any, sort: any) => action(PAGE_SET_FILTER, { pageName, filter, sort });

@@ -21,7 +21,9 @@ import {
     RESET_ALL_MESSAGE,
     CLEAR_REQUEST_RESULT,
     GET_IDENTITY,
-    SET_DEFAULT_IDENTITY
+    SET_DEFAULT_IDENTITY,
+    SET_SUBMIT_DATA,
+    SET_DEFAULT_SUBMIT_DATA
 } from './actions';
 import { IMessageBlock } from '../constants';
 
@@ -152,9 +154,34 @@ function identity(state: StateIdentity = initialIdentity, action: any) {
     return state;
 }
 
+export type ISubmitData = {
+    data: any[];
+};
+
+const initialSubmitData: ISubmitData = {
+    data: []
+};
+
+function submitData(state: ISubmitData = initialSubmitData, action: any) {
+    switch (action.type) {
+    case SET_SUBMIT_DATA:
+        const update = state.data.find(o => o.id === action.submitData.id);
+        let data = [];
+        data = !update ? [...state.data, action.submitData] : [...state.data.filter(o => o.id !== action.submitData.id), action.submitData];
+        return {
+                ...state,
+                data
+            };
+            case SET_DEFAULT_SUBMIT_DATA:
+            return { ...initialSubmitData };
+    }
+    return state;
+}
+
 const appReducer = combineReducers({
     entities,
     requestResult,
+    submitData,
     message,
     flagger,
     identity

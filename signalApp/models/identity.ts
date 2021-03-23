@@ -29,6 +29,24 @@ class Identity extends Entity {
     }
 
     @action()
+    public * logoutUser() {
+        const { response, message } = yield call(Entity.fetch, 'http://ix.rebaltic.lt/api/auth/logout');
+        if (response && response.length > 0 && response[0]?.hasOwnProperty('id') && response[0]?.id === 'user') {
+            yield put(logoutUserAction());
+        }
+        yield put(Entity.clear());
+        Entity.user = null;
+        if (message) {
+            yield put(sendMessage(message));
+        }
+    }
+
+
+
+
+
+
+    @action()
     public * registerUser(data: any) {
         yield call(Entity.fetch, '/auth/register', data, HTTP_METHOD.POST);
     }
@@ -51,19 +69,6 @@ class Identity extends Entity {
     @action()
     public * verifyAccount(data: any) {
         yield call(Entity.fetch, '/auth/verify', data, HTTP_METHOD.POST);
-    }
-
-    @action()
-    public * logoutUser() {
-        const { response, message } = yield call(Entity.fetch, 'http://ix.rebaltic.lt/api/auth/logout');
-        if (response && response.length > 0 && response[0]?.hasOwnProperty('id') && response[0]?.id === 'user') {
-            yield put(logoutUserAction());
-        }
-        yield put(Entity.clear());
-        Entity.user = null;
-        if (message) {
-            yield put(sendMessage(message));
-        }
     }
 
     public * showMessage() {

@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
-import { useDispatch } from 'react-redux';
+// import { useDispatch } from 'react-redux';
 import { ISingleDataItem } from '../../models/DataEntity';
 import { getStringDate, showToastWithGravityAndOffset } from '../../utils';
 
 
 interface ICustomInputProps {
     currentElement: ISingleDataItem | undefined;
-    makeCall: (num: string) => Promise<any>;
+    makeCall: (num: string, pauseDisable: string) => Promise<any>;
     sendSMS: (data: { phone: string, smsBody: string }) => void;
+    setSubmitData: (data: any) => void;
+    clearSubmitData: () => void;
+    submitData: any;
 }
 interface ICustomInputState {
     date: number;
@@ -16,8 +19,7 @@ interface ICustomInputState {
     smsBody: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
-    const { currentElement, makeCall, sendSMS } = props;
-    const dispatch = useDispatch();
+    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData } = props;
     const currentElDate = currentElement ? currentElement?.get('date') : null;
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
     const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
@@ -57,7 +59,7 @@ const CustomInput = (props: ICustomInputProps) => {
         })
     }
 
-    const calling = () => currentElement && makeCall(currentElement?.get('phone'))
+    const calling = () => currentElement && makeCall(currentElement?.get('phone'), 'disable')
 
     // const handleDateChange = (data: string) => {
     //     setState((prevState) => {
@@ -109,12 +111,12 @@ const CustomInput = (props: ICustomInputProps) => {
         sendSMS(sms)
     }
     const submit = () => {
-        showToastWithGravityAndOffset('Successfully!');
         const data = { ...state, id: currentElement?.get('id') }
         if (state.smsBody.length === 0) {
             data.smsBody = null
         }
-        console.log('Submit=', data);
+        setSubmitData(data)
+        // clearSubmitData()
     };
     const cancelDetailsDis = currentElDetails === state.details
     const cancelSMSDis = currentElSmsBody === state.smsBody
