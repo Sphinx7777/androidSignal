@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
+import { ICallLog } from '.';
 // import { useDispatch } from 'react-redux';
 import { ISingleDataItem } from '../../models/DataEntity';
 import { getStringDate, isNetworkAvailable } from '../../utils';
@@ -12,6 +13,7 @@ interface ICustomInputProps {
     setSubmitData: (data: any) => void;
     clearSubmitData: () => void;
     submitData: any;
+    responseDialog: ICallLog;
 }
 interface ICustomInputState {
     date: number;
@@ -19,7 +21,7 @@ interface ICustomInputState {
     smsBody: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
-    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData } = props;
+    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog } = props;
     const currentElDate = currentElement ? currentElement?.get('date') : null;
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
     const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
@@ -111,9 +113,8 @@ const CustomInput = (props: ICustomInputProps) => {
         sendSMS(sms)
     }
     const submit = async () => {
-        const isConnected = await isNetworkAvailable()
-        console.log('submit_isConnected', isConnected)
-        const data = { ...state, id: currentElement?.get('id') }
+        // const isConnected = await isNetworkAvailable()
+        const data = { ...state, id: currentElement?.get('id'), responseDialog }
         if (state.smsBody.length === 0) {
             data.smsBody = null
         }

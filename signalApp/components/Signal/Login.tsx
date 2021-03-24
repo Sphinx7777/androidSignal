@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'reac
 import { connect } from 'react-redux';
 import Identity from '../../models/identity';
 import saga from '../../decoradors/saga';
-import { MAIL_REGEX } from '../../utils';
+import { isNetworkAvailable, MAIL_REGEX, showToastWithGravityAndOffset } from '../../utils';
 interface ICustomInputProps {
     loginUser?: (data: any) => void;
     logoutUser?: () => void;
@@ -55,9 +55,10 @@ class Login extends React.Component<ICustomInputProps, ICustomInputState> {
         }
     }
 
-    submit = () => {
-        const emailValid = this.state.userEmail && this.state.userEmail.search(MAIL_REGEX) >= 0
-        const passValid = this.state.password && this.state.password.length >= 8 && this.state.password.length < 50
+    submit = async () => {
+        const emailValid = this.state.userEmail && this.state.userEmail.search(MAIL_REGEX) >= 0;
+        const passValid = this.state.password && this.state.password.length >= 8 && this.state.password.length < 50;
+        const isConnected = await isNetworkAvailable();
         if (!passValid) {
             this.setState((prevState) => {
                 return {
@@ -74,7 +75,7 @@ class Login extends React.Component<ICustomInputProps, ICustomInputState> {
                 }
             })
         }
-        if (emailValid && passValid) {
+        if (emailValid && passValid && isConnected.isConnected) {
             const data = {password: this.state.password, userEmail: this.state.userEmail, timezone: RNLocalize.getTimeZone()}
             this.props.loginUser(data)
             this.setState((prevState) => {
@@ -86,6 +87,8 @@ class Login extends React.Component<ICustomInputProps, ICustomInputState> {
                     password: ''
                 }
             })
+        } else if (!isConnected.isConnected) {
+            showToastWithGravityAndOffset('No internet connect !!!');
         }
     }
 

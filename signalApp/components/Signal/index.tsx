@@ -10,11 +10,11 @@ import { EntityList } from '../../models/entity';
 import ContactList from './ContactList';
 import CallDetectorManager from 'react-native-call-detection';
 import CallLogs from 'react-native-call-log';
-import {showToastWithGravityAndOffset} from '../../utils';
+import {isNetworkAvailable, showToastWithGravityAndOffset} from '../../utils';
 const DirectSms = NativeModules.DirectSms;
 const DirectDial = NativeModules.DirectDial;
 
-interface ICallLog {
+export interface ICallLog {
     dateTime: string;
     duration: number;
     name: any;
@@ -36,27 +36,34 @@ interface ISignalProps {
 class Signal extends React.Component<ISignalProps> {
 
     state = {
-        response: null,
+        internetConnect: false,
         currentItemIndex: 0,
         currentElement: this.props.dataItems && this.props.dataItems?.valueSeq()?.get(0),
         callDetector: undefined,
         callStates: [],
         isStart: false,
         listData: [],
-        pause: false
+        pause: false,
+        responseDialog: null
     }
 
     getSignalData = async () => {
         const { getData } = this.props;
-        const res = await fetch(`http://neologic.golden-team.org/api/page/url/process`)
-        const response: any = await res.json()
+        const isConnected = await isNetworkAvailable();
+        let response = null;
+        if (isConnected.isConnected) {
+            const res = await fetch(`http://neologic.golden-team.org/api/page/url/process`)
+            response = await res.json()
+        }else {
+            showToastWithGravityAndOffset('No internet connect !!!');
+        }
         if (response) {
             getData()
         }
         this.setState((prevState) => {
             return {
                 ...prevState,
-                response,
+                internetConnect: isConnected.isConnected,
             }
         })
     }
@@ -132,7 +139,6 @@ class Signal extends React.Component<ISignalProps> {
 
     sendDirectSms = async (data: {phone: string, smsBody: string} | null = null) => {
         const { dataItems } = this.props;
-        console.log('data', data)
         let dataSmsArray = [];
         if (dataItems && dataItems.size > 0 && !data) {
         dataSmsArray = dataItems.valueSeq().filter(obj => obj.get('smsBody'))?.toJS() || []
@@ -183,7 +189,7 @@ class Signal extends React.Component<ISignalProps> {
         }
     }
 
-    makeNextDialogLogic = (event: string, num: string, res: any[]) => {
+    makeNextDialogLogic = (event: string, num: string, res: ICallLog[]) => {
         const { currentElement, currentItemIndex } = this.state;
         const { dataItems } = this.props;
         const response = res && res.length > 0 && res[0] || null;
@@ -200,11 +206,25 @@ class Signal extends React.Component<ISignalProps> {
             console.log('currentElement -> ', currentElement);
             console.log('--------------------------------------------------------------------------------');
             this.setNextElement()
-            setTimeout(() => this.makeCall(nextElement?.get('phone')), 10000)
+            setTimeout(() => this.makeCall(nextElement?.get('phone')), 8000)
         }
-        // if (nextElement && response && response['phoneNumber'] === currentElement?.get('phone') && response['duration'] > 0) {
-        //     this.setDialogDate()
-        // }
+        if (nextElement && response && response['phoneNumber'] === currentElement?.get('phone') && response['duration'] > 0) {
+            console.log('--------------------------------------------------------------------------------');
+            console.log('event -> ', event, 'num -> ', num, 'response -> ', response);
+            console.log('--------------------------------------------------------------------------------');
+            console.log('currentElement -> ', currentElement);
+            console.log('--------------------------------------------------------------------------------');
+            this.setDialog(response)
+        }
+    }
+
+    setDialog = (responseDialog: ICallLog) => {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                responseDialog
+            }
+        })
     }
 
     startStopListener = async () => {
@@ -264,6 +284,12 @@ class Signal extends React.Component<ISignalProps> {
     };
 
     makeCall = async (num: string, pause: boolean | string = this.state.pause) => {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                responseDialog: null
+            }
+        })
         let currentPause = this.state.pause
         if (pause === 'disable') {
             this.pausePress(false);
@@ -365,13 +391,8 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     render() {
-        const { currentItemIndex, currentElement, listData, pause } = this.state;
+        const { currentItemIndex, currentElement, responseDialog, pause } = this.state;
         const { dataItems, user, navigation, submitData, setSubmitData, clearSubmitData } = this.props;
-        let lastCallData = null as ICallLog | null;
-        if (listData.length > 0) {
-            lastCallData = listData[0];
-        }
-        const dataSms = currentElement?.get('smsBody');
         let dataSmsArray = null;
         if (dataItems && dataItems.size > 0) {
             dataSmsArray = dataItems.filter(obj => obj.get('smsBody'))
@@ -421,6 +442,7 @@ class Signal extends React.Component<ISignalProps> {
                     />
                     <ScrollView style={styles.container}>
                         <CustomInput
+                        responseDialog={responseDialog}
                         submitData={submitData}
                         setSubmitData={setSubmitData}
                         clearSubmitData={clearSubmitData}
