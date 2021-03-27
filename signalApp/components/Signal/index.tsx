@@ -52,8 +52,15 @@ class Signal extends React.Component<ISignalProps> {
         const isConnected = await isNetworkAvailable();
         let response = null;
         if (isConnected.isConnected) {
-            const res = await fetch(`http://neologic.golden-team.org/api/page/url/process`)
+            const res = await fetch('http://ix.rebaltic.lt/api/signal', {
+                method: 'POST',
+                headers: {
+                    ['content-type']: 'application/json',
+                },
+                body: JSON.stringify({ pageName: 'signal', perPage: 100, filter: {forMobile: true}}),
+            })
             response = await res.json()
+            console.log('getSignalData_response===', response)
         }else {
             showToastWithGravityAndOffset('No internet connect !!!');
         }
