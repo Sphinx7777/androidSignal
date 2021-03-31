@@ -57,7 +57,7 @@ const ContactList = (props: IContactListProps) => {
                 </View>
                 <Text style={styles.text}>{item?.email}</Text>
                 <View style={styles.nameLine}>
-                    <Text style={styles.text}>{getStringDate(new Date(item?.date * 1000))}</Text>
+                    <Text style={styles.text}>{getStringDate(new Date(item?.updatedAt * 1000))}</Text>
                     <Text style={styles.text}>Calling Status</Text>
                 </View>
             </TouchableOpacity>

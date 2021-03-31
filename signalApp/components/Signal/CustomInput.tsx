@@ -9,25 +9,25 @@ import { getStringDate, isNetworkAvailable } from '../../utils';
 interface ICustomInputProps {
     currentElement: ISingleDataItem | undefined;
     makeCall: (num: string, pauseDisable: string) => Promise<any>;
-    sendSMS: (data: { phone: string, smsBody: string }) => void;
+    sendSMS: (data: { id: string, phone: string, smsBody: string }) => void;
     setSubmitData: (data: any) => void;
     clearSubmitData: () => void;
     submitData: any;
     responseDialog: ICallLog;
 }
 interface ICustomInputState {
-    date: number;
+    updatedAt: number;
     details: string | undefined;
     smsBody: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
     const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog } = props;
-    const currentElDate = currentElement ? currentElement?.get('date') : null;
+    const currentElDate = currentElement ? currentElement?.get('updatedAt') : null;
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
     const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
 
     const [state, setState] = useState<ICustomInputState>({
-        date: currentElDate,
+        updatedAt: currentElDate,
         details: currentElDetails,
         smsBody: currentElSmsBody
     })
@@ -36,7 +36,7 @@ const CustomInput = (props: ICustomInputProps) => {
         setState((prevState) => {
             return {
                 ...prevState,
-                date: currentElDate
+                updatedAt: currentElDate
             }
         })
     }
@@ -45,7 +45,7 @@ const CustomInput = (props: ICustomInputProps) => {
         setState((prevState) => {
             return {
                 ...prevState,
-                date: currentElDate,
+                updatedAt: currentElDate,
                 details: currentElDetails,
                 smsBody: currentElSmsBody
             }
@@ -56,7 +56,7 @@ const CustomInput = (props: ICustomInputProps) => {
         setState((prevState) => {
             return {
                 ...prevState,
-                date: Math.round(new Date().getTime() / 1000)
+                updatedAt: Math.round(new Date().getTime() / 1000)
             }
         })
     }
@@ -107,6 +107,7 @@ const CustomInput = (props: ICustomInputProps) => {
 
     const handleSendSms = () => {
         const sms = {
+            id: currentElement?.get('id'),
             phone: currentElement?.get('phone'),
             smsBody: state.smsBody
         }
@@ -114,7 +115,7 @@ const CustomInput = (props: ICustomInputProps) => {
     }
     const submit = async () => {
         // const isConnected = await isNetworkAvailable()
-        const data = { ...state, id: currentElement?.get('id'), responseDialog }
+        const data = { ...state, id: currentElement?.get('id'), responseDialog, needToDialog: false }
         if (state.smsBody.length === 0) {
             data.smsBody = null
         }
@@ -123,7 +124,7 @@ const CustomInput = (props: ICustomInputProps) => {
     };
     const cancelDetailsDis = currentElDetails === state.details
     const cancelSMSDis = currentElSmsBody === state.smsBody
-    const cancelDateDis = currentElDate === state.date
+    const cancelDateDis = currentElDate === state.updatedAt
     return (
         <>
             <View style={styles.container}>
@@ -142,7 +143,7 @@ const CustomInput = (props: ICustomInputProps) => {
                         <Text style={styles.text}>{currentElement?.get('email')}</Text>
                     </View>
                     <View style={styles.nameLine}>
-                        <Text style={styles.text}>{getStringDate(new Date(currentElement?.get('date') * 1000))}</Text>
+                        <Text style={styles.text}>{getStringDate(new Date(currentElement?.get('updatedAt') * 1000))}</Text>
                         <Text style={styles.text}>Calling Status</Text>
                     </View>
                 </TouchableOpacity>}
@@ -150,7 +151,7 @@ const CustomInput = (props: ICustomInputProps) => {
                     <TextInput
                         style={{ ...styles.textInput, ...styles.dateInput }}
                         placeholder='set date'
-                        value={getStringDate(new Date(state.date * 1000))}
+                        value={getStringDate(new Date(state.updatedAt * 1000))}
                         editable={false}
                     // onChangeText={handleDateChange}
                     />

@@ -48,19 +48,26 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     getSignalData = async () => {
-        const { getData } = this.props;
+        const { getData, user } = this.props;
         const isConnected = await isNetworkAvailable();
-        let response = null;
+        const response = true;
         if (isConnected.isConnected) {
-            const res = await fetch('http://ix.rebaltic.lt/api/signal', {
-                method: 'POST',
-                headers: {
-                    ['content-type']: 'application/json',
-                },
-                body: JSON.stringify({ pageName: 'signal', perPage: 100, filter: {forMobile: true}}),
-            })
-            response = await res.json()
-            console.log('getSignalData_response===', response)
+            // try {
+            //     const res = await fetch('http://ix.rebaltic.lt/api/signal', {
+            //         method: 'POST',
+            //         headers: {
+            //             Authorization: 'bearer ' + user.token,
+            //             credentials: 'include',
+            //             ['content-type']: 'application/json',
+            //         },
+            //         body: JSON.stringify({ pageName: 'signal', perPage: 100, filter: {forMobile: true}}),
+            //     })
+            //     response = await res.json()
+            //     console.log('getSignalData_response===', response)
+            // } catch (error) {
+            //     console.log('getSignalData_ERROR===', JSON.stringify(error))
+            // }
+
         }else {
             showToastWithGravityAndOffset('No internet connect !!!');
         }
@@ -144,14 +151,15 @@ class Signal extends React.Component<ISignalProps> {
         }
     };
 
-    sendDirectSms = async (data: {phone: string, smsBody: string} | null = null) => {
+    sendDirectSms = async (data: {id: string, phone: string, smsBody: string} | null = null) => {
         const { dataItems } = this.props;
         let dataSmsArray = [];
         if (dataItems && dataItems.size > 0 && !data) {
-        dataSmsArray = dataItems.valueSeq().filter(obj => obj.get('smsBody'))?.toJS() || []
+        dataSmsArray = dataItems.valueSeq().filter(obj => obj.get('needToSendSMS'))?.toJS() || []
         }
         if (data) {
             dataSmsArray = [{
+                id: data.id,
                 phone: data.phone,
                 smsBody: data.smsBody
             }]
@@ -186,6 +194,7 @@ class Signal extends React.Component<ISignalProps> {
                     console.log('send_sms_to ', one.phone, one.smsBody)
                     console.log('--------------------------------------')
                     await DirectSms.sendDirectSms(one.phone, one.smsBody);
+                    this.props.setSubmitData({id: one.id, needToSendSMS: false})
                 }
                 showToastWithGravityAndOffset(dataSmsArray.length > 1 ? 'All messages sent' : 'Message sent')
             } else {
@@ -400,6 +409,7 @@ class Signal extends React.Component<ISignalProps> {
     render() {
         const { currentItemIndex, currentElement, responseDialog, pause } = this.state;
         const { dataItems, user, navigation, submitData, setSubmitData, clearSubmitData } = this.props;
+        // clearSubmitData()
         let dataSmsArray = null;
         if (dataItems && dataItems.size > 0) {
             dataSmsArray = dataItems.filter(obj => obj.get('smsBody'))

@@ -12,31 +12,56 @@ import { isEmpty } from '../utils';
 
 const dataTest: any = [
     {
+        id: '60641a72a1bb102b055ee490',
+        mobileInfo: false,
+        needToSendSMS: true,
+        needToSendEmail: true,
+        needToDialog: true,
+        smsBody: 'test sms 60641a72a1bb102b055ee490',
+        emailBody: 'test email 60641a72a1bb102b055ee490',
+        phone: '37068313907',
+        email: 'kcirbaite@yahoo.com',
+        taskName: 'Karolina 68313907 A. Gostauto 4',
+        taskDescription: 'Email kcirbaite@yahoo.com Objekto adresas: A.Gostauto 4 Norėtumėte: Ti...',
+        taskCreated: 1612964683,
+        taskUpdate: 1617027253,
+        taskGid: '1199919605279260',
+        asanaDataType: true,
+        updatedAt: 1617177333,
+        createdAt: 1617173107,
+        details: 'is marketingo seno, turi daug butu trumpalaikei nuomai, lygtai vyras i...',
+        emailsSent: ''
+    },
+    {
         id: '1',
         phone: '0663952488',
+        needToSendSMS: true,
+        smsBody: 'test sms 60641a72a1bb102b055ee490',
         email: 'spamoglot1111@gmail.com',
         name: 'Sergei111',
-        date: 1573044606,
+        updatedAt: 1573044606,
         dbType: 'asana',
         details: 'details 111111111'
     },
     {
         id: '2',
         phone: '2222222222',
+        needToSendSMS: false,
         smsBody: null,
         email: 'spamoglot222@gmail.com',
         name: 'Sergei222',
-        date: 1573044606,
+        updatedAt: 1573044606,
         dbType: 'DBX',
         details: 'details 2222222222'
     },
     {
         id: '3',
         phone: '3333333333',
+        needToSendSMS: false,
         smsBody: null,
         email: 'spamoglot333@gmail.com',
         name: 'Sergei333',
-        date: 1573044606,
+        updatedAt: 1573044606,
         dbType: 'C',
         details: 'details 3333333333333'
     }
@@ -44,60 +69,66 @@ const dataTest: any = [
     {
         id: '4',
         phone: '4444444444',
+        needToSendSMS: false,
         smsBody: null,
         email: 'spamoglot444@gmail.com',
         name: 'Sergei444',
-        date: 1573044606,
+        updatedAt: 1573044606,
         dbType: 'asana',
         details: 'details 4444444444444'
     },
     {
         id: '5',
         phone: '5555555555',
+        needToSendSMS: false,
         smsBody: null,
         email: 'spamoglot555@gmail.com',
         name: 'Sergei555',
-        date: 1567884606,
+        updatedAt: 1567884606,
         dbType: 'DBX',
         details: 'details 5555555555'
     },
     {
         id: '6',
         phone: '6666666666',
+        needToSendSMS: false,
         smsBody: null,
         email: 'spamoglot666@gmail.com',
         name: 'Sergei666',
-        date: 1570049606,
+        updatedAt: 1570049606,
         dbType: 'C',
         details: 'details 666666666666666'
     },
     {
         id: '7',
         phone: '0668848072',
+        needToSendSMS: true,
         smsBody: 'Test sms Ira',
         email: 'kaktus1977@gmail.com',
         name: 'Ira',
-        date: 1571044606,
+        updatedAt: 1571044606,
         dbType: 'asana',
         details: 'details 77777777'
     },
     {
         id: '8',
         phone: '0953302725',
+        needToSendSMS: true,
         smsBody: 'Test sms Arhip',
         email: 'arhip@gmail.com',
         name: 'Arhip',
-        date: 1572044606,
+        updatedAt: 1572044606,
         dbType: 'asana',
         details: 'details 88888888'
     },
     {
         id: '9',
         phone: '0964290414',
+        needToSendSMS: true,
         smsBody: 'Test sms Kostya',
         email: 'kostya@gmail.com',
         name: 'Kostya',
-        date: 1576044606,
+        updatedAt: 1576044606,
         dbType: 'DBX',
         details: 'details 9999999999'
     }
