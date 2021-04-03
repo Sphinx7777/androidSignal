@@ -118,10 +118,10 @@ const styles = StyleSheet.create({
     },
     textContainerActive: {
         borderStyle: 'solid',
-        borderColor: '#1b6b2f',
+        borderColor: '#0730b5',
         borderWidth: 2,
         marginBottom: 3,
-        backgroundColor: '#97cca5',
+        backgroundColor: '#90f3f5',
         padding: 5,
         width: '100%',
         borderRadius: 10
