@@ -48,7 +48,7 @@ const ContactList = (props: IContactListProps) => {
                 onLongPress={onLongPress}
                 onPress={onPress}>
                 <View style={styles.nameLine}>
-                    <Text numberOfLines={1} style={{...styles.text, maxWidth: 200}}>{item.asanaDataType ? item?.taskName : item?.name}</Text>
+                    <Text numberOfLines={1} style={{...styles.text, maxWidth: 220}}>{item.asanaDataType ? item?.taskName : item?.name}</Text>
                     <Text style={styles.text}>{item?.phone}</Text>
                     {item?.asanaDataType
                         ? <Image style={{ width: 25, height: 25 }} source={require('../../../assets/asana.png')} />
@@ -103,14 +103,14 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         width: '100%',
         height: 'auto',
-        maxHeight: 270,
+        maxHeight: 280,
         padding: 5
     },
     textContainer: {
         borderStyle: 'solid',
         borderColor: '#6993f5',
         borderWidth: 2,
-        marginBottom: 3,
+        marginBottom: 5,
         backgroundColor: '#bfeef5',
         padding: 5,
         width: '100%',

@@ -143,12 +143,10 @@ class Signal extends React.Component<ISignalProps> {
                     console.log('Call Log permission denied');
                 }
             } catch (e) {
-                console.log(e);
+                console.log('fetchData_error=', e);
             }
         } else {
-            console.log(
-                'Sorry! You can’t get call logs in iOS devices because of the security concern',
-            );
+            console.log('Sorry! You can’t get call logs in iOS devices because of the security concern');
         }
     };
 
@@ -398,7 +396,6 @@ class Signal extends React.Component<ISignalProps> {
     render() {
         const { currentItemIndex, currentElement, responseDialog, pause, isInternet } = this.state;
         const { dataItems, user, navigation, submitData, setSubmitData, clearSubmitData } = this.props;
-        console.log('navigation', navigation.getCurrentOptions, 'route', this.props.route)
         // clearSubmitData()
         let dataSmsArray = null;
         if (dataItems && dataItems.size > 0) {

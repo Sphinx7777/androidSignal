@@ -132,11 +132,11 @@ const CustomInput = (props: ICustomInputProps) => {
         <>
             <View style={styles.container}>
                 {currentElement && <TouchableOpacity
+                    onPress={showDetails}
                     onLongPress={calling}
                     style={styles.textContainer}>
                     <View style={styles.nameLine}>
-                        <Text numberOfLines={1} style={{...styles.text, maxWidth: 200}}>{currentElement?.get('asanaDataType') ? currentElement?.get('taskName') : currentElement?.get('name')}</Text>
-                        <Text style={styles.text}>{currentElement?.get('name')}</Text>
+                        <Text numberOfLines={1} style={{...styles.text, maxWidth: 220}}>{currentElement?.get('asanaDataType') ? currentElement?.get('taskName') : currentElement?.get('name')}</Text>
                         <Text style={styles.text}>{currentElement?.get('phone')}</Text>
                         {currentElement?.get('asanaDataType')
                             ? <Image style={{ width: 25, height: 25, marginRight: 5 }} source={require('../../../assets/asana.png')} />
