@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'reac
 import { ICallLog } from '.';
 // import { useDispatch } from 'react-redux';
 import { ISingleDataItem } from '../../models/DataEntity';
-import { getStringDate, isNetworkAvailable } from '../../utils';
+import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
 
 
 interface ICustomInputProps {
@@ -14,6 +14,7 @@ interface ICustomInputProps {
     clearSubmitData: () => void;
     submitData: any;
     responseDialog: ICallLog;
+    onDetailsPress?: (id: string) => void;
 }
 interface ICustomInputState {
     updatedAt: number;
@@ -21,7 +22,7 @@ interface ICustomInputState {
     smsBody: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
-    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog } = props;
+    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress } = props;
     const currentElDate = currentElement ? currentElement?.get('updatedAt') : null;
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
     const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
@@ -114,15 +115,16 @@ const CustomInput = (props: ICustomInputProps) => {
         sendSMS(sms)
     }
     const submit = async () => {
-        // const isConnected = await isNetworkAvailable()
+        const isConnected = await isNetworkAvailable()
         const needToDialog = responseDialog && responseDialog.duration > 0 ? false : true;
         const data = { ...state, id: currentElement?.get('id'), responseDialog, needToDialog }
         if (state.smsBody.length === 0) {
             data.smsBody = null
         }
-        setSubmitData(data)
+        isConnected.isConnected ? setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
         // clearSubmitData()
     };
+    const showDetails = () => onDetailsPress(currentElement.get('id'))
     const cancelDetailsDis = currentElDetails === state.details
     const cancelSMSDis = currentElSmsBody === state.smsBody
     const cancelDateDis = currentElDate === state.updatedAt
@@ -227,13 +229,13 @@ const CustomInput = (props: ICustomInputProps) => {
                             : { ...styles.button, ...styles.sendButton, ...styles.disabled }}
                         disabled={state.smsBody.length === 0}
                         onPress={handleSendSms}>
-                        <Text style={styles.buttonText}>Send sms</Text>
+                        <Text style={styles.buttonText}>Custom sms</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={(!cancelDetailsDis || !cancelDateDis)
+                        style={(!cancelDetailsDis || !cancelDateDis || !cancelSMSDis)
                             ? { ...styles.button, ...styles.sendButton }
                             : { ...styles.button, ...styles.sendButton, ...styles.disabled }}
-                        disabled={(cancelDateDis && cancelDetailsDis)}
+                        disabled={(cancelDateDis && cancelDetailsDis && cancelSMSDis)}
                         onPress={submit}>
                         <Text style={styles.buttonText}> Submit </Text>
                     </TouchableOpacity>

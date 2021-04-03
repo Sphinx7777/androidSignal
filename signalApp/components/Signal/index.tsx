@@ -31,6 +31,7 @@ interface ISignalProps {
     clearSubmitData?: () => void;
     navigation?: any;
     submitData: any;
+    route?: any;
 }
 @saga(DataEntity, ['getData', 'setSubmitData', 'clearSubmitData'])
 class Signal extends React.Component<ISignalProps> {
@@ -44,21 +45,29 @@ class Signal extends React.Component<ISignalProps> {
         isStart: false,
         listData: [],
         pause: false,
-        responseDialog: null
+        responseDialog: null,
+        isInternet: true
     }
 
     getSignalData = async () => {
         const { getData, user } = this.props;
         const isConnected = await isNetworkAvailable();
         if (isConnected.isConnected) {
-            try {
-                this.getDataSignal()
-            } catch (error) {
-                console.log('getSignalData_ERROR===', JSON.stringify(error))
-            }
-
+            this.getDataSignal()
+            this.setState((prevState) => {
+                return {
+                    ...prevState,
+                    isInternet: true,
+                }
+            })
         }else {
             showToastWithGravityAndOffset('No internet connect !!!');
+            this.setState((prevState) => {
+                return {
+                    ...prevState,
+                    isInternet: false,
+                }
+            })
         }
         this.setState((prevState) => {
             return {
@@ -330,18 +339,6 @@ class Signal extends React.Component<ISignalProps> {
         } else {
             console.log('SMS permission denied');
         }
-        // const args = {
-        //     number: num,
-        //     prompt: false
-        // }
-        // return call(args)
-        //     .then((r: any) => {
-        //         console.log('call', r)
-        //         return r;
-        //     })
-        //     .catch((err: any) => {
-        //         return err
-        //     })
     }
 
     setCurrentItemIndex = (currentItemIndex: number) => {
@@ -399,8 +396,9 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     render() {
-        const { currentItemIndex, currentElement, responseDialog, pause } = this.state;
+        const { currentItemIndex, currentElement, responseDialog, pause, isInternet } = this.state;
         const { dataItems, user, navigation, submitData, setSubmitData, clearSubmitData } = this.props;
+        console.log('navigation', navigation.getCurrentOptions, 'route', this.props.route)
         // clearSubmitData()
         let dataSmsArray = null;
         if (dataItems && dataItems.size > 0) {
@@ -413,6 +411,13 @@ class Signal extends React.Component<ISignalProps> {
         const onLoginPress = () => {
             if (navigation) {
                 navigation.navigate('Login')
+            } else {
+                console.log('onLoginPress_error')
+            }
+        }
+        const onDetailsPress = (id: string) => {
+            if (navigation) {
+                navigation.navigate('Details', {id})
             } else {
                 console.log('onLoginPress_error')
             }
@@ -431,11 +436,25 @@ class Signal extends React.Component<ISignalProps> {
                     </View>
                 </View>)
         }
-        if (!dataItems || dataItems.size === 0) {
+        if ((!dataItems || dataItems.size === 0) && isInternet) {
             return (<View style={styles.loadContainer}>
-                <Text style={{ ...styles.loadContainer, height: 100 }}>
+                <View style={{ ...styles.loadContainer, height: 200 }}>
                     <ActivityIndicator size='large' color='green' />
-                </Text>
+                    <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#fc9fa8' }}>No data to download, click to try again</Text>
+                </View>
+            </View>)
+        }
+        if (!isInternet) {
+            return (<View style={styles.loadContainer}>
+                <View style={{ ...styles.loadContainer, height: 200 }}>
+                    <ActivityIndicator size='large' color='green' />
+                    <TouchableOpacity
+                            activeOpacity={0.5}
+                            style={{marginTop: 20}}
+                            onPress={this.getSignalData}>
+                            <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#fc9fa8' }}>No internet connection, click to try again</Text>
+                    </TouchableOpacity>
+                </View>
             </View>)
         }
 
@@ -451,6 +470,7 @@ class Signal extends React.Component<ISignalProps> {
                     />
                     <ScrollView style={styles.container}>
                         <CustomInput
+                        onDetailsPress={onDetailsPress}
                         responseDialog={responseDialog}
                         submitData={submitData}
                         setSubmitData={setSubmitData}
@@ -490,7 +510,7 @@ const styles = StyleSheet.create({
     loadContainer: {
         display: 'flex',
         flexDirection: 'column',
-        height: 270,
+        height: 700,
         justifyContent: 'center',
         alignItems: 'center'
     }

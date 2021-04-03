@@ -58,9 +58,15 @@ class DataEntity extends Entity {
     @action()
     public * setSubmitData(submitData: any) {
         const isConnected = yield isNetworkAvailable()
-        yield call(this.xSave, 'http://ix.rebaltic.lt/api/signal', submitData, HTTP_METHOD.PUT);
+        if (isConnected.isConnected) {
+            yield call(this.xSave, 'http://ix.rebaltic.lt/api/signal', submitData, HTTP_METHOD.PUT);
+            showToastWithGravityAndOffset('Successfully submit !');
+        } else {
+            showToastWithGravityAndOffset('No internet connect !!!');
+        }
+
+
         console.log('setSubmitData', submitData)
-        showToastWithGravityAndOffset('Successfully submit !');
         // yield put(setSubmitData({ submitData }));
     }
 

@@ -10,6 +10,7 @@ import { StyleSheet } from 'react-native';
 import { PersistGate } from 'redux-persist/integration/react'
 import Signal from './signalApp/components/Signal/index';
 import Login from './signalApp/components/Signal/Login';
+import Details from 'signalApp/components/Signal/Details';
 
 const App = () => {
     const store = makeStore()
@@ -21,6 +22,7 @@ const App = () => {
                 <Drawer.Navigator initialRouteName='Home' drawerStyle={styles.drawerStyle}>
                     <Drawer.Screen name='Home' component={Signal} options={{ title: 'Main page' }} />
                     <Drawer.Screen name='Login' component={Login} options={{ title: 'Authorization' }} />
+                    <Drawer.Screen name='Details' component={Details} />
                     {/* <Drawer.Screen name='Test' component={TestedOnly} options={{ title: 'Test' }} /> */}
                 </Drawer.Navigator>
             </NavigationContainer>

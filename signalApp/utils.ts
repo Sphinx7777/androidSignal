@@ -15,7 +15,7 @@ export const getStringDate: (date: Date) => string = (date: Date) => {
 export const showToastWithGravityAndOffset = (text: string) => {
     ToastAndroid.showWithGravityAndOffset(
         text,
-        ToastAndroid.LONG,
+        ToastAndroid.SHORT,
         ToastAndroid.BOTTOM,
         50,
         150

@@ -4,7 +4,7 @@
 // import React in our code
 // import React, {useState, useEffect} from 'react';
 
-// // import all the components we are going to use
+// // // import all the components we are going to use
 // import {
 //     SafeAreaView,
 //     Platform,
