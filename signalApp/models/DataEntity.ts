@@ -6,25 +6,31 @@ import { setSubmitData, defaultSubmitData } from '../redux/actions';
 import { showToastWithGravityAndOffset, isNetworkAvailable } from 'signalApp/utils';
 
 export type ISingleDataItem = EntityMap<{
-    id: string;
-    phone: string;
-    smsBody: string | null;
-    email: string;
-    name: string;
-    updatedAt: number;
-    dbType: string;
-    details: string;
+    id?: string;
+    phone?: string;
+    smsBody?: string | null;
+    email?: string;
+    name?: string;
+    updatedAt?: number;
+    dbType?: string;
+    details?: string;
+    needToDialog?: boolean;
+    needToSendEmail?: boolean;
+    needToSendSMS?: boolean;
     }>;
 
 export interface IDataItem {
-    id: string;
-    phone: string;
-    smsBody: string | null;
-    email: string;
-    name: string;
-    updatedAt: number;
-    dbType: string;
-    details: string;
+    id?: string;
+    phone?: string;
+    smsBody?: string | null;
+    email?: string;
+    name?: string;
+    updatedAt?: number;
+    dbType?: string;
+    details?: string;
+    needToDialog?: boolean;
+    needToSendEmail?: boolean;
+    needToSendSMS?: boolean;
 }
 
 class DataEntity extends Entity {
@@ -34,16 +40,17 @@ class DataEntity extends Entity {
     }
 
     @action()
-    public * getData() {
-        const {response} = yield call(this.xRead, 'http://neologic.golden-team.org/api/page/url/process');
-        console.log('SAGA_getData_response=', response)
+    public * getData(data: any) {
+        // const {response} = yield call(this.xRead, 'http://neologic.golden-team.org/api/page/url/process');
+        const {response} = yield call(this.xRead, 'http://ix.rebaltic.lt/api/signal', data, HTTP_METHOD.POST);
+        console.log('data', data, 'SAGA_getData_response=', response)
     }
 
     @action()
     public * setSubmitData(submitData: any) {
         const isConnected = yield isNetworkAvailable()
-        // yield call(Entity.fetch, 'http://ix.rebaltic.lt/api/signal', submitData, HTTP_METHOD.PUT);
-        console.log('setSubmitData', submitData, 'SAGA_isConnected', isConnected.isConnected)
+        yield call(this.xSave, 'http://ix.rebaltic.lt/api/signal', submitData, HTTP_METHOD.PUT);
+        console.log('setSubmitData', submitData)
         showToastWithGravityAndOffset('Successfully submit !');
         // yield put(setSubmitData({ submitData }));
     }

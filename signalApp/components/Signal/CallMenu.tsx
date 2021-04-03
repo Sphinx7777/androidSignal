@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { ISingleDataItem } from '../../models/DataEntity';
@@ -90,11 +91,11 @@ const CallMenu = (props: ICallMenuProps) => {
                         <Text style={styles.buttonText}>Next <Image style={{width: 20, height: 20}} source={require('../../../assets/phone-volume-solid.png')} /></Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={{ ...styles.button, marginBottom: 1, marginTop: 10, paddingVertical: 2 }}
-                        // style={(dataSmsArray)
-                        //     ? { ...styles.button, ...styles.sendButton }
-                        //     : { ...styles.button, ...styles.sendButton, ...styles.disabled }}
-                        disabled={dataSmsArray ? false : true}
+                        // style={{ ...styles.button, marginBottom: 1, marginTop: 10, paddingVertical: 2 }}
+                        style={(dataSmsArray && dataSmsArray.size > 0)
+                            ? { ...styles.button}
+                            : { ...styles.button, ...styles.disabled }}
+                        disabled={!dataSmsArray || dataSmsArray.size === 0 ? true : false}
                         onPress={handleSendAllSMS}>
                         <Text style={styles.buttonText}>Send all sms</Text>
                     </TouchableOpacity>
@@ -143,6 +144,10 @@ const styles = StyleSheet.create({
         display: 'flex',
         width: '35%',
     },
+    disabled: {
+        backgroundColor: 'gray',
+        borderColor: 'gray'
+    }
 });
 
 export default CallMenu;

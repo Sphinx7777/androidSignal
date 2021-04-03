@@ -337,7 +337,7 @@ export default class Entity {
 
         let response = {} as any;
         if (success && this.mSchema && query) {
-            response = normalize(camelizeKeys(JSON.parse(JSON.stringify(dataTest))), this.mSchema);
+            response = normalize(camelizeKeys(JSON.parse(JSON.stringify(query))), this.mSchema);
             response['pager'] = pager ? pager : null;
         } else if (query) {
             response = query.data;
@@ -381,8 +381,8 @@ export default class Entity {
         return action;
     }
 
-    public xSave = (uri: string, data: any = {}) => {
-        return this.actionRequest(uri, CRUD.UPDATE, HTTP_METHOD.POST, data);
+    public xSave = (uri: string, data: any = {},  method: HTTP_METHOD = HTTP_METHOD.POST) => {
+        return this.actionRequest(uri, CRUD.UPDATE, method, data);
     }
 
     public xRead = (uri: string, data: any = {}, method: HTTP_METHOD = HTTP_METHOD.GET) => {

@@ -115,7 +115,8 @@ const CustomInput = (props: ICustomInputProps) => {
     }
     const submit = async () => {
         // const isConnected = await isNetworkAvailable()
-        const data = { ...state, id: currentElement?.get('id'), responseDialog, needToDialog: false }
+        const needToDialog = responseDialog && responseDialog.duration > 0 ? false : true;
+        const data = { ...state, id: currentElement?.get('id'), responseDialog, needToDialog }
         if (state.smsBody.length === 0) {
             data.smsBody = null
         }
@@ -144,7 +145,7 @@ const CustomInput = (props: ICustomInputProps) => {
                     </View>
                     <View style={styles.nameLine}>
                         <Text style={styles.text}>{getStringDate(new Date(currentElement?.get('updatedAt') * 1000))}</Text>
-                        <Text style={styles.text}>Calling Status</Text>
+                        <Text style={styles.text}>{`${currentElement?.get('needToDialog') ? '-Need dial' : ''}${currentElement?.get('needToSendSMS') ? '-Need sms-' : ''}`}</Text>
                     </View>
                 </TouchableOpacity>}
                 <View style={styles.inputContainer}>

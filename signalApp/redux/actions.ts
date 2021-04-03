@@ -21,6 +21,8 @@ export const SET_DEFAULT_SUBMIT_DATA = 'SET_DEFAULT_SUBMIT_DATA';
 export const CLEAR_IDENTITY = 'CLEAR_IDENTITY';
 export const SET_SSR_DATA = 'QUERY_DATA';
 export const CLEAR_SSR_DATA = 'CLEAR_QUERY';
+export const DELETE_ITEM = 'DELETE_ITEM';
+
 
 
 export enum IMethod {
@@ -84,6 +86,7 @@ export const logoutUserAction = () => action(SET_DEFAULT_IDENTITY, {});
 export const clearIdentity = () => action(CLEAR_IDENTITY, {});
 
 export const setSubmitData = (data: any) => action(SET_SUBMIT_DATA, data);
+export const deleteItem = (data: any) => action(DELETE_ITEM, data);
 export const defaultSubmitData = () => action(SET_DEFAULT_SUBMIT_DATA, {});
 
 export const pageClear = (pageName: string) => action(PAGE_CLEAR, { pageName });

@@ -42,6 +42,7 @@ const ContactList = (props: IContactListProps) => {
         const { item, index } = data
         const onLongPress: (event: GestureResponderEvent) => void = () => handleLongPress(data)
         const onPress: (event: GestureResponderEvent) => void = () => handlePress(data)
+        console.log('item', item)
         return (
             <TouchableOpacity
                 style={currentItemIndex !== index ? styles.textContainer : styles.textContainerActive}
@@ -58,7 +59,7 @@ const ContactList = (props: IContactListProps) => {
                 <Text style={styles.text}>{item?.email}</Text>
                 <View style={styles.nameLine}>
                     <Text style={styles.text}>{getStringDate(new Date(item?.updatedAt * 1000))}</Text>
-                    <Text style={styles.text}>Calling Status</Text>
+                    <Text style={styles.text}>{`${item?.needToDialog ? '-Need dial' : ''}${item?.needToSendSMS ? '-Need sms-' : ''}`}</Text>
                 </View>
             </TouchableOpacity>
         )
@@ -80,7 +81,7 @@ const ContactList = (props: IContactListProps) => {
                 {
                     callData && callData.size > 0 && <FlatList
                         keyExtractor={keyExtractor}
-                        data={callData?.valueSeq()?.toJS()}
+                        data={callData?.valueSeq()?.toJS() || []}
                         renderItem={renderItem}
                     />
                 }
