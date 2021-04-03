@@ -133,19 +133,27 @@ const CustomInput = (props: ICustomInputProps) => {
                     onLongPress={calling}
                     style={styles.textContainer}>
                     <View style={styles.nameLine}>
+                        <Text numberOfLines={1} style={{...styles.text, maxWidth: 200}}>{currentElement?.get('asanaDataType') ? currentElement?.get('taskName') : currentElement?.get('name')}</Text>
                         <Text style={styles.text}>{currentElement?.get('name')}</Text>
                         <Text style={styles.text}>{currentElement?.get('phone')}</Text>
-                        {currentElement?.get('dbType') === 'asana'
+                        {currentElement?.get('asanaDataType')
                             ? <Image style={{ width: 25, height: 25, marginRight: 5 }} source={require('../../../assets/asana.png')} />
-                            : <Text style={{ ...styles.text, color: '#de471d', fontWeight: '700', marginRight: 5 }}>{currentElement?.get('dbType')}</Text>
+                            : <Text style={{ ...styles.text, color: '#de471d', fontWeight: '700', marginRight: 5 }}>{currentElement?.get('searchType')}</Text>
                         }
                     </View>
                     <View style={styles.nameLine}>
-                        <Text style={styles.text}>{currentElement?.get('email')}</Text>
+                        <Text numberOfLines={1} style={{...styles.text, maxWidth: 200}}>{currentElement?.get('email')}</Text>
                     </View>
                     <View style={styles.nameLine}>
                         <Text style={styles.text}>{getStringDate(new Date(currentElement?.get('updatedAt') * 1000))}</Text>
-                        <Text style={styles.text}>{`${currentElement?.get('needToDialog') ? '-Need dial' : ''}${currentElement?.get('needToSendSMS') ? '-Need sms-' : ''}`}</Text>
+                        <View style={styles.dataType}>
+                        {
+                            currentElement?.get('needToSendSMS') && <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} />
+                        }
+                        {
+                            currentElement?.get('needToDialog') && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />
+                        }
+                    </View>
                     </View>
                 </TouchableOpacity>}
                 <View style={styles.inputContainer}>
@@ -322,6 +330,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '100%',
         marginBottom: 5
+    },
+    dataType: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     sendButton: {
         marginBottom: 0,

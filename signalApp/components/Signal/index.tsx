@@ -52,7 +52,7 @@ class Signal extends React.Component<ISignalProps> {
         const isConnected = await isNetworkAvailable();
         if (isConnected.isConnected) {
             try {
-                getData({ pageName: 'signal', perPage: 100, filter: {forMobile: true}})
+                this.getDataSignal()
             } catch (error) {
                 console.log('getSignalData_ERROR===', JSON.stringify(error))
             }
@@ -75,6 +75,12 @@ class Signal extends React.Component<ISignalProps> {
             }
         })
     }
+
+    getDataSignal = () => {
+        const { getData } = this.props;
+        getData({ pageName: 'signal', perPage: 100, filter: {forMobile: true}})
+    }
+
     setIsStart = (isStart: boolean) => {
         this.setState((prevState) => {
             return {
@@ -141,9 +147,9 @@ class Signal extends React.Component<ISignalProps> {
         const { dataItems } = this.props;
         let dataSmsArray = [];
         if (dataItems && dataItems.size > 0 && !data) {
-        dataSmsArray = dataItems.valueSeq().filter(obj => obj.get('needToSendSMS'))?.toJS() || []
+        dataSmsArray = dataItems.valueSeq().filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0)?.toJS() || []
         }
-        if (data) {
+        if (data && data.smsBody && data.smsBody.length > 0) {
             dataSmsArray = [{
                 id: data.id,
                 phone: data.phone,
@@ -398,7 +404,7 @@ class Signal extends React.Component<ISignalProps> {
         // clearSubmitData()
         let dataSmsArray = null;
         if (dataItems && dataItems.size > 0) {
-            dataSmsArray = dataItems.filter(obj => obj.get('needToSendSMS'))
+            dataSmsArray = dataItems.filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0)
         }
         const validUser = user && user?.token && user?.token?.length > 0;
         if (!validUser && navigation) {
@@ -454,6 +460,7 @@ class Signal extends React.Component<ISignalProps> {
                         sendSMS={this.sendDirectSms}/>
                         <CallMenu
                             pause={pause}
+                            getDataSignal={this.getDataSignal}
                             pausePress={this.pausePress}
                             sendAllSMS={this.sendDirectSms}
                             dataSmsArray={dataSmsArray}
@@ -491,8 +498,6 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state: any) => {
     const dataItems = state.entities.get('signalData')
-    const dataItems2 = state.entities.get('signalData')?.valueSeq().filter(item => item.get('needToDialog') || item.get('needToSendSMS')) || []
-    console.log('dataItems222222=============================================', dataItems2)
     const user = state.identity.user || null
     const submitData = state.submitData.data || []
     return {

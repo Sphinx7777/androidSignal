@@ -17,6 +17,11 @@ export type ISingleDataItem = EntityMap<{
     needToDialog?: boolean;
     needToSendEmail?: boolean;
     needToSendSMS?: boolean;
+    searchType?: string;
+    asanaDataType?: boolean;
+    teamDataType?: boolean;
+    allBrokersDataType?: boolean;
+    taskName?: string;
     }>;
 
 export interface IDataItem {
@@ -31,6 +36,11 @@ export interface IDataItem {
     needToDialog?: boolean;
     needToSendEmail?: boolean;
     needToSendSMS?: boolean;
+    searchType?: string;
+    asanaDataType?: boolean;
+    teamDataType?: boolean;
+    allBrokersDataType?: boolean;
+    taskName?: string;
 }
 
 class DataEntity extends Entity {
@@ -41,9 +51,8 @@ class DataEntity extends Entity {
 
     @action()
     public * getData(data: any) {
-        // const {response} = yield call(this.xRead, 'http://neologic.golden-team.org/api/page/url/process');
-        const {response} = yield call(this.xRead, 'http://ix.rebaltic.lt/api/signal', data, HTTP_METHOD.POST);
-        console.log('data', data, 'SAGA_getData_response=', response)
+        yield call(this.xRead, 'http://ix.rebaltic.lt/api/signal', data, HTTP_METHOD.POST);
+        showToastWithGravityAndOffset('Successfully getData !');
     }
 
     @action()

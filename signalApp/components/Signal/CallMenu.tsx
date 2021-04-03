@@ -13,12 +13,13 @@ interface ICallMenuProps {
     dataSmsArray: any;
     pausePress: (pause?: boolean) => void;
     pause: boolean;
+    getDataSignal?: () => void;
 }
 interface ICallMenuState {
     callStart: boolean;
 }
 const CallMenu = (props: ICallMenuProps) => {
-    const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, pausePress, pause } = props;
+    const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, pausePress, pause, getDataSignal } = props;
 
     const [state, setState] = useState<ICallMenuState>({
         callStart: false
@@ -76,6 +77,12 @@ const CallMenu = (props: ICallMenuProps) => {
                     <Text>Info block</Text>
                     <Text>Info block</Text>
                     <Text>Info block</Text>
+                    <TouchableOpacity
+                        style={{ ...styles.button, maxWidth: 100, marginTop: 25}}
+                        onPress={getDataSignal}
+                    >
+                        <Text style={{...styles.buttonText, marginTop: 5}}>Reload</Text>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.buttonsBlock}>
                     <TouchableOpacity
@@ -93,8 +100,8 @@ const CallMenu = (props: ICallMenuProps) => {
                     <TouchableOpacity
                         // style={{ ...styles.button, marginBottom: 1, marginTop: 10, paddingVertical: 2 }}
                         style={(dataSmsArray && dataSmsArray.size > 0)
-                            ? { ...styles.button}
-                            : { ...styles.button, ...styles.disabled }}
+                            ? { ...styles.button, marginTop: 5}
+                            : { ...styles.button, marginTop: 5, ...styles.disabled }}
                         disabled={!dataSmsArray || dataSmsArray.size === 0 ? true : false}
                         onPress={handleSendAllSMS}>
                         <Text style={styles.buttonText}>Send all sms</Text>

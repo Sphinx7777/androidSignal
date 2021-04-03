@@ -42,24 +42,30 @@ const ContactList = (props: IContactListProps) => {
         const { item, index } = data
         const onLongPress: (event: GestureResponderEvent) => void = () => handleLongPress(data)
         const onPress: (event: GestureResponderEvent) => void = () => handlePress(data)
-        console.log('item', item)
         return (
             <TouchableOpacity
                 style={currentItemIndex !== index ? styles.textContainer : styles.textContainerActive}
                 onLongPress={onLongPress}
                 onPress={onPress}>
                 <View style={styles.nameLine}>
-                    <Text style={styles.text}>{item?.name}</Text>
+                    <Text numberOfLines={1} style={{...styles.text, maxWidth: 200}}>{item.asanaDataType ? item?.taskName : item?.name}</Text>
                     <Text style={styles.text}>{item?.phone}</Text>
-                    {item?.dbType === 'asana'
+                    {item?.asanaDataType
                         ? <Image style={{ width: 25, height: 25 }} source={require('../../../assets/asana.png')} />
-                        : <Text style={{ ...styles.text, color: '#de471d', fontWeight: '700' }}>{item?.dbType}</Text>
+                        : <Text style={{ ...styles.text, color: '#de471d', fontWeight: '700' }}>{item?.searchType}</Text>
                     }
                 </View>
                 <Text style={styles.text}>{item?.email}</Text>
                 <View style={styles.nameLine}>
                     <Text style={styles.text}>{getStringDate(new Date(item?.updatedAt * 1000))}</Text>
-                    <Text style={styles.text}>{`${item?.needToDialog ? '-Need dial' : ''}${item?.needToSendSMS ? '-Need sms-' : ''}`}</Text>
+                    <View style={styles.dataType}>
+                        {
+                            item?.needToSendSMS && <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} />
+                        }
+                        {
+                            item?.needToDialog && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />
+                        }
+                    </View>
                 </View>
             </TouchableOpacity>
         )
@@ -96,7 +102,8 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
-        height: 270,
+        height: 'auto',
+        maxHeight: 270,
         padding: 5
     },
     textContainer: {
@@ -125,6 +132,11 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         justifyContent: 'space-between'
+    },
+    dataType: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     text: {
         color: 'black',
