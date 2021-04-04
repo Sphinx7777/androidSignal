@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         width: '100%',
         height: 'auto',
-        maxHeight: 280,
+        maxHeight: '50%',
         padding: 5
     },
     textContainer: {

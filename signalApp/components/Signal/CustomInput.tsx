@@ -115,6 +115,7 @@ const CustomInput = (props: ICustomInputProps) => {
     };
     const editSubmit = async (e: any, name: string) => {
         e.preventDefault()
+        // const { text } = e.nativeEvent;
         const isConnected = await isNetworkAvailable()
         const data = { [name]: state[name], id: currentElement?.get('id') }
         isConnected.isConnected ? setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
@@ -124,11 +125,11 @@ const CustomInput = (props: ICustomInputProps) => {
     const showDialog = () => {
         setVisible(true);
     };
-    
+
     const handleCancel = () => {
         setVisible(false);
     };
-    
+
     const handleDelete = async () => {
         finishedSubmit()
         setVisible(false);
@@ -273,6 +274,7 @@ const CustomInput = (props: ICustomInputProps) => {
                         style={{ ...styles.textInput, width: '100%' }}
                         autoCorrect={false}
                         placeholder='sms body'
+                        data-name='bar'
                         value={state.smsBody}
                         onEndEditing={(e) => editSubmit(e, 'smsBody')}
                         onChangeText={text => handleInputChange(text, 'smsBody')}
@@ -301,8 +303,8 @@ const CustomInput = (props: ICustomInputProps) => {
                     <Dialog.Description>
                         Do you want to finished work with it object in mobile app ?
                     </Dialog.Description>
-                    <Dialog.Button label="Cancel" onPress={handleCancel}/>
-                    <Dialog.Button label="Finished" onPress={handleDelete}/>
+                    <Dialog.Button label="Cancel" onPress={handleCancel} />
+                    <Dialog.Button label="Finished" onPress={handleDelete} />
                 </Dialog.Container>
             </View>
         </>
