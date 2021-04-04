@@ -201,8 +201,12 @@ class Signal extends React.Component<ISignalProps> {
                 for await (const one of dataSmsArray) {
                     console.log('send_sms_to ', one.phone, one.smsBody)
                     console.log('--------------------------------------')
-                    DirectSms.sendDirectSms(one.phone, one.smsBody);
-                    this.props.setSubmitData({id: one.id, needToSendSMS: false})
+                    if (one.phone && (one.phone.length >= 9 && one.phone.length <= 11) && one.smsBody && one.smsBody.length > 0) {
+                        DirectSms.sendDirectSms(one.phone, one.smsBody);
+                        this.props.setSubmitData({id: one.id, needToSendSMS: false})
+                    } else {
+                        showToastWithGravityAndOffset('Message not sent, incorrect data or number')
+                    }
                 }
                 showToastWithGravityAndOffset(dataSmsArray.length > 1 ? 'All messages sent' : 'Message sent')
             } else {
@@ -342,7 +346,12 @@ class Signal extends React.Component<ISignalProps> {
             },
         );
         if (grantedCall === PermissionsAndroid.RESULTS.GRANTED && grantedLog === PermissionsAndroid.RESULTS.GRANTED && !currentPause) {
-            await DirectDial.createDial(num)
+            if (num && (num.length >= 9 && num.length <= 11)) {
+                await DirectDial.createDial(num)
+            } else {
+                showToastWithGravityAndOffset(`Error, incorrect number : ${num}`)
+            }
+            
         } else {
             console.log('SMS permission denied');
         }
