@@ -133,7 +133,11 @@ const CustomInput = (props: ICustomInputProps) => {
                         <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 200 }}>{currentElement?.get('email')}</Text>
                     </View>
                     <View style={styles.nameLine}>
-                        <Text style={styles.text}>{getStringDate(new Date(currentElement?.get('updatedAt') * 1000))}</Text>
+                        <View style={{ display: 'flex', flexDirection: 'column' }}>
+                            {isAsanaType && <Text style={styles.text}>Asana create: {getStringDate(new Date(currentElTaskCreated * 1000))}</Text>}
+                            {isTeamType && <Text style={styles.text}>TD date: {getStringDate(new Date(currentElTeamDate * 1000))}</Text>}
+                            {isBrokersType && <Text style={styles.text}>BD date: {getStringDate(new Date(currentElBrokersDate * 1000))}</Text>}
+                        </View>
                         <View style={styles.dataType}>
                             {currentElement?.get('needToSendSMS') && <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} />}
                             {currentElement?.get('needToDialog') && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
@@ -143,85 +147,88 @@ const CustomInput = (props: ICustomInputProps) => {
                 {isAsanaType && <>
                     <Text style={styles.label}>Task created</Text>
                     <View style={styles.inputContainer}>
-                    <TextInput
-                        style={{ ...styles.textInput }}
-                        placeholder='set new date'
-                        value={getStringDate(new Date(state.taskCreated * 1000))}
-                        editable={false}
+                        <TextInput
+                            style={{ ...styles.textInput }}
+                            placeholder='set new date'
+                            value={getStringDate(new Date(state.taskCreated * 1000))}
+                            editable={false}
                         // onChangeText={handleDateChange}
-                    />
-                    <View style={styles.dateButtons}>
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => addNewDate('taskCreated')}>
-                            <Text style={styles.buttonText}>Set new date</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                        <Text style={styles.label}>Task description</Text>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={{ ...styles.textInput, width: '100%' }}
-                                placeholder='enter task description'
-                                value={state.taskDescription}
-                                onEndEditing={(e) => editSubmit(e, 'taskDescription')}
-                                onChangeText={text => handleInputChange(text, 'taskDescription')}
-                                multiline={true} />
+                        />
+                        <View style={styles.dateButtons}>
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={() => addNewDate('taskCreated')}>
+                                <Text style={styles.buttonText}>Set new date</Text>
+                            </TouchableOpacity>
                         </View>
-                    </>}
-                {isTeamType &&
-                <>
-                    <Text style={styles.label}>Team base date</Text>
-                    <View style={styles.inputContainer}>
-                    <TextInput
-                        style={{ ...styles.textInput }}
-                        placeholder='set new date'
-                        value={state.teamDate ? getStringDate(new Date(state.teamDate * 1000)) : null}
-                        editable={false}
-                        // onChangeText={handleDateChange}
-                    />
-                    <View style={styles.dateButtons}>
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => addNewDate('teamDate')}>
-                            <Text style={styles.buttonText}>Set new date</Text>
-                        </TouchableOpacity>
                     </View>
-                </View>
-                    <Text style={styles.label}>Details</Text>
+                    <Text style={styles.label}>Task description</Text>
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={{ ...styles.textInput, width: '100%' }}
-                            placeholder='enter details'
-                            value={state.details}
-                            onEndEditing={(e) => editSubmit(e, 'details')}
-                            onChangeText={text => handleInputChange(text, 'details')}
+                            autoCorrect={false}
+                            placeholder='enter task description'
+                            value={state.taskDescription}
+                            onEndEditing={(e) => editSubmit(e, 'taskDescription')}
+                            onChangeText={text => handleInputChange(text, 'taskDescription')}
                             multiline={true} />
                     </View>
                 </>}
+                {isTeamType &&
+                    <>
+                        <Text style={styles.label}>Team base date</Text>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={{ ...styles.textInput }}
+                                placeholder='set new date'
+                                value={state.teamDate ? getStringDate(new Date(state.teamDate * 1000)) : null}
+                                editable={false}
+                            // onChangeText={handleDateChange}
+                            />
+                            <View style={styles.dateButtons}>
+                                <TouchableOpacity
+                                    style={styles.button}
+                                    onPress={() => addNewDate('teamDate')}>
+                                    <Text style={styles.buttonText}>Set new date</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        <Text style={styles.label}>Details</Text>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={{ ...styles.textInput, width: '100%' }}
+                                autoCorrect={false}
+                                placeholder='enter details'
+                                value={state.details}
+                                onEndEditing={(e) => editSubmit(e, 'details')}
+                                onChangeText={text => handleInputChange(text, 'details')}
+                                multiline={true} />
+                        </View>
+                    </>}
                 {isBrokersType &&
                     <>
-                    <Text style={styles.label}>All brokers base date</Text>
-                    <View style={styles.inputContainer}>
-                    <TextInput
-                        style={{ ...styles.textInput }}
-                        placeholder='set new date'
-                        value={state.allBrokersBaseDate ? getStringDate(new Date(state.allBrokersBaseDate * 1000)) : null}
-                        editable={false}
-                        // onChangeText={handleDateChange}
-                    />
-                    <View style={styles.dateButtons}>
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => addNewDate('allBrokersBaseDate')}>
-                            <Text style={styles.buttonText}>Set new date</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                        <Text style={styles.label}>All brokers base date</Text>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={{ ...styles.textInput }}
+                                placeholder='set new date'
+                                value={state.allBrokersBaseDate ? getStringDate(new Date(state.allBrokersBaseDate * 1000)) : null}
+                                editable={false}
+                            // onChangeText={handleDateChange}
+                            />
+                            <View style={styles.dateButtons}>
+                                <TouchableOpacity
+                                    style={styles.button}
+                                    onPress={() => addNewDate('allBrokersBaseDate')}>
+                                    <Text style={styles.buttonText}>Set new date</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
                         <Text style={styles.label}>Comment 2020</Text>
                         <View style={styles.inputContainer}>
                             <TextInput
                                 style={{ ...styles.textInput, width: '100%' }}
+                                autoCorrect={false}
                                 placeholder='comment 2020'
                                 value={state.comment2020}
                                 onEndEditing={(e) => editSubmit(e, 'comment2020')}
@@ -229,20 +236,22 @@ const CustomInput = (props: ICustomInputProps) => {
                                 multiline={true} />
                         </View>
                     </>}
-                    <Text style={styles.label}>Phone</Text>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={{ ...styles.textInput, width: '100%' }}
-                                placeholder='phone'
-                                value={state.phone}
-                                onEndEditing={(e) => editSubmit(e, 'phone')}
-                                onChangeText={text => handleInputChange(text, 'phone')}
-                                multiline={true} />
-                        </View>
+                <Text style={styles.label}>Phone</Text>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={{ ...styles.textInput, width: '100%' }}
+                        autoCorrect={false}
+                        placeholder='phone'
+                        value={state.phone}
+                        onEndEditing={(e) => editSubmit(e, 'phone')}
+                        onChangeText={text => handleInputChange(text, 'phone')}
+                        multiline={true} />
+                </View>
                 <Text style={styles.label}>sms body</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={{ ...styles.textInput, width: '100%' }}
+                        autoCorrect={false}
                         placeholder='sms body'
                         value={state.smsBody}
                         onEndEditing={(e) => editSubmit(e, 'smsBody')}
@@ -260,7 +269,7 @@ const CustomInput = (props: ICustomInputProps) => {
                         <Text style={styles.buttonText}>Custom sms</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={{ ...styles.button, ...styles.sendButton, backgroundColor: '#6993f5' }}
+                        style={{ ...styles.button, ...styles.sendButton, backgroundColor: '#f26257', borderColor: '#f26257' }}
                         onPress={finishedSubmit}>
                         <Text style={styles.buttonText}>Finished</Text>
                     </TouchableOpacity>
@@ -314,7 +323,7 @@ const styles = StyleSheet.create({
     },
     text: {
         color: 'black',
-        paddingVertical: 5
+        paddingVertical: 2
     },
     textInput: {
         borderStyle: 'solid',

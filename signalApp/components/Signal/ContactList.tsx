@@ -41,6 +41,11 @@ const ContactList = (props: IContactListProps) => {
 
     const renderItem = (data: any) => {
         const { item } = data
+        const currentElSearchType = item.searchType || '';
+        const isAsanaType = currentElSearchType ? currentElSearchType.split(',').includes('AD') : false;
+        const isTeamType = currentElSearchType ? currentElSearchType.split(',').includes('TD') : false;
+        const isBrokersType = currentElSearchType ? currentElSearchType.split(',').includes('BD') : false;
+
         const onLongPress: (event: GestureResponderEvent) => void = () => handleLongPress(data)
         const onPress: (event: GestureResponderEvent) => void = () => handlePress(data)
         return (
@@ -58,14 +63,14 @@ const ContactList = (props: IContactListProps) => {
                 </View>
                 <Text style={styles.text}>{item?.email}</Text>
                 <View style={styles.nameLine}>
-                    <Text style={styles.text}>{getStringDate(new Date(item?.updatedAt * 1000))}</Text>
+                    <View style={{display: 'flex', flexDirection: 'column'}}>
+                    {isAsanaType && <Text style={styles.text}>Asana create: {getStringDate(new Date(item?.taskCreated * 1000))}</Text>}
+                    {isTeamType && <Text style={styles.text}>TD date: {getStringDate(new Date(item?.teamDate * 1000))}</Text>}
+                    {isBrokersType && <Text style={styles.text}>BD date: {getStringDate(new Date(item?.allBrokersBaseDate * 1000))}</Text>}
+                    </View>
                     <View style={styles.dataType}>
-                        {
-                            item?.needToSendSMS && <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} />
-                        }
-                        {
-                            item?.needToDialog && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />
-                        }
+                        {item?.needToSendSMS && <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} />}
+                        {item?.needToDialog && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
                     </View>
                 </View>
             </TouchableOpacity>
