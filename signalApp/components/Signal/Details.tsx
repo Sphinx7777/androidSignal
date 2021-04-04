@@ -1,121 +1,183 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-
-// // import all the components we are going to use
+import React from 'react';
 import {
-    SafeAreaView,
-    Platform,
-    StyleSheet,
-    Text,
-    View,
-    FlatList,
-    Button,
+    StyleSheet, Text, View, FlatList, TextInput,
     TouchableOpacity, GestureResponderEvent, Image
 } from 'react-native';
-import { getStringDate } from 'signalApp/utils';
-import { IDataItem } from '../../models/DataEntity';
-
-
-
-const Details = (props) => {
-    const [id, setId] = useState(props.route?.params?.id)
-    const signalData = useSelector((state: any) => state.entities.get('signalData'));
-    let dataItems: IDataItem[] = useMemo(() => signalData?.valueSeq()?.toJS() || [], [signalData])
-    if (id && dataItems) {
-        dataItems = dataItems.filter(item => item.id === id)
+import saga from '../../decoradors/saga';
+import { IDataItem, ISingleDataItem } from '../../models/DataEntity';
+import { connect } from 'react-redux';
+import DataEntity from '../../models/DataEntity';
+import { EntityList } from '../../models/entity';
+import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
+interface IDetailsProps {
+    route: any;
+    signalData: EntityList<ISingleDataItem>;
+    getData: (data: any) => void;
+    setSubmitData: (data: any) => void;
+}
+@saga(DataEntity, ['getData', 'setSubmitData', 'clearSubmitData'])
+class Details extends React.Component<IDetailsProps> {
+    state = {
+        id: this.props.route?.params?.id,
+        currentItem: this.props.signalData?.valueSeq()?.find(o => o.get('id') === this.props.route?.params?.id)?.toJS(),
+        ...this.props.signalData?.valueSeq()?.find(o => o.get('id') === this.props.route?.params?.id)?.toJS()
     }
-    useEffect(() => {
-        setId(props.route?.params?.id)
-        return () => setId(null)
-    }, [props.route?.params?.id])
 
-    const showAll = () => setId(null)
-    const showOne = (itemId: string) => !id && setId(itemId)
+    componentDidUpdate(prevProps: any) {
+        if (this.props.route?.params?.id && prevProps.route?.params?.id !== this.props.route?.params?.id) {
+            const id = this.props.route?.params?.id;
+            const currentItem = this.props.signalData.valueSeq().find(o => o.get('id') === id)?.toJS()
+            this.setState({ 
+                id,
+                currentItem,
+                ...this.props.signalData.valueSeq().find(o => o.get('id') === id)?.toJS()
+            })
+        }
+    }
 
-    const renderItem = (data: any) => {
+    componentWillUnmount() {
+        this.setState({ id: null })
+    }
+
+    handleInputChange = (text: string, name: string) => {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                [name]: text
+            }
+        })
+    }
+
+    editSubmit = async (e: any, name: string, id: string) => {
+        e.preventDefault()
+        const { text } = e.nativeEvent;
+        const isConnected = await isNetworkAvailable()
+        const data = { [name]: text, id}
+        isConnected.isConnected ? this.props.setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
+    }
+
+    showAll = () => this.setState({ id: null, currentItem: null })
+    showOne = (itemId: string) => {
+        const currentItem = this.props.signalData.valueSeq().find(o => o.get('id') === itemId)?.toJS()
+        !this.state.id && this.setState({
+            id: itemId,
+            currentItem,
+            ...currentItem
+        })
+    }
+
+    renderItem = (data: any) => {
         const item: IDataItem = data.item
-        const onLongPress: (event: GestureResponderEvent) => void = () => showOne(item.id)
-        const onPress: (event: GestureResponderEvent) => void = () => console.log(data)
+        const onLongPress: (event: GestureResponderEvent) => void = () => this.showOne(item.id)
+        const onPress: (event: GestureResponderEvent) => void = () => console.log('renderItem_onPress=', data)
         return (
             <>
-                {
-                    id &&
+                {this.state.id &&
                     <View style={styles.showLine}>
                         <TouchableOpacity
-                        activeOpacity={0.6}
-                        style={styles.button}
-                        onPress={showAll}>
-                        <Text style={styles.buttonText}>Show all</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.text}>Count: {` ( ${signalData?.size || 0} )`}</Text>
-                    </View>
-
-                }
+                            activeOpacity={0.6}
+                            style={styles.button}
+                            onPress={this.showAll}>
+                            <Text style={styles.buttonText}>Show all</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.text}>Count: {` ( ${this.props.signalData?.size || 0} )`}</Text>
+                    </View>}
                 <TouchableOpacity
                     activeOpacity={0.6}
                     style={styles.item}
                     onLongPress={onLongPress}
                     onPress={onPress}>
-                    {
-                        Object.keys(item).sort().map(o => {
-                            return (
-                                <View key={item['id'] + o}>
-                                    {[
-                                        'email', 'agentID', 'name', 'taskName', 'details', 'searchType',
-                                        'reference', 'phone', 'highNetWorth', 'segment', 'year', 'taskDescription',
-                                        'memberRating', 'source', 'id', 'smsBody', 'emailBody', 'language', 'comment2020',
-                                        'group', 'comment2019', 'price', 'calledAbout', 'brokersTabId', 'memberRating'
-                                    ].includes(String(o)) ?
-                                        <View style={styles.itemLine}>
+                    {Object.keys(item).sort().map(o => {
+                        return (
+                            <View key={item['id'] + o}>
+                                {['agentID', 'searchType',
+                                    'reference', 'phone', 'highNetWorth', 'segment', 'year', 'taskDescription',
+                                    'memberRating', 'source', 'id', 'smsBody', 'emailBody', 'language', 'comment2020',
+                                    'group', 'comment2019', 'price', 'calledAbout', 'brokersTabId', 'memberRating'].includes(String(o)) &&
+                                    <View style={styles.itemLine}>
+                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                        <Text style={styles.text}>{String(item[o])}</Text>
+                                    </View>
+                                }
+                                {['email', 'name', 'taskName', 'details',
+                                    // 'reference', 'phone', 'highNetWorth', 'segment', 'year', 'taskDescription',
+                                    // 'memberRating', 'source', 'id', 'smsBody', 'emailBody', 'language', 'comment2020',
+                                    // 'group', 'comment2019', 'price', 'calledAbout', 'brokersTabId', 'memberRating'
+                                ].includes(String(o)) &&
+                                    <>
+                                    {this.state.id && <>
+                                        <Text style={{ ...styles.text, ...styles.textTitle, fontSize: 18, color: '#0b4702' }}>{String(o)} :</Text>
+                                        <View style={styles.inputContainer}>
+                                            <TextInput
+                                                style={{ ...styles.textInput}}
+                                                autoCorrect={false}
+                                                placeholder={String(o)}
+                                                value={this.state[String(o)]}
+                                                onEndEditing={(e) => this.editSubmit(e, o, item['id'])}
+                                                onChangeText={text => this.handleInputChange(text, String(o))}
+                                                multiline={true} />
+                                        </View></>}
+                                    {
+                                        !this.state.id && <View style={styles.itemLine}>
+                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                        <Text style={styles.text}>{String(item[o])}</Text>
+                                    </View>}</>
+                                }
+                                {['allBrokersBaseDate', 'teamDate', 'createdAt', 'updatedAt'].includes(String(o)) &&
+                                    <View style={styles.itemLine}>
+                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                        <Text style={styles.text}>{getStringDate(new Date(Number(item[o] * 1000)))}</Text>
+                                    </View>
+                                }
+                                {['needToSendSMS'].includes(String(o)) &&
+                                    <View style={styles.itemLine}>
+                                        {item?.needToSendSMS && <>
                                             <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
-                                            <Text style={styles.text}>{String(item[o])}</Text>
-                                        </View>
-                                        : ['allBrokersBaseDate', 'teamDate', 'createdAt', 'updatedAt'
-                                        ].includes(String(o)) ?
-                                            <View style={styles.itemLine}>
-                                                <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
-                                                <Text style={styles.text}>{getStringDate(new Date(Number(item[o] * 1000)))}</Text>
-                                            </View>
-                                            : ['needToSendSMS'
-                                            ].includes(String(o)) ?
-                                                <View style={styles.itemLine}>
-                                                    {item?.needToSendSMS && <>
-                                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
-                                                        <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} /></>}
-                                                </View>
-                                                :
-                                                ['needToDialog'
-                                                ].includes(String(o)) ?
-                                                    <View style={styles.itemLine}>
-                                                        {item?.needToDialog && <>
-                                                            <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
-                                                            <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} /></>}
-                                                    </View> : null
-                                    }
-                                </View>
-                            )
-
-                        })
+                                            <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} /></>}
+                                    </View>
+                                }
+                                {['needToDialog'].includes(String(o)) &&
+                                    <View style={styles.itemLine}>
+                                        {item?.needToDialog && <>
+                                            <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                            <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} /></>}
+                                    </View>}
+                            </View>
+                        )
+                    })
                     }
                 </TouchableOpacity>
             </>
         )
     }
 
-    const keyExtractor = (item: IDataItem) => item.id
+    keyExtractor = (item: IDataItem) => item.id
 
-    return (
-        <View style={styles.container}>
-            {
-                dataItems && dataItems.length > 0 && <FlatList
-                    keyExtractor={keyExtractor}
-                    data={dataItems || []}
-                    renderItem={renderItem}
-                />
-            }
-        </View>
-    )
+    render() {
+        let dataItems: IDataItem[] = this.props.signalData?.valueSeq()?.toJS() || []
+        if (this.state.id && dataItems) {
+            dataItems = dataItems.filter(item => item.id === this.state.id)
+        }
+        if ((!this.props.signalData || this.props.signalData.size === 0)) {
+            return (<View style={styles.loadContainer}>
+                <View style={{ ...styles.loadContainer, height: 200 }}>
+                            <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#dbdbd7' }}>No data...</Text>
+                </View>
+            </View>)
+        }
+        return (
+            <View style={styles.container}>
+                {
+                    dataItems && dataItems.length > 0 && <FlatList
+                        keyExtractor={this.keyExtractor}
+                        data={dataItems || []}
+                        renderItem={this.renderItem}
+                    />
+                }
+            </View>
+        )
+    }
 }
 
 const styles = StyleSheet.create({
@@ -136,6 +198,23 @@ const styles = StyleSheet.create({
         padding: 5,
         width: '100%',
         borderRadius: 10
+    },
+    loadContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        height: 700,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    textInput: {
+        borderStyle: 'solid',
+        borderBottomWidth: 1,
+        borderBottomColor: '#0b4702',
+        paddingVertical: 2,
+        width: '100%',
+    },
+    inputContainer: {
+        width: '100%',
     },
     itemLine: {
         display: 'flex',
@@ -189,4 +268,11 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Details
+const mapStateToProps = (state: any) => {
+    const signalData = state.entities.get('signalData')?.sort()
+    return {
+        signalData
+    };
+}
+
+export default connect(mapStateToProps, { ...DataEntity.actions })(Details);

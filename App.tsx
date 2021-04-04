@@ -10,7 +10,7 @@ import { StyleSheet } from 'react-native';
 import { PersistGate } from 'redux-persist/integration/react'
 import Signal from './signalApp/components/Signal/index';
 import Login from './signalApp/components/Signal/Login';
-import Details from 'signalApp/components/Signal/Details';
+import Details from './signalApp/components/Signal/Details';
 
 const App = () => {
     const store = makeStore()

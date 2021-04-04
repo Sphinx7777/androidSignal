@@ -204,7 +204,7 @@ class Signal extends React.Component<ISignalProps> {
                         DirectSms.sendDirectSms(one.phone, one.smsBody);
                         this.props.setSubmitData({id: one.id, needToSendSMS: false})
                     } else {
-                        showToastWithGravityAndOffset('Message not sent, incorrect data or number')
+                        showToastWithGravityAndOffset(`Message not sent, incorrect data or number ${one.phone}`)
                     }
                 }
                 showToastWithGravityAndOffset(dataSmsArray.length > 1 ? 'All messages sent' : 'Message sent')
