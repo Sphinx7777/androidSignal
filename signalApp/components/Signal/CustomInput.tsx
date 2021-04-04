@@ -1,11 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import { CRUD } from 'signalApp/models/entity';
 import { ICallLog } from '.';
-// import { useDispatch } from 'react-redux';
 import { ISingleDataItem } from '../../models/DataEntity';
 import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
-
 
 interface ICustomInputProps {
     currentElement: ISingleDataItem | undefined;
@@ -21,28 +20,32 @@ interface ICustomInputState {
     updatedAt: number;
     details: string | undefined;
     smsBody: string;
+    taskDescription: string;
+    comment2020: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
-    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress} = props;
+    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress } = props;
+    console.log('currentElement', currentElement)
     const currentElDate = currentElement?.get('updatedAt') || null;
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
     const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
-    const currentElSearchType = currentElement?.get('searchType');
+    const currentElTaskDescription = currentElement?.get('taskDescription') ? currentElement?.get('taskDescription') : '';
+    const currentElComment2020 = currentElement?.get('comment2020') ? currentElement?.get('comment2020') : '';
+    const currentElTeamDate = currentElement?.get('teamDate') ? currentElement?.get('teamDate') : null;
+
+    const currentElSearchType = currentElement?.get('searchType') || '';
+    const isAsanaType = currentElSearchType ? currentElSearchType.split(',').includes('AD') : false;
+    const isTeamType = currentElSearchType ? currentElSearchType.split(',').includes('TD') : false;
+    const isBrokersType = currentElSearchType ? currentElSearchType.split(',').includes('BD') : false;
+
 
     const [state, setState] = useState<ICustomInputState>({
         updatedAt: currentElDate,
         details: currentElDetails,
-        smsBody: currentElSmsBody
+        smsBody: currentElSmsBody,
+        taskDescription: currentElTaskDescription,
+        comment2020: currentElComment2020
     })
-
-    // const cancelDate = () => {
-    //     setState((prevState) => {
-    //         return {
-    //             ...prevState,
-    //             updatedAt: currentElDate
-    //         }
-    //     })
-    // }
 
     useEffect(() => {
         setState((prevState) => {
@@ -50,10 +53,13 @@ const CustomInput = (props: ICustomInputProps) => {
                 ...prevState,
                 updatedAt: currentElDate,
                 details: currentElDetails,
-                smsBody: currentElSmsBody
+                smsBody: currentElSmsBody,
+                taskDescription: currentElTaskDescription,
+                comment2020: currentElComment2020
             }
         })
-    }, [currentElDate, currentElDetails, currentElSmsBody])
+    }, [currentElDate, currentElDetails, currentElSmsBody, currentElTaskDescription, currentElComment2020])
+
     const addNewDate = () => {
         setState((prevState) => {
             return {
@@ -61,52 +67,19 @@ const CustomInput = (props: ICustomInputProps) => {
                 updatedAt: Math.round(new Date().getTime() / 1000)
             }
         })
-        setSubmitData({...state, id: currentElement?.get('id'), updatedAt: Math.round(new Date().getTime() / 1000)})
+        setSubmitData({ ...state, id: currentElement?.get('id'), updatedAt: Math.round(new Date().getTime() / 1000) })
     }
 
     const calling = () => currentElement && makeCall(currentElement?.get('phone'), 'disable')
 
-    // const handleDateChange = (data: string) => {
-    //     setState((prevState) => {
-    //         return {
-    //             ...prevState,
-    //             date: data
-    //         }
-    //     })
-    // }
-    const handleDetailsChange = (details: string) => {
+    const handleInputChange = (text: string, name: string) => {
         setState((prevState) => {
             return {
                 ...prevState,
-                details
+                [name]: text
             }
         })
     }
-    // const cancelDetails = () => {
-    //     setState((prevState) => {
-    //         return {
-    //             ...prevState,
-    //             details: currentElDetails
-    //         }
-    //     })
-    // }
-
-    const handleSMSChange = (smsBody: string) => {
-        setState((prevState) => {
-            return {
-                ...prevState,
-                smsBody
-            }
-        })
-    }
-    // const cancelSMSBody = () => {
-    //     setState((prevState) => {
-    //         return {
-    //             ...prevState,
-    //             smsBody: currentElSmsBody
-    //         }
-    //     })
-    // }
 
     const handleSendSms = () => {
         const sms = {
@@ -116,9 +89,9 @@ const CustomInput = (props: ICustomInputProps) => {
         }
         sendSMS(sms)
     }
-    const submit = async () => {
+    const finishedSubmit = async () => {
         const isConnected = await isNetworkAvailable()
-        const data = { ...state, id: currentElement?.get('id'), responseDialog, needToDialog: false, needToSendSMS: false, needToSendEmail: false, crud: CRUD.DELETE }
+        const data = { ...state, id: currentElement?.get('id'), responseDialog, needToDialog: false, needToSendSMS: false, crud: CRUD.DELETE }
         isConnected.isConnected ? setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
         // clearSubmitData()
     };
@@ -128,9 +101,7 @@ const CustomInput = (props: ICustomInputProps) => {
         isConnected.isConnected ? setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
     }
     const showDetails = () => onDetailsPress(currentElement.get('id'))
-    // const cancelDetailsDis = currentElDetails === state.details
-    // const cancelSMSDis = currentElSmsBody === state.smsBody
-    // const cancelDateDis = currentElDate === state.updatedAt
+
     return (
         <>
             <View style={styles.container}>
@@ -139,7 +110,7 @@ const CustomInput = (props: ICustomInputProps) => {
                     onLongPress={calling}
                     style={styles.textContainer}>
                     <View style={styles.nameLine}>
-                        <Text numberOfLines={1} style={{...styles.text, maxWidth: 220}}>{currentElement?.get('asanaDataType') ? currentElement?.get('taskName') : currentElement?.get('name')}</Text>
+                        <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 220 }}>{currentElement?.get('asanaDataType') ? currentElement?.get('taskName') : currentElement?.get('name')}</Text>
                         <Text style={styles.text}>{currentElement?.get('phone')}</Text>
                         {currentElement?.get('asanaDataType')
                             ? <Image style={{ width: 25, height: 25, marginRight: 5 }} source={require('../../../assets/asana.png')} />
@@ -147,18 +118,14 @@ const CustomInput = (props: ICustomInputProps) => {
                         }
                     </View>
                     <View style={styles.nameLine}>
-                        <Text numberOfLines={1} style={{...styles.text, maxWidth: 200}}>{currentElement?.get('email')}</Text>
+                        <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 200 }}>{currentElement?.get('email')}</Text>
                     </View>
                     <View style={styles.nameLine}>
                         <Text style={styles.text}>{getStringDate(new Date(currentElement?.get('updatedAt') * 1000))}</Text>
                         <View style={styles.dataType}>
-                        {
-                            currentElement?.get('needToSendSMS') && <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} />
-                        }
-                        {
-                            currentElement?.get('needToDialog') && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />
-                        }
-                    </View>
+                            {currentElement?.get('needToSendSMS') && <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} />}
+                            {currentElement?.get('needToDialog') && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
+                        </View>
                     </View>
                 </TouchableOpacity>}
                 <View style={styles.inputContainer}>
@@ -167,7 +134,7 @@ const CustomInput = (props: ICustomInputProps) => {
                         placeholder='set new date'
                         value={getStringDate(new Date(state.updatedAt * 1000))}
                         editable={false}
-                    // onChangeText={handleDateChange}
+                        // onChangeText={handleDateChange}
                     />
                     <View style={styles.dateButtons}>
                         <TouchableOpacity
@@ -175,56 +142,56 @@ const CustomInput = (props: ICustomInputProps) => {
                             onPress={addNewDate}>
                             <Text style={styles.buttonText}>Set new date</Text>
                         </TouchableOpacity>
-                        {/* <TouchableOpacity
-                            style={!cancelDateDis
-                                ? { ...styles.button, marginLeft: 5 }
-                                : { ...styles.button, ...styles.disabled, marginLeft: 5 }}
-                            disabled={cancelDateDis}
-                            onPress={cancelDate}>
-                            <Text style={styles.buttonText}>Cancel</Text>
-                        </TouchableOpacity> */}
                     </View>
                 </View>
-                <Text style={styles.label}>details</Text>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={{...styles.textInput, width: '100%'}}
-                        placeholder='enter details'
-                        value={state.details}
-                        onEndEditing={editSubmit}
-                        onChangeText={handleDetailsChange}
-                        multiline={true}
-                    />
-                    {/* <View style={styles.detailsButtons}>
-                        <TouchableOpacity
-                            style={!cancelDetailsDis
-                                ? styles.button
-                                : { ...styles.button, ...styles.disabled }}
-                            disabled={cancelDetailsDis}
-                            onPress={cancelDetails}>
-                            <Text style={styles.buttonText}>Cancel</Text>
-                        </TouchableOpacity>
-                    </View> */}
-                </View>
+                {isAsanaType && <>
+                        <Text style={styles.label}>Task description</Text>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={{ ...styles.textInput, width: '100%' }}
+                                placeholder='enter task description'
+                                value={state.taskDescription}
+                                onEndEditing={editSubmit}
+                                onChangeText={text => handleInputChange(text, 'taskDescription')}
+                                multiline={true} />
+                        </View>
+                    </>}
+                {isTeamType &&
+                <>
+                    <Text style={styles.label}>Details</Text>
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={{ ...styles.textInput, width: '100%' }}
+                            placeholder='enter details'
+                            value={state.details}
+                            onEndEditing={editSubmit}
+                            onChangeText={text => handleInputChange(text, 'details')}
+                            multiline={true} />
+                    </View>
+                </>}
+                {isBrokersType &&
+                    <>
+                        <Text style={styles.label}>Comment 2020</Text>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={{ ...styles.textInput, width: '100%' }}
+                                placeholder='comment 2020'
+                                value={state.comment2020}
+                                onEndEditing={editSubmit}
+                                onChangeText={text => handleInputChange(text, 'comment2020')}
+                                multiline={true} />
+                        </View>
+                    </>}
                 <Text style={styles.label}>sms body</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
-                        style={{...styles.textInput, width: '100%'}}
+                        style={{ ...styles.textInput, width: '100%' }}
                         placeholder='sms body'
                         value={state.smsBody}
-                        onChangeText={handleSMSChange}
+                        onEndEditing={editSubmit}
+                        onChangeText={text => handleInputChange(text, 'smsBody')}
                         multiline={true}
                     />
-                    {/* <View style={styles.detailsButtons}>
-                        <TouchableOpacity
-                            style={!cancelSMSDis
-                                ? styles.button
-                                : { ...styles.button, ...styles.disabled }}
-                            disabled={cancelSMSDis}
-                            onPress={cancelSMSBody}>
-                            <Text style={styles.buttonText}>Cancel</Text>
-                        </TouchableOpacity>
-                    </View> */}
                 </View>
                 <View style={styles.sendButtonContainer}>
                     <TouchableOpacity
@@ -237,7 +204,7 @@ const CustomInput = (props: ICustomInputProps) => {
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={{ ...styles.button, ...styles.sendButton, backgroundColor: '#6993f5' }}
-                        onPress={submit}>
+                        onPress={finishedSubmit}>
                         <Text style={styles.buttonText}>Finished</Text>
                     </TouchableOpacity>
                 </View>
