@@ -87,7 +87,7 @@ class Signal extends React.Component<ISignalProps> {
 
     getDataSignal = () => {
         const { getData } = this.props;
-        getData({ pageName: 'signal', perPage: 100, filter: {forMobile: true}})
+        getData({ pageName: 'signal', perPage: 100, filter: {mobileInfo: ['needToDialog', 'needToSendSMS']}})
     }
 
     setIsStart = (isStart: boolean) => {
@@ -204,7 +204,7 @@ class Signal extends React.Component<ISignalProps> {
                         DirectSms.sendDirectSms(one.phone, one.smsBody);
                         this.props.setSubmitData({id: one.id, needToSendSMS: false})
                     } else {
-                        showToastWithGravityAndOffset(`Message not sent, incorrect data or number ${one.phone}`)
+                        showToastWithGravityAndOffset(`ERROR, incorrect number ${one.phone} or empty sms body`)
                     }
                 }
                 showToastWithGravityAndOffset(dataSmsArray.length > 1 ? 'All messages sent' : 'Message sent')

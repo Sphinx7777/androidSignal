@@ -13,10 +13,9 @@ import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from
 interface IDetailsProps {
     route: any;
     signalData: EntityList<ISingleDataItem>;
-    getData: (data: any) => void;
     setSubmitData: (data: any) => void;
 }
-@saga(DataEntity, ['getData', 'setSubmitData', 'clearSubmitData'])
+@saga(DataEntity, ['setSubmitData'])
 class Details extends React.Component<IDetailsProps> {
     state = {
         id: this.props.route?.params?.id,
@@ -91,29 +90,28 @@ class Details extends React.Component<IDetailsProps> {
                     {Object.keys(item).sort().map(o => {
                         return (
                             <View key={item['id'] + o}>
-                                {['agentID', 'searchType',
-                                    'reference', 'phone', 'highNetWorth', 'segment', 'year', 'taskDescription',
-                                    'memberRating', 'source', 'id', 'smsBody', 'emailBody', 'language', 'comment2020',
-                                    'group', 'comment2019', 'price', 'calledAbout', 'brokersTabId', 'memberRating'].includes(String(o)) &&
+                                {['agentID', 'searchType','reference', 'highNetWorth', 'year', 'source', 'id', 'language', 'brokersTabId'].includes(String(o)) &&
                                     <View style={styles.itemLine}>
                                         <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
                                         <Text style={styles.text}>{String(item[o])}</Text>
                                     </View>
                                 }
-                                {['email', 'name', 'taskName', 'details',
-                                    // 'reference', 'phone', 'highNetWorth', 'segment', 'year', 'taskDescription',
-                                    // 'memberRating', 'source', 'id', 'smsBody', 'emailBody', 'language', 'comment2020',
-                                    // 'group', 'comment2019', 'price', 'calledAbout', 'brokersTabId', 'memberRating'
+                                {['email', 'name', 'taskName', 'details', 'phone', 'segment', 'taskDescription', 'memberRating',
+                                'smsBody', 'emailBody', 'comment2020','group', 'price', 'calledAbout', 'comment2019'
                                 ].includes(String(o)) &&
                                     <>
                                     {this.state.id && <>
-                                        <Text style={{ ...styles.text, ...styles.textTitle, fontSize: 18, color: '#0b4702' }}>{String(o)} :</Text>
+                                    <View style={styles.showLine}>
+                                    <Text style={{ ...styles.text, ...styles.textTitle, color: '#f56b45' }}>{String(o)} :</Text>
+                                    <Image style={{ width: 20, height: 20, marginLeft: 5 }} source={require('../../../assets/edit.png')} />
+                                    </View>
+                                        
                                         <View style={styles.inputContainer}>
                                             <TextInput
                                                 style={{ ...styles.textInput}}
                                                 autoCorrect={false}
                                                 placeholder={String(o)}
-                                                value={this.state[String(o)]}
+                                                value={String(this.state[o])}
                                                 onEndEditing={(e) => this.editSubmit(e, o, item['id'])}
                                                 onChangeText={text => this.handleInputChange(text, String(o))}
                                                 multiline={true} />
@@ -127,14 +125,14 @@ class Details extends React.Component<IDetailsProps> {
                                 {['allBrokersBaseDate', 'teamDate', 'createdAt', 'updatedAt'].includes(String(o)) &&
                                     <View style={styles.itemLine}>
                                         <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
-                                        <Text style={styles.text}>{getStringDate(new Date(Number(item[o] * 1000)))}</Text>
+                                        <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
                                     </View>
                                 }
                                 {['needToSendSMS'].includes(String(o)) &&
                                     <View style={styles.itemLine}>
                                         {item?.needToSendSMS && <>
                                             <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
-                                            <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} /></>}
+                                            <Image style={{ width: 18, height: 18 }} source={require('../../../assets/sms.png')} /></>}
                                     </View>
                                 }
                                 {['needToDialog'].includes(String(o)) &&

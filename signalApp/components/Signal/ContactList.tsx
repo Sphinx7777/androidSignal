@@ -45,6 +45,9 @@ const ContactList = (props: IContactListProps) => {
         const isAsanaType = currentElSearchType ? currentElSearchType.split(',').includes('AD') : false;
         const isTeamType = currentElSearchType ? currentElSearchType.split(',').includes('TD') : false;
         const isBrokersType = currentElSearchType ? currentElSearchType.split(',').includes('BD') : false;
+        const isPhone = item.phone.length >= 9 && item.phone.length <= 11;
+        const currentElSMSBody= item.smsBody;
+        const isNeedSms = item.needToSendSMS
 
         const onLongPress: (event: GestureResponderEvent) => void = () => handleLongPress(data)
         const onPress: (event: GestureResponderEvent) => void = () => handlePress(data)
@@ -55,20 +58,21 @@ const ContactList = (props: IContactListProps) => {
                 onPress={onPress}>
                 <View style={styles.nameLine}>
                     <Text numberOfLines={1} style={{...styles.text, maxWidth: 220}}>{item.asanaDataType ? item?.taskName : item?.name}</Text>
-                    <Text style={styles.text}>{item?.phone}</Text>
+                    <Text style={{...styles.text, color: isPhone ? 'black' : '#bf0416'}}>{item.phone && item.phone.length > 0 ? item.phone : '--------'}</Text>
                     {item?.asanaDataType
                         ? <Image style={{ width: 25, height: 25 }} source={require('../../../assets/asana.png')} />
-                        : <Text style={{ ...styles.text, color: '#de471d', fontWeight: '700' }}>{item?.searchType}</Text>
+                        : <Text style={{ ...styles.text, color: '#0d1180', fontWeight: '700' }}>{item?.searchType}</Text>
                     }
                 </View>
                 <Text style={styles.text}>{item?.email}</Text>
                 <View style={styles.nameLine}>
                     <View style={{display: 'flex', flexDirection: 'column'}}>
-                    {isAsanaType && <Text style={styles.text}>Asana create: {getStringDate(new Date(item?.taskCreated * 1000))}</Text>}
-                    {isTeamType && <Text style={styles.text}>TD date: {getStringDate(new Date(item?.teamDate * 1000))}</Text>}
-                    {isBrokersType && <Text style={styles.text}>BD date: {getStringDate(new Date(item?.allBrokersBaseDate * 1000))}</Text>}
+                    {isAsanaType && <Text style={styles.text}>Asana create: {item?.taskCreated > 0 ? getStringDate(new Date(item?.taskCreated * 1000)) : 'no info'}</Text>}
+                    {isTeamType && <Text style={styles.text}>TD date: {item?.teamDate > 0 ? getStringDate(new Date(item?.teamDate * 1000)) : 'no info'}</Text>}
+                    {isBrokersType && <Text style={styles.text}>BD date: {item?.allBrokersBaseDate > 0 ? getStringDate(new Date(item?.allBrokersBaseDate * 1000)) : 'no info'}</Text>}
                     </View>
                     <View style={styles.dataType}>
+                        {(!currentElSMSBody || currentElSMSBody.length === 0 && isNeedSms) && <Text style={{color: '#bf0416', paddingVertical: 2, marginRight: 4, fontWeight: '600'}}>Empty sms body</Text>}  
                         {item?.needToSendSMS && <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} />}
                         {item?.needToDialog && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
                     </View>

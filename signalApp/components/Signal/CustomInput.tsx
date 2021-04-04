@@ -134,6 +134,10 @@ const CustomInput = (props: ICustomInputProps) => {
         finishedSubmit()
         setVisible(false);
     };
+    const phone = currentElement?.get('phone') && currentElement?.get('phone')?.length > 0 ? currentElement?.get('phone') : '--------'
+    const isPhone = currentElement?.get('phone') && currentElement?.get('phone').length >= 9 && currentElement?.get('phone').length <= 11;
+    const currentElSMSBody= currentElement?.get('smsBody');
+    const isNeedSms = currentElement?.get('needToSendSMS');
 
     return (
         <>
@@ -144,10 +148,10 @@ const CustomInput = (props: ICustomInputProps) => {
                     style={styles.textContainer}>
                     <View style={styles.nameLine}>
                         <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 220 }}>{currentElement?.get('asanaDataType') ? currentElement?.get('taskName') : currentElement?.get('name')}</Text>
-                        <Text style={styles.text}>{currentElement?.get('phone')}</Text>
+                        <Text style={{...styles.text, color: isPhone ? 'black' : '#bf0416'}}>{phone}</Text>
                         {currentElement?.get('asanaDataType')
                             ? <Image style={{ width: 25, height: 25, marginRight: 5 }} source={require('../../../assets/asana.png')} />
-                            : <Text style={{ ...styles.text, color: '#de471d', fontWeight: '700', marginRight: 5 }}>{currentElement?.get('searchType')}</Text>
+                            : <Text style={{ ...styles.text, color: '#0d1180', fontWeight: '700', marginRight: 5 }}>{currentElement?.get('searchType')}</Text>
                         }
                     </View>
                     <View style={styles.nameLine}>
@@ -155,11 +159,12 @@ const CustomInput = (props: ICustomInputProps) => {
                     </View>
                     <View style={styles.nameLine}>
                         <View style={{ display: 'flex', flexDirection: 'column' }}>
-                            {isAsanaType && <Text style={styles.text}>Asana create: {getStringDate(new Date(currentElTaskCreated * 1000))}</Text>}
-                            {isTeamType && <Text style={styles.text}>TD date: {getStringDate(new Date(currentElTeamDate * 1000))}</Text>}
-                            {isBrokersType && <Text style={styles.text}>BD date: {getStringDate(new Date(currentElBrokersDate * 1000))}</Text>}
+                            {isAsanaType && <Text style={styles.text}>Asana create: {currentElTaskCreated > 0 ? getStringDate(new Date(currentElTaskCreated * 1000)) : 'no info'}</Text>}
+                            {isTeamType && <Text style={styles.text}>TD date: {currentElTeamDate > 0 ? getStringDate(new Date(currentElTeamDate * 1000)) : 'no info'}</Text>}
+                            {isBrokersType && <Text style={styles.text}>BD date: {currentElBrokersDate > 0 ? getStringDate(new Date(currentElBrokersDate * 1000)) : 'no info'}</Text>}
                         </View>
                         <View style={styles.dataType}>
+                        {(!currentElSMSBody || currentElSMSBody.length === 0 && isNeedSms) && <Text style={{color: '#bf0416', paddingVertical: 2, marginRight: 4, fontWeight: '600'}}>Empty sms body</Text>}
                             {currentElement?.get('needToSendSMS') && <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} />}
                             {currentElement?.get('needToDialog') && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
                         </View>
