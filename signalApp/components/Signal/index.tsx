@@ -39,18 +39,19 @@ class Signal extends React.Component<ISignalProps> {
     state = {
         internetConnect: false,
         currentItemIndex: 0,
-        currentElement: this.props.dataItems && this.props.dataItems?.valueSeq()?.get(0),
+        currentElement: this.props.dataItems?.valueSeq()?.get(0),
         callDetector: undefined,
         callStates: [],
         isStart: false,
         listData: [],
         pause: false,
         responseDialog: null,
-        isInternet: true
+        isInternet: true,
+        currentElementId: null
     }
 
     getSignalData = async () => {
-        const { getData, user } = this.props;
+        console.log('getSignalData')
         const isConnected = await isNetworkAvailable();
         if (isConnected.isConnected) {
             this.getDataSignal()
@@ -95,6 +96,14 @@ class Signal extends React.Component<ISignalProps> {
             return {
                 ...prevState,
                 isStart
+            }
+        })
+    }
+
+    setPrevElement = () => {
+        this.setState((prevState) => {
+            return {
+                ...prevState
             }
         })
     }
@@ -349,10 +358,12 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     setCurrentElement = (currentElement: ISingleDataItem) => {
+        const currentElementId = currentElement?.get('id')
         this.setState((prevState) => {
             return {
                 ...prevState,
                 currentElement,
+                currentElementId
             }
         })
     }
@@ -372,12 +383,19 @@ class Signal extends React.Component<ISignalProps> {
 
     componentDidUpdate(prevProps: any) {
         const { user, dataItems } = this.props
+        let currentElement = this.state.currentElement
+        if (this.state.currentElementId) {
+            currentElement = dataItems?.get(this.state.currentElementId);
+        } else if (currentElement) {
+            currentElement = currentElement
+        } else {
+            currentElement = this.props.dataItems?.valueSeq()?.get(0)
+        }
         const validUser = user && prevProps.user !== user && user?.token && user?.token?.length > 0 && !dataItems
         if (validUser) {
             this.getSignalData();
         }
         if (prevProps.dataItems !== dataItems) {
-            const currentElement = dataItems && dataItems?.valueSeq()?.get(0);
             this.setState((prevState) => {
                 return {
                     ...prevState,
@@ -437,7 +455,12 @@ class Signal extends React.Component<ISignalProps> {
             return (<View style={styles.loadContainer}>
                 <View style={{ ...styles.loadContainer, height: 200 }}>
                     <ActivityIndicator size='large' color='green' />
-                    <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#fc9fa8' }}>No data to download, click to try again</Text>
+                    <TouchableOpacity
+                            activeOpacity={0.5}
+                            style={{marginTop: 20}}
+                            onPress={this.getSignalData}>
+                            <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#fc9fa8' }}>No data to download, click to try again</Text>
+                    </TouchableOpacity>
                 </View>
             </View>)
         }
@@ -459,6 +482,7 @@ class Signal extends React.Component<ISignalProps> {
             <View style={styles.container}>
                 <View style={styles.viewContainer}>
                     <ContactList
+                        currentElement={currentElement}
                         currentItemIndex={currentItemIndex}
                         callData={dataItems}
                         setCurrentItemIndex={this.setCurrentItemIndex}
@@ -514,7 +538,7 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state: any) => {
-    const dataItems = state.entities.get('signalData')
+    const dataItems = state.entities.get('signalData')?.sort()
     const user = state.identity.user || null
     const submitData = state.submitData.data || []
     return {

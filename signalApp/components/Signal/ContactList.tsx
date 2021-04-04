@@ -9,12 +9,13 @@ interface IContactListProps {
     currentItemIndex: number;
     makeCall: (phone: string) => Promise<any>;
     setCurrentElement: (currentElement: ISingleDataItem) => void;
+    currentElement?: ISingleDataItem | undefined;
 }
 interface IContactListState {
 
 }
 const ContactList = (props: IContactListProps) => {
-    const { callData, setCurrentItemIndex, currentItemIndex, makeCall, setCurrentElement } = props;
+    const { callData, setCurrentItemIndex, currentItemIndex, makeCall, setCurrentElement, currentElement } = props;
 
     const [state, setState] = useState<IContactListState>({
 
@@ -24,11 +25,11 @@ const ContactList = (props: IContactListProps) => {
         const { index } = data
         const phone = callData?.valueSeq()?.getIn([index, 'phone'])
         const element = callData?.valueSeq()?.get(index)
-        const res = await makeCall(phone)
-        if (res) {
-            setCurrentElement(element)
-            setCurrentItemIndex(index)
-        }
+        makeCall(phone)
+        // if (res) {
+        //     setCurrentElement(element)
+        //     setCurrentItemIndex(index)
+        // }
     }
 
     const handlePress = (data: any) => {
@@ -39,12 +40,12 @@ const ContactList = (props: IContactListProps) => {
     }
 
     const renderItem = (data: any) => {
-        const { item, index } = data
+        const { item } = data
         const onLongPress: (event: GestureResponderEvent) => void = () => handleLongPress(data)
         const onPress: (event: GestureResponderEvent) => void = () => handlePress(data)
         return (
             <TouchableOpacity
-                style={currentItemIndex !== index ? styles.textContainer : styles.textContainerActive}
+                style={currentElement?.get('id') !== item.id ? styles.textContainer : styles.textContainerActive}
                 onLongPress={onLongPress}
                 onPress={onPress}>
                 <View style={styles.nameLine}>

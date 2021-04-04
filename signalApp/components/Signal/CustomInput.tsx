@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
+import { CRUD } from 'signalApp/models/entity';
 import { ICallLog } from '.';
 // import { useDispatch } from 'react-redux';
 import { ISingleDataItem } from '../../models/DataEntity';
@@ -22,10 +23,11 @@ interface ICustomInputState {
     smsBody: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
-    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress } = props;
-    const currentElDate = currentElement ? currentElement?.get('updatedAt') : null;
+    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress} = props;
+    const currentElDate = currentElement?.get('updatedAt') || null;
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
     const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
+    const currentElSearchType = currentElement?.get('searchType');
 
     const [state, setState] = useState<ICustomInputState>({
         updatedAt: currentElDate,
@@ -33,14 +35,14 @@ const CustomInput = (props: ICustomInputProps) => {
         smsBody: currentElSmsBody
     })
 
-    const cancelDate = () => {
-        setState((prevState) => {
-            return {
-                ...prevState,
-                updatedAt: currentElDate
-            }
-        })
-    }
+    // const cancelDate = () => {
+    //     setState((prevState) => {
+    //         return {
+    //             ...prevState,
+    //             updatedAt: currentElDate
+    //         }
+    //     })
+    // }
 
     useEffect(() => {
         setState((prevState) => {
@@ -52,7 +54,6 @@ const CustomInput = (props: ICustomInputProps) => {
             }
         })
     }, [currentElDate, currentElDetails, currentElSmsBody])
-
     const addNewDate = () => {
         setState((prevState) => {
             return {
@@ -60,6 +61,7 @@ const CustomInput = (props: ICustomInputProps) => {
                 updatedAt: Math.round(new Date().getTime() / 1000)
             }
         })
+        setSubmitData({...state, id: currentElement?.get('id'), updatedAt: Math.round(new Date().getTime() / 1000)})
     }
 
     const calling = () => currentElement && makeCall(currentElement?.get('phone'), 'disable')
@@ -80,14 +82,14 @@ const CustomInput = (props: ICustomInputProps) => {
             }
         })
     }
-    const cancelDetails = () => {
-        setState((prevState) => {
-            return {
-                ...prevState,
-                details: currentElDetails
-            }
-        })
-    }
+    // const cancelDetails = () => {
+    //     setState((prevState) => {
+    //         return {
+    //             ...prevState,
+    //             details: currentElDetails
+    //         }
+    //     })
+    // }
 
     const handleSMSChange = (smsBody: string) => {
         setState((prevState) => {
@@ -97,14 +99,14 @@ const CustomInput = (props: ICustomInputProps) => {
             }
         })
     }
-    const cancelSMSBody = () => {
-        setState((prevState) => {
-            return {
-                ...prevState,
-                smsBody: currentElSmsBody
-            }
-        })
-    }
+    // const cancelSMSBody = () => {
+    //     setState((prevState) => {
+    //         return {
+    //             ...prevState,
+    //             smsBody: currentElSmsBody
+    //         }
+    //     })
+    // }
 
     const handleSendSms = () => {
         const sms = {
@@ -116,18 +118,19 @@ const CustomInput = (props: ICustomInputProps) => {
     }
     const submit = async () => {
         const isConnected = await isNetworkAvailable()
-        const needToDialog = responseDialog && responseDialog.duration > 0 ? false : true;
-        const data = { ...state, id: currentElement?.get('id'), responseDialog, needToDialog }
-        if (state.smsBody.length === 0) {
-            data.smsBody = null
-        }
+        const data = { ...state, id: currentElement?.get('id'), responseDialog, needToDialog: false, needToSendSMS: false, needToSendEmail: false, crud: CRUD.DELETE }
         isConnected.isConnected ? setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
         // clearSubmitData()
     };
+    const editSubmit = async () => {
+        const isConnected = await isNetworkAvailable()
+        const data = { ...state, id: currentElement?.get('id') }
+        isConnected.isConnected ? setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
+    }
     const showDetails = () => onDetailsPress(currentElement.get('id'))
-    const cancelDetailsDis = currentElDetails === state.details
-    const cancelSMSDis = currentElSmsBody === state.smsBody
-    const cancelDateDis = currentElDate === state.updatedAt
+    // const cancelDetailsDis = currentElDetails === state.details
+    // const cancelSMSDis = currentElSmsBody === state.smsBody
+    // const cancelDateDis = currentElDate === state.updatedAt
     return (
         <>
             <View style={styles.container}>
@@ -160,8 +163,8 @@ const CustomInput = (props: ICustomInputProps) => {
                 </TouchableOpacity>}
                 <View style={styles.inputContainer}>
                     <TextInput
-                        style={{ ...styles.textInput, ...styles.dateInput }}
-                        placeholder='set date'
+                        style={{ ...styles.textInput }}
+                        placeholder='set new date'
                         value={getStringDate(new Date(state.updatedAt * 1000))}
                         editable={false}
                     // onChangeText={handleDateChange}
@@ -170,28 +173,29 @@ const CustomInput = (props: ICustomInputProps) => {
                         <TouchableOpacity
                             style={styles.button}
                             onPress={addNewDate}>
-                            <Text style={styles.buttonText}>Set date</Text>
+                            <Text style={styles.buttonText}>Set new date</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             style={!cancelDateDis
                                 ? { ...styles.button, marginLeft: 5 }
                                 : { ...styles.button, ...styles.disabled, marginLeft: 5 }}
                             disabled={cancelDateDis}
                             onPress={cancelDate}>
                             <Text style={styles.buttonText}>Cancel</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </View>
                 <Text style={styles.label}>details</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
-                        style={styles.textInput}
+                        style={{...styles.textInput, width: '100%'}}
                         placeholder='enter details'
                         value={state.details}
+                        onEndEditing={editSubmit}
                         onChangeText={handleDetailsChange}
                         multiline={true}
                     />
-                    <View style={styles.detailsButtons}>
+                    {/* <View style={styles.detailsButtons}>
                         <TouchableOpacity
                             style={!cancelDetailsDis
                                 ? styles.button
@@ -200,18 +204,18 @@ const CustomInput = (props: ICustomInputProps) => {
                             onPress={cancelDetails}>
                             <Text style={styles.buttonText}>Cancel</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                 </View>
                 <Text style={styles.label}>sms body</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
-                        style={styles.textInput}
+                        style={{...styles.textInput, width: '100%'}}
                         placeholder='sms body'
                         value={state.smsBody}
                         onChangeText={handleSMSChange}
                         multiline={true}
                     />
-                    <View style={styles.detailsButtons}>
+                    {/* <View style={styles.detailsButtons}>
                         <TouchableOpacity
                             style={!cancelSMSDis
                                 ? styles.button
@@ -220,7 +224,7 @@ const CustomInput = (props: ICustomInputProps) => {
                             onPress={cancelSMSBody}>
                             <Text style={styles.buttonText}>Cancel</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                 </View>
                 <View style={styles.sendButtonContainer}>
                     <TouchableOpacity
@@ -232,12 +236,9 @@ const CustomInput = (props: ICustomInputProps) => {
                         <Text style={styles.buttonText}>Custom sms</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={(!cancelDetailsDis || !cancelDateDis || !cancelSMSDis)
-                            ? { ...styles.button, ...styles.sendButton }
-                            : { ...styles.button, ...styles.sendButton, ...styles.disabled }}
-                        disabled={(cancelDateDis && cancelDetailsDis && cancelSMSDis)}
+                        style={{ ...styles.button, ...styles.sendButton, backgroundColor: '#6993f5' }}
                         onPress={submit}>
-                        <Text style={styles.buttonText}> Submit </Text>
+                        <Text style={styles.buttonText}>Finished</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: 'lightgrey',
         paddingVertical: 5,
-        width: '70%',
+        width: '60%',
     },
     dateInput: {
         width: '40%'
@@ -315,7 +316,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 2,
         borderColor: '#1f6b4e',
-        width: 85,
+        width: 120,
         paddingVertical: 2,
         borderRadius: 10,
         overflow: 'hidden',

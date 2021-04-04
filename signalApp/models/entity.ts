@@ -381,8 +381,8 @@ export default class Entity {
         return action;
     }
 
-    public xSave = (uri: string, data: any = {},  method: HTTP_METHOD = HTTP_METHOD.POST) => {
-        return this.actionRequest(uri, CRUD.UPDATE, method, data);
+    public xSave = (uri: string, crud: CRUD = CRUD.UPDATE, data: any = {},  method: HTTP_METHOD = HTTP_METHOD.POST) => {
+        return this.actionRequest(uri, crud, method, data);
     }
 
     public xRead = (uri: string, data: any = {}, method: HTTP_METHOD = HTTP_METHOD.GET) => {
