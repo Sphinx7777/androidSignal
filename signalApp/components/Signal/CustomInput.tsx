@@ -5,6 +5,7 @@ import { CRUD } from 'signalApp/models/entity';
 import { ICallLog } from '.';
 import { ISingleDataItem } from '../../models/DataEntity';
 import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
+import Dialog from "react-native-dialog";
 
 interface ICustomInputProps {
     currentElement: ISingleDataItem | undefined;
@@ -15,6 +16,7 @@ interface ICustomInputProps {
     submitData: any;
     responseDialog: ICallLog;
     onDetailsPress?: (id: string) => void;
+    setNextElement: () => void;
 }
 interface ICustomInputState {
     taskCreated: number;
@@ -27,8 +29,9 @@ interface ICustomInputState {
     phone: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
-    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress } = props;
+    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement } = props;
     const currentElTaskCreated = currentElement?.get('taskCreated') || null;
+    const [visible, setVisible] = useState(false)
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
     const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
     const currentElTaskDescription = currentElement?.get('taskDescription') ? currentElement?.get('taskDescription') : '';
@@ -41,7 +44,6 @@ const CustomInput = (props: ICustomInputProps) => {
     const isAsanaType = currentElSearchType ? currentElSearchType.split(',').includes('AD') : false;
     const isTeamType = currentElSearchType ? currentElSearchType.split(',').includes('TD') : false;
     const isBrokersType = currentElSearchType ? currentElSearchType.split(',').includes('BD') : false;
-
 
     const [state, setState] = useState<ICustomInputState>({
         taskCreated: currentElTaskCreated,
@@ -98,12 +100,17 @@ const CustomInput = (props: ICustomInputProps) => {
             phone: currentElement?.get('phone'),
             smsBody: state.smsBody
         }
-        sendSMS(sms)
+        sendSMS(sms);
     }
     const finishedSubmit = async () => {
         const isConnected = await isNetworkAvailable()
         const data = { ...state, id: currentElement?.get('id'), responseDialog, needToDialog: false, needToSendSMS: false, crud: CRUD.DELETE }
-        isConnected.isConnected ? setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
+        if (isConnected.isConnected) {
+            setSubmitData(data);
+            setNextElement();
+        } else {
+            showToastWithGravityAndOffset('No internet connect !!!');
+        }
         // clearSubmitData()
     };
     const editSubmit = async (e: any, name: string) => {
@@ -113,6 +120,19 @@ const CustomInput = (props: ICustomInputProps) => {
         isConnected.isConnected ? setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
     }
     const showDetails = () => onDetailsPress(currentElement.get('id'))
+
+    const showDialog = () => {
+        setVisible(true);
+    };
+    
+    const handleCancel = () => {
+        setVisible(false);
+    };
+    
+    const handleDelete = async () => {
+        finishedSubmit()
+        setVisible(false);
+    };
 
     return (
         <>
@@ -270,10 +290,20 @@ const CustomInput = (props: ICustomInputProps) => {
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={{ ...styles.button, ...styles.sendButton, backgroundColor: '#f26257', borderColor: '#f26257' }}
-                        onPress={finishedSubmit}>
+                        onPress={showDialog}>
                         <Text style={styles.buttonText}>Finished</Text>
                     </TouchableOpacity>
                 </View>
+            </View>
+            <View style={styles.dialogContainer}>
+                <Dialog.Container visible={visible}>
+                    <Dialog.Title>Finished</Dialog.Title>
+                    <Dialog.Description>
+                        Do you want to finished work with it object in mobile app ?
+                    </Dialog.Description>
+                    <Dialog.Button label="Cancel" onPress={handleCancel}/>
+                    <Dialog.Button label="Finished" onPress={handleDelete}/>
+                </Dialog.Container>
             </View>
         </>
     );
@@ -308,6 +338,12 @@ const styles = StyleSheet.create({
         padding: 1,
         width: '100%',
         borderRadius: 10,
+    },
+    dialogContainer: {
+        flex: 1,
+        backgroundColor: "#fff",
+        alignItems: "center",
+        justifyContent: "center",
     },
     label: {
         color: 'black',

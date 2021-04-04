@@ -51,7 +51,6 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     getSignalData = async () => {
-        console.log('getSignalData')
         const isConnected = await isNetworkAvailable();
         if (isConnected.isConnected) {
             this.getDataSignal()
@@ -500,6 +499,7 @@ class Signal extends React.Component<ISignalProps> {
                     />
                     <ScrollView style={styles.container}>
                         <CustomInput
+                        setNextElement={this.setNextElement}
                         onDetailsPress={onDetailsPress}
                         responseDialog={responseDialog}
                         submitData={submitData}
