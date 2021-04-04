@@ -17,21 +17,23 @@ interface ICustomInputProps {
     onDetailsPress?: (id: string) => void;
 }
 interface ICustomInputState {
-    updatedAt: number;
+    taskCreated: number;
     details: string | undefined;
     smsBody: string;
     taskDescription: string;
     comment2020: string;
+    teamDate: number;
+    allBrokersBaseDate: number;
 }
 const CustomInput = (props: ICustomInputProps) => {
     const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress } = props;
-    console.log('currentElement', currentElement)
-    const currentElDate = currentElement?.get('updatedAt') || null;
+    const currentElTaskCreated = currentElement?.get('taskCreated') || null;
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
     const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
     const currentElTaskDescription = currentElement?.get('taskDescription') ? currentElement?.get('taskDescription') : '';
     const currentElComment2020 = currentElement?.get('comment2020') ? currentElement?.get('comment2020') : '';
     const currentElTeamDate = currentElement?.get('teamDate') ? currentElement?.get('teamDate') : null;
+    const currentElBrokersDate = currentElement?.get('allBrokersBaseDate') ? currentElement?.get('allBrokersBaseDate') : null;
 
     const currentElSearchType = currentElement?.get('searchType') || '';
     const isAsanaType = currentElSearchType ? currentElSearchType.split(',').includes('AD') : false;
@@ -40,31 +42,35 @@ const CustomInput = (props: ICustomInputProps) => {
 
 
     const [state, setState] = useState<ICustomInputState>({
-        updatedAt: currentElDate,
+        taskCreated: currentElTaskCreated,
         details: currentElDetails,
         smsBody: currentElSmsBody,
         taskDescription: currentElTaskDescription,
-        comment2020: currentElComment2020
+        comment2020: currentElComment2020,
+        teamDate: currentElTeamDate,
+        allBrokersBaseDate: currentElBrokersDate
     })
 
     useEffect(() => {
         setState((prevState) => {
             return {
                 ...prevState,
-                updatedAt: currentElDate,
+                taskCreated: currentElTaskCreated,
                 details: currentElDetails,
                 smsBody: currentElSmsBody,
                 taskDescription: currentElTaskDescription,
-                comment2020: currentElComment2020
+                comment2020: currentElComment2020,
+                teamDate: currentElTeamDate,
+                allBrokersBaseDate: currentElBrokersDate
             }
         })
-    }, [currentElDate, currentElDetails, currentElSmsBody, currentElTaskDescription, currentElComment2020])
+    }, [currentElTaskCreated, currentElDetails, currentElSmsBody, currentElTaskDescription, currentElComment2020, currentElTeamDate, currentElBrokersDate])
 
-    const addNewDate = () => {
+    const addNewDate = (dateType: string) => {
         setState((prevState) => {
             return {
                 ...prevState,
-                updatedAt: Math.round(new Date().getTime() / 1000)
+                [dateType]: Math.round(new Date().getTime() / 1000)
             }
         })
         setSubmitData({ ...state, id: currentElement?.get('id'), updatedAt: Math.round(new Date().getTime() / 1000) })
@@ -95,9 +101,10 @@ const CustomInput = (props: ICustomInputProps) => {
         isConnected.isConnected ? setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
         // clearSubmitData()
     };
-    const editSubmit = async () => {
+    const editSubmit = async (e: any, name: string) => {
+        e.preventDefault()
         const isConnected = await isNetworkAvailable()
-        const data = { ...state, id: currentElement?.get('id') }
+        const data = { [name]: state[name], id: currentElement?.get('id') }
         isConnected.isConnected ? setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
     }
     const showDetails = () => onDetailsPress(currentElement.get('id'))
@@ -128,56 +135,91 @@ const CustomInput = (props: ICustomInputProps) => {
                         </View>
                     </View>
                 </TouchableOpacity>}
-                <View style={styles.inputContainer}>
+                {isAsanaType && <>
+                    <Text style={styles.label}>Task created</Text>
+                    <View style={styles.inputContainer}>
                     <TextInput
                         style={{ ...styles.textInput }}
                         placeholder='set new date'
-                        value={getStringDate(new Date(state.updatedAt * 1000))}
+                        value={getStringDate(new Date(state.taskCreated * 1000))}
                         editable={false}
                         // onChangeText={handleDateChange}
                     />
                     <View style={styles.dateButtons}>
                         <TouchableOpacity
                             style={styles.button}
-                            onPress={addNewDate}>
+                            onPress={() => addNewDate('taskCreated')}>
                             <Text style={styles.buttonText}>Set new date</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
-                {isAsanaType && <>
                         <Text style={styles.label}>Task description</Text>
                         <View style={styles.inputContainer}>
                             <TextInput
                                 style={{ ...styles.textInput, width: '100%' }}
                                 placeholder='enter task description'
                                 value={state.taskDescription}
-                                onEndEditing={editSubmit}
+                                onEndEditing={(e) => editSubmit(e, 'taskDescription')}
                                 onChangeText={text => handleInputChange(text, 'taskDescription')}
                                 multiline={true} />
                         </View>
                     </>}
                 {isTeamType &&
                 <>
+                    <Text style={styles.label}>Team base date</Text>
+                    <View style={styles.inputContainer}>
+                    <TextInput
+                        style={{ ...styles.textInput }}
+                        placeholder='set new date'
+                        value={state.teamDate ? getStringDate(new Date(state.teamDate * 1000)) : null}
+                        editable={false}
+                        // onChangeText={handleDateChange}
+                    />
+                    <View style={styles.dateButtons}>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => addNewDate('teamDate')}>
+                            <Text style={styles.buttonText}>Set new date</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
                     <Text style={styles.label}>Details</Text>
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={{ ...styles.textInput, width: '100%' }}
                             placeholder='enter details'
                             value={state.details}
-                            onEndEditing={editSubmit}
+                            onEndEditing={(e) => editSubmit(e, 'details')}
                             onChangeText={text => handleInputChange(text, 'details')}
                             multiline={true} />
                     </View>
                 </>}
                 {isBrokersType &&
                     <>
+                    <Text style={styles.label}>All brokers base date</Text>
+                    <View style={styles.inputContainer}>
+                    <TextInput
+                        style={{ ...styles.textInput }}
+                        placeholder='set new date'
+                        value={state.allBrokersBaseDate ? getStringDate(new Date(state.allBrokersBaseDate * 1000)) : null}
+                        editable={false}
+                        // onChangeText={handleDateChange}
+                    />
+                    <View style={styles.dateButtons}>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => addNewDate('allBrokersBaseDate')}>
+                            <Text style={styles.buttonText}>Set new date</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
                         <Text style={styles.label}>Comment 2020</Text>
                         <View style={styles.inputContainer}>
                             <TextInput
                                 style={{ ...styles.textInput, width: '100%' }}
                                 placeholder='comment 2020'
                                 value={state.comment2020}
-                                onEndEditing={editSubmit}
+                                onEndEditing={(e) => editSubmit(e, 'comment2020')}
                                 onChangeText={text => handleInputChange(text, 'comment2020')}
                                 multiline={true} />
                         </View>
@@ -188,7 +230,7 @@ const CustomInput = (props: ICustomInputProps) => {
                         style={{ ...styles.textInput, width: '100%' }}
                         placeholder='sms body'
                         value={state.smsBody}
-                        onEndEditing={editSubmit}
+                        onEndEditing={(e) => editSubmit(e, 'smsBody')}
                         onChangeText={text => handleInputChange(text, 'smsBody')}
                         multiline={true}
                     />

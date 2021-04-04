@@ -25,6 +25,8 @@ export type ISingleDataItem = EntityMap<{
     taskDescription?: string;
     comment2020?: string;
     teamDate?: number;
+    taskCreated?: number;
+    allBrokersBaseDate?: number;
     }>;
 
 export interface IDataItem {
@@ -47,6 +49,8 @@ export interface IDataItem {
     taskDescription?: string;
     comment2020?: string;
     teamDate?: number;
+    taskCreated?: number;
+    allBrokersBaseDate?: number;
 }
 
 class DataEntity extends Entity {
