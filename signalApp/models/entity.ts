@@ -1,8 +1,8 @@
 import { camelizeKeys } from 'humps';
 import { IIdentity } from '../acl/types';
 import { Store, AnyAction } from 'redux';
-import { fromJS, Map, List } from 'immutable';
-// import fetch from 'cross-fetch';
+import { Map, List } from 'immutable';
+import fetch from 'cross-fetch';
 import { normalize, Schema, schema } from 'normalizr';
 import { select, put, call, fork } from 'redux-saga/effects';
 import { action , pageFetching, sendMessage, entityRequest, IMethod, MODEL_CLEAR, clearSSRData, IActionRequest, pageSetFilter } from '../redux/actions';
