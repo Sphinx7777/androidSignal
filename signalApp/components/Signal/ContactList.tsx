@@ -72,7 +72,7 @@ const ContactList = (props: IContactListProps) => {
                     {isBrokersType && <Text style={styles.text}>BD date: {item?.allBrokersBaseDate > 0 ? getStringDate(new Date(item?.allBrokersBaseDate * 1000)) : 'no info'}</Text>}
                     </View>
                     <View style={styles.dataType}>
-                        {(!currentElSMSBody || currentElSMSBody.length === 0 && isNeedSms) && <Text style={{color: '#bf0416', paddingVertical: 2, marginRight: 4, fontWeight: '600'}}>Empty sms body</Text>}  
+                        {(!currentElSMSBody || currentElSMSBody.length === 0 && isNeedSms) && <Text style={{color: '#bf0416', paddingVertical: 2, marginRight: 4, fontWeight: '600'}}>Empty sms body</Text>}
                         {item?.needToSendSMS && <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} />}
                         {item?.needToDialog && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
                     </View>

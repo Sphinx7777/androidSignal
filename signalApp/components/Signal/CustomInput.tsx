@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import { CRUD } from 'signalApp/models/entity';
-import { ICallLog } from '.';
+import { ICallLog } from './index';
 import { ISingleDataItem } from '../../models/DataEntity';
 import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
-import Dialog from "react-native-dialog";
+import ModalDialog from '../Dialog';
 
 interface ICustomInputProps {
     currentElement: ISingleDataItem | undefined;
@@ -30,8 +30,9 @@ interface ICustomInputState {
 }
 const CustomInput = (props: ICustomInputProps) => {
     const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement } = props;
+    const [finishedVisible, setFinishedVisible] = useState(false)
+    const [sendCustomSMSVisible, setSendCustomSMSVisible] = useState(false)
     const currentElTaskCreated = currentElement?.get('taskCreated') || null;
-    const [visible, setVisible] = useState(false)
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
     const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
     const currentElTaskDescription = currentElement?.get('taskDescription') ? currentElement?.get('taskDescription') : '';
@@ -122,18 +123,35 @@ const CustomInput = (props: ICustomInputProps) => {
     }
     const showDetails = () => onDetailsPress(currentElement.get('id'))
 
-    const showDialog = () => {
-        setVisible(true);
+    const showDialog = (dialogKey: string) => {
+        if (dialogKey === 'finished') {
+            setFinishedVisible(true);
+        }
+        if (dialogKey === 'sendCustomSMS') {
+            setSendCustomSMSVisible(true);
+        }
     };
 
-    const handleCancel = () => {
-        setVisible(false);
+    const handleCancel = (dialogKey: string) => {
+        if (dialogKey === 'finished') {
+            setFinishedVisible(false);
+        }
+        if (dialogKey === 'sendCustomSMS') {
+            setSendCustomSMSVisible(false);
+        }
     };
 
-    const handleDelete = async () => {
-        finishedSubmit()
-        setVisible(false);
+    const handleDelete = async (dialogKey: string) => {
+        if (dialogKey === 'finished') {
+            finishedSubmit();
+            setFinishedVisible(false);
+        }
+        if (dialogKey === 'sendCustomSMS') {
+            handleSendSms();
+            setSendCustomSMSVisible(false)
+        }
     };
+
     const phone = currentElement?.get('phone') && currentElement?.get('phone')?.length > 0 ? currentElement?.get('phone') : '--------'
     const isPhone = currentElement?.get('phone') && currentElement?.get('phone').length >= 9 && currentElement?.get('phone').length <= 11;
     const currentElSMSBody= currentElement?.get('smsBody');
@@ -292,26 +310,34 @@ const CustomInput = (props: ICustomInputProps) => {
                             ? { ...styles.button, ...styles.sendButton }
                             : { ...styles.button, ...styles.sendButton, ...styles.disabled }}
                         disabled={state.smsBody.length === 0}
-                        onPress={handleSendSms}>
+                        onPress={() => showDialog('sendCustomSMS')}>
                         <Text style={styles.buttonText}>Custom sms</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={{ ...styles.button, ...styles.sendButton, backgroundColor: '#f26257', borderColor: '#f26257' }}
-                        onPress={showDialog}>
+                        onPress={() => showDialog('finished')}>
                         <Text style={styles.buttonText}>Finished</Text>
                     </TouchableOpacity>
                 </View>
             </View>
-            <View style={styles.dialogContainer}>
-                <Dialog.Container visible={visible}>
-                    <Dialog.Title>Finished</Dialog.Title>
-                    <Dialog.Description>
-                        Do you want to finished work with it object in mobile app ?
-                    </Dialog.Description>
-                    <Dialog.Button label="Cancel" onPress={handleCancel} />
-                    <Dialog.Button label="Finished" onPress={handleDelete} />
-                </Dialog.Container>
-            </View>
+            <ModalDialog
+            handleCancel={handleCancel}
+            handleConfirm={handleDelete}
+            dialogKey='finished'
+            visible={finishedVisible}
+            title='Finished'
+            description='Do you want to finished work with it object in mobile app ?'
+            confirmButtonText='Finished'
+            />
+            <ModalDialog
+            handleCancel={handleCancel}
+            handleConfirm={handleDelete}
+            dialogKey='sendCustomSMS'
+            visible={sendCustomSMSVisible}
+            title='Send custom sms'
+            description='Do you want to send this sms ?'
+            confirmButtonText='Send'
+            />
         </>
     );
 }
@@ -348,9 +374,9 @@ const styles = StyleSheet.create({
     },
     dialogContainer: {
         flex: 1,
-        backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     label: {
         color: 'black',
@@ -401,7 +427,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: 'white',
-        fontSize: 18
+        fontSize: 16
     },
     sendButtonContainer: {
         display: 'flex',

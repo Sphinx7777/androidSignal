@@ -69,6 +69,13 @@ const CallMenu = (props: ICallMenuProps) => {
     }
     const handleSendAllSMS = () => sendAllSMS()
 
+    const isSMSCount = callData.filter(obj => obj.get('needToSendSMS'))
+    const isValidSMS = callData.filter(obj => obj.get('smsBody') && obj.get('smsBody').length > 0 && obj.get('phone') && (obj.get('phone').length >= 9 && obj.get('phone').length <= 11))
+    console.log('------------------------------------------------------')
+    console.log('isSMSCount', isSMSCount.size)
+    console.log('------------------------------------------------------')
+    console.log('isValidSMS', isValidSMS.size)
+
     return (
         <>
             <View style={styles.container}>
@@ -78,33 +85,29 @@ const CallMenu = (props: ICallMenuProps) => {
                     <Text>Info block</Text>
                     <Text>Info block</Text>
                     <TouchableOpacity
-                        style={{ ...styles.button, maxWidth: 100, marginTop: 25}}
-                        onPress={getDataSignal}
-                    >
-                        <Text style={{...styles.buttonText, marginTop: 5}}>Reload</Text>
+                        style={{ ...styles.button, maxWidth: 100, marginTop: 25 }}
+                        onPress={getDataSignal}>
+                        <Text style={{ ...styles.buttonText, marginTop: 5 }}>Reload</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.buttonsBlock}>
                     <TouchableOpacity
-                        style={{ ...styles.button, marginTop: 1, marginBottom: 5 }}
-                        onPress={!pause ? handlePausePress : handleContinuePress}
-                    >
-                        <Text style={{...styles.buttonText, marginTop: 5}}>{!pause ? 'Pause' : 'Continue'}</Text>
+                        style={{ ...styles.button, marginTop: 1, marginBottom: 10 }}
+                        onPress={!pause ? handlePausePress : handleContinuePress}>
+                        <Text style={{ ...styles.buttonText, marginTop: 5 }}>{!pause ? 'Pause' : 'Continue'}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={{ ...styles.button, marginBottom: 1, marginTop: 5, paddingVertical: 2 }}
-                        onPress={handleNextPress}
-                    >
-                        <Text style={styles.buttonText}>Next <Image style={{width: 20, height: 20}} source={require('../../../assets/phone-volume-solid.png')} /></Text>
+                        style={{ ...styles.button, marginBottom: 1, paddingVertical: 2 }}
+                        onPress={handleNextPress}>
+                        <Text style={styles.buttonText}>Next <Image style={{ width: 15, height: 15 }} source={require('../../../assets/phone-volume-solid.png')} /></Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        // style={{ ...styles.button, marginBottom: 1, marginTop: 10, paddingVertical: 2 }}
                         style={(dataSmsArray && dataSmsArray.size > 0)
-                            ? { ...styles.button, marginTop: 5}
+                            ? { ...styles.button, marginTop: 5 }
                             : { ...styles.button, marginTop: 5, ...styles.disabled }}
                         disabled={!dataSmsArray || dataSmsArray.size === 0 ? true : false}
                         onPress={handleSendAllSMS}>
-                        <Text style={styles.buttonText}>Send all sms</Text>
+                        <Text style={styles.buttonText}>{`Send all sms: ${isSMSCount.size}`}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -119,14 +122,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 2,
         borderColor: '#1f6b4e',
-        paddingHorizontal: 10,
         borderRadius: 10,
         overflow: 'hidden',
         backgroundColor: '#1f6b4e'
     },
     buttonText: {
         color: 'white',
-        fontSize: 18,
+        fontSize: 16,
         paddingBottom: 8,
         paddingTop: 3
     },
@@ -145,11 +147,11 @@ const styles = StyleSheet.create({
     },
     textBlock: {
         display: 'flex',
-        width: '65%',
+        width: '60%',
     },
     buttonsBlock: {
         display: 'flex',
-        width: '35%',
+        width: '40%',
     },
     disabled: {
         backgroundColor: 'gray',
