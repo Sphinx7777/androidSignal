@@ -1,9 +1,9 @@
 
 import action from '../decoradors/action';
 import Entity from './entity';
-import { take, put, call, cancelled } from 'redux-saga/effects';
+import { take, put, call } from 'redux-saga/effects';
 import { getIdentity, SEND_MESSAGE, toastMessage, resetMessage, sendMessage, logoutUserAction } from '../redux/actions';
-import { HTTP_METHOD, ResCode, MessageType, TOAST_TIME, ENTITY } from '../constants';
+import { HTTP_METHOD, ResCode, MessageType, TOAST_TIME } from '../constants';
 
 export interface ILoginData {
     userEmail: string,
