@@ -46,7 +46,7 @@ const ContactList = (props: IContactListProps) => {
         const isTeamType = currentElSearchType ? currentElSearchType.split(',').includes('TD') : false;
         const isBrokersType = currentElSearchType ? currentElSearchType.split(',').includes('BD') : false;
         const isPhone = item.phone.length === 9 || item.phone.length === 11;
-        const currentElSMSBody= item.smsBody;
+        const currentElSMSBody = item.smsBody;
         const isNeedSms = item.needToSendSMS
 
         const onLongPress: (event: GestureResponderEvent) => void = () => handleLongPress(data)

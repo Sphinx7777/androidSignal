@@ -31,6 +31,11 @@ interface ICustomInputState {
 const CustomInput = (props: ICustomInputProps) => {
     const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement } = props;
     const [finishedVisible, setFinishedVisible] = useState(false)
+
+    const [addTaskDateVisible, setAddTaskDateVisible] = useState(false)
+    const [addTeamDateVisible, setAddTeamDateVisible] = useState(false)
+    const [addBrokersDateVisible, setAddBrokersDateVisible] = useState(false)
+
     const [sendCustomSMSVisible, setSendCustomSMSVisible] = useState(false)
     const currentElTaskCreated = currentElement?.get('taskCreated') || null;
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
@@ -81,7 +86,7 @@ const CustomInput = (props: ICustomInputProps) => {
                 [dateType]: Math.round(new Date().getTime() / 1000)
             }
         })
-        setSubmitData({ ...state, id: currentElement?.get('id'), updatedAt: Math.round(new Date().getTime() / 1000) })
+        setSubmitData({ id: currentElement?.get('id'), [dateType]: Math.round(new Date().getTime() / 1000) })
     }
 
     const calling = () => currentElement && makeCall(currentElement?.get('phone'), 'disable')
@@ -130,6 +135,15 @@ const CustomInput = (props: ICustomInputProps) => {
         if (dialogKey === 'sendCustomSMS') {
             setSendCustomSMSVisible(true);
         }
+        if (dialogKey === 'taskCreated') {
+            setAddTaskDateVisible(true);
+        }
+        if (dialogKey === 'teamDate') {
+            setAddTeamDateVisible(true);
+        }
+        if (dialogKey === 'allBrokersBaseDate') {
+            setAddBrokersDateVisible(true);
+        }
     };
 
     const handleCancel = (dialogKey: string) => {
@@ -138,6 +152,15 @@ const CustomInput = (props: ICustomInputProps) => {
         }
         if (dialogKey === 'sendCustomSMS') {
             setSendCustomSMSVisible(false);
+        }
+        if (dialogKey === 'taskCreated') {
+            setAddTaskDateVisible(false);
+        }
+        if (dialogKey === 'teamDate') {
+            setAddTeamDateVisible(false);
+        }
+        if (dialogKey === 'allBrokersBaseDate') {
+            setAddBrokersDateVisible(false);
         }
     };
 
@@ -149,6 +172,18 @@ const CustomInput = (props: ICustomInputProps) => {
         if (dialogKey === 'sendCustomSMS') {
             handleSendSms();
             setSendCustomSMSVisible(false)
+        }
+        if (dialogKey === 'taskCreated') {
+            addNewDate(dialogKey)
+            setAddTaskDateVisible(false);
+        }
+        if (dialogKey === 'teamDate') {
+            addNewDate(dialogKey)
+            setAddTeamDateVisible(false);
+        }
+        if (dialogKey === 'allBrokersBaseDate') {
+            addNewDate(dialogKey)
+            setAddBrokersDateVisible(false);
         }
     };
 
@@ -197,12 +232,11 @@ const CustomInput = (props: ICustomInputProps) => {
                             placeholder='set new date'
                             value={getStringDate(new Date(state.taskCreated * 1000))}
                             editable={false}
-                        // onChangeText={handleDateChange}
                         />
                         <View style={styles.dateButtons}>
                             <TouchableOpacity
                                 style={styles.button}
-                                onPress={() => addNewDate('taskCreated')}>
+                                onPress={() => showDialog('taskCreated')}>
                                 <Text style={styles.buttonText}>Set new date</Text>
                             </TouchableOpacity>
                         </View>
@@ -228,12 +262,11 @@ const CustomInput = (props: ICustomInputProps) => {
                                 placeholder='set new date'
                                 value={state.teamDate ? getStringDate(new Date(state.teamDate * 1000)) : null}
                                 editable={false}
-                            // onChangeText={handleDateChange}
                             />
                             <View style={styles.dateButtons}>
                                 <TouchableOpacity
                                     style={styles.button}
-                                    onPress={() => addNewDate('teamDate')}>
+                                    onPress={() => showDialog('teamDate')}>
                                     <Text style={styles.buttonText}>Set new date</Text>
                                 </TouchableOpacity>
                             </View>
@@ -264,7 +297,7 @@ const CustomInput = (props: ICustomInputProps) => {
                             <View style={styles.dateButtons}>
                                 <TouchableOpacity
                                     style={styles.button}
-                                    onPress={() => addNewDate('allBrokersBaseDate')}>
+                                    onPress={() => showDialog('allBrokersBaseDate')}>
                                     <Text style={styles.buttonText}>Set new date</Text>
                                 </TouchableOpacity>
                             </View>
@@ -338,6 +371,33 @@ const CustomInput = (props: ICustomInputProps) => {
             title='Send custom sms'
             description={dialogDescription}
             confirmButtonText='Send'
+            />
+            <ModalDialog
+            handleCancel={handleCancel}
+            handleConfirm={handleDelete}
+            dialogKey='allBrokersBaseDate'
+            visible={addBrokersDateVisible}
+            title='Change date'
+            description='Do you want to change the date ?'
+            confirmButtonText='Ok'
+            />
+            <ModalDialog
+            handleCancel={handleCancel}
+            handleConfirm={handleDelete}
+            dialogKey='teamDate'
+            visible={addTeamDateVisible}
+            title='Change date'
+            description='Do you want to change the date ?'
+            confirmButtonText='Ok'
+            />
+            <ModalDialog
+            handleCancel={handleCancel}
+            handleConfirm={handleDelete}
+            dialogKey='taskCreated'
+            visible={addTaskDateVisible}
+            title='Change date'
+            description='Do you want to change the date ?'
+            confirmButtonText='Ok'
             />
         </>
     );
