@@ -153,9 +153,10 @@ const CustomInput = (props: ICustomInputProps) => {
     };
 
     const phone = currentElement?.get('phone') && currentElement?.get('phone')?.length > 0 ? currentElement?.get('phone') : '--------'
-    const isPhone = currentElement?.get('phone') && currentElement?.get('phone').length >= 9 && currentElement?.get('phone').length <= 11;
-    const currentElSMSBody= currentElement?.get('smsBody');
+    const isPhone = currentElement?.get('phone') && currentElement?.get('phone').length === 9 || currentElement?.get('phone').length === 11;
+    const currentElSMSBody = currentElement?.get('smsBody');
     const isNeedSms = currentElement?.get('needToSendSMS');
+    const dialogDescription = `Do you want to send this sms ? Number: ${phone} sms body: ${currentElSMSBody}`
 
     return (
         <>
@@ -335,7 +336,7 @@ const CustomInput = (props: ICustomInputProps) => {
             dialogKey='sendCustomSMS'
             visible={sendCustomSMSVisible}
             title='Send custom sms'
-            description='Do you want to send this sms ?'
+            description={dialogDescription}
             confirmButtonText='Send'
             />
         </>
@@ -440,6 +441,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
+        marginBottom: 5
     },
     sendButton: {
         marginBottom: 0,

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { ISingleDataItem } from '../../models/DataEntity';
 import { EntityList } from '../../models/entity';
+import ModalDialog from '../Dialog';
 interface ICallMenuProps {
     setCurrentItemIndex: (currentItemIndex: number) => void;
     currentItemIndex: number;
@@ -20,6 +21,7 @@ interface ICallMenuState {
 }
 const CallMenu = (props: ICallMenuProps) => {
     const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, pausePress, pause, getDataSignal } = props;
+    const [sendAllSMSVisible, setSendAllSMSVisible] = useState(false)
 
     const [state, setState] = useState<ICallMenuState>({
         callStart: false
@@ -69,13 +71,32 @@ const CallMenu = (props: ICallMenuProps) => {
     }
     const handleSendAllSMS = () => sendAllSMS()
 
-    const isSMSCount = callData.filter(obj => obj.get('needToSendSMS'))
-    const isValidSMS = callData.filter(obj => obj.get('smsBody') && obj.get('smsBody').length > 0 && obj.get('phone') && (obj.get('phone').length >= 9 && obj.get('phone').length <= 11))
-    console.log('------------------------------------------------------')
-    console.log('isSMSCount', isSMSCount.size)
-    console.log('------------------------------------------------------')
-    console.log('isValidSMS', isValidSMS.size)
+    const showDialog = (dialogKey: string) => {
+        if (dialogKey === 'sendAllSMS') {
+            setSendAllSMSVisible(true);
+        }
+    };
 
+    const handleCancel = (dialogKey: string) => {
+        if (dialogKey === 'sendAllSMS') {
+            setSendAllSMSVisible(false);
+        }
+    };
+
+    const handleConfirm = async (dialogKey: string) => {
+        if (dialogKey === 'sendAllSMS') {
+            handleSendAllSMS();
+            setSendAllSMSVisible(false);
+        }
+    };
+
+    const isSMSCount = callData?.filter(obj => obj.get('needToSendSMS'));
+    const isValidSMS = callData?.filter(obj => obj.get('smsBody') && obj.get('smsBody').length > 0 && obj.get('phone') && (obj.get('phone').length === 9 || obj.get('phone').length === 11));
+    let count = 0;
+    if (isSMSCount && isValidSMS) {
+        count = isSMSCount?.size - isValidSMS?.size;
+    }
+    const dialogDescription = `You confirm the sending of all messages ? ${isValidSMS?.size} SMS will be sent. ${count && count > 0 ? count === 1 ? count + ' message' +  ' have incorrect number format or empty message body' : count + ' messages' +  ' have incorrect number format or empty message body' : ''}`
     return (
         <>
             <View style={styles.container}>
@@ -87,30 +108,39 @@ const CallMenu = (props: ICallMenuProps) => {
                     <TouchableOpacity
                         style={{ ...styles.button, maxWidth: 100, marginTop: 25 }}
                         onPress={getDataSignal}>
-                        <Text style={{ ...styles.buttonText, marginTop: 5 }}>Reload</Text>
+                        <Text style={{ ...styles.buttonText, marginTop: 5 }}>Reload data</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.buttonsBlock}>
                     <TouchableOpacity
-                        style={{ ...styles.button, marginTop: 1, marginBottom: 10 }}
+                        style={{ ...styles.button, marginTop: 1, marginBottom: 15 }}
                         onPress={!pause ? handlePausePress : handleContinuePress}>
                         <Text style={{ ...styles.buttonText, marginTop: 5 }}>{!pause ? 'Pause' : 'Continue'}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={{ ...styles.button, marginBottom: 1, paddingVertical: 2 }}
+                        style={{ ...styles.button, marginBottom: 15, paddingVertical: 3 }}
                         onPress={handleNextPress}>
                         <Text style={styles.buttonText}>Next <Image style={{ width: 15, height: 15 }} source={require('../../../assets/phone-volume-solid.png')} /></Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={(dataSmsArray && dataSmsArray.size > 0)
-                            ? { ...styles.button, marginTop: 5 }
-                            : { ...styles.button, marginTop: 5, ...styles.disabled }}
+                            ? { ...styles.button, paddingVertical: 3 }
+                            : { ...styles.button, paddingVertical: 3, ...styles.disabled }}
                         disabled={!dataSmsArray || dataSmsArray.size === 0 ? true : false}
-                        onPress={handleSendAllSMS}>
+                        onPress={() => showDialog('sendAllSMS')}>
                         <Text style={styles.buttonText}>{`Send all sms: ${isSMSCount.size}`}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
+            <ModalDialog
+            handleCancel={handleCancel}
+            handleConfirm={handleConfirm}
+            dialogKey='sendAllSMS'
+            visible={sendAllSMSVisible}
+            title='Send all sms'
+            description={dialogDescription}
+            confirmButtonText='Send'
+            />
         </>
     );
 }
@@ -151,6 +181,7 @@ const styles = StyleSheet.create({
     },
     buttonsBlock: {
         display: 'flex',
+        flexDirection: 'column',
         width: '40%',
     },
     disabled: {

@@ -5,9 +5,8 @@ import {
     TouchableOpacity, GestureResponderEvent, Image
 } from 'react-native';
 import saga from '../../decoradors/saga';
-import { IDataItem, ISingleDataItem } from '../../models/DataEntity';
+import DataEntity, { IDataItem, ISingleDataItem } from '../../models/DataEntity';
 import { connect } from 'react-redux';
-import DataEntity from '../../models/DataEntity';
 import { EntityList } from '../../models/entity';
 import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
 interface IDetailsProps {
@@ -27,7 +26,7 @@ class Details extends React.Component<IDetailsProps> {
         if (this.props.route?.params?.id && prevProps.route?.params?.id !== this.props.route?.params?.id) {
             const id = this.props.route?.params?.id;
             const currentItem = this.props.signalData.valueSeq().find(o => o.get('id') === id)?.toJS()
-            this.setState({ 
+            this.setState({
                 id,
                 currentItem,
                 ...this.props.signalData.valueSeq().find(o => o.get('id') === id)?.toJS()
@@ -59,11 +58,13 @@ class Details extends React.Component<IDetailsProps> {
     showAll = () => this.setState({ id: null, currentItem: null })
     showOne = (itemId: string) => {
         const currentItem = this.props.signalData.valueSeq().find(o => o.get('id') === itemId)?.toJS()
-        !this.state.id && this.setState({
-            id: itemId,
-            currentItem,
-            ...currentItem
-        })
+        if (!this.state.id) {
+            this.setState({
+                id: itemId,
+                currentItem,
+                ...currentItem
+            })
+        }
     }
 
     renderItem = (data: any) => {
@@ -90,14 +91,14 @@ class Details extends React.Component<IDetailsProps> {
                     {Object.keys(item).sort().map(o => {
                         return (
                             <View key={item['id'] + o}>
-                                {['agentID', 'searchType','reference', 'highNetWorth', 'year', 'source', 'id', 'language', 'brokersTabId'].includes(String(o)) &&
+                                {['agentID', 'searchType', 'reference', 'highNetWorth', 'year', 'source', 'id', 'language', 'brokersTabId'].includes(String(o)) &&
                                     <View style={styles.itemLine}>
                                         <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
                                         <Text style={styles.text}>{String(item[o])}</Text>
                                     </View>
                                 }
                                 {['email', 'name', 'taskName', 'details', 'phone', 'segment', 'taskDescription', 'memberRating',
-                                'smsBody', 'emailBody', 'comment2020','group', 'price', 'calledAbout', 'comment2019'
+                                'smsBody', 'emailBody', 'comment2020', 'group', 'price', 'calledAbout', 'comment2019'
                                 ].includes(String(o)) &&
                                     <>
                                     {this.state.id && <>
@@ -105,7 +106,6 @@ class Details extends React.Component<IDetailsProps> {
                                     <Text style={{ ...styles.text, ...styles.textTitle, color: '#f56b45' }}>{String(o)} :</Text>
                                     <Image style={{ width: 20, height: 20, marginLeft: 5 }} source={require('../../../assets/edit.png')} />
                                     </View>
-                                        
                                         <View style={styles.inputContainer}>
                                             <TextInput
                                                 style={{ ...styles.textInput}}
@@ -116,8 +116,7 @@ class Details extends React.Component<IDetailsProps> {
                                                 onChangeText={text => this.handleInputChange(text, String(o))}
                                                 multiline={true} />
                                         </View></>}
-                                    {
-                                        !this.state.id && <View style={styles.itemLine}>
+                                    {!this.state.id && <View style={styles.itemLine}>
                                         <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
                                         <Text style={styles.text}>{String(item[o])}</Text>
                                     </View>}</>
