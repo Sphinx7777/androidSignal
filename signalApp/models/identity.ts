@@ -41,36 +41,6 @@ class Identity extends Entity {
         }
     }
 
-
-
-
-
-
-    @action()
-    public * registerUser(data: any) {
-        yield call(Entity.fetch, '/auth/register', data, HTTP_METHOD.POST);
-    }
-
-    @action()
-    public * onForgotClick(data: any) {
-        yield call(Entity.fetch, '/auth/forgot', data, HTTP_METHOD.POST);
-    }
-
-    @action()
-    public * resetPassword(data: any) {
-        yield call(Entity.fetch, '/auth/reset-user-pass', data, HTTP_METHOD.POST);
-    }
-
-    @action()
-    public * changePassword(data: any) {
-        yield call(Entity.fetch, '/auth/change-user-pass', data, HTTP_METHOD.POST);
-    }
-
-    @action()
-    public * verifyAccount(data: any) {
-        yield call(Entity.fetch, '/auth/verify', data, HTTP_METHOD.POST);
-    }
-
     public * showMessage() {
         while (true) {
             const { text, code, msgType } = yield take(SEND_MESSAGE);

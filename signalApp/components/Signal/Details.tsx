@@ -13,6 +13,8 @@ interface IDetailsProps {
     route: any;
     signalData: EntityList<ISingleDataItem>;
     setSubmitData: (data: any) => void;
+    navigation?: any;
+    user?: any;
 }
 @saga(DataEntity, ['setSubmitData'])
 class Details extends React.Component<IDetailsProps> {
@@ -64,6 +66,13 @@ class Details extends React.Component<IDetailsProps> {
                 currentItem,
                 ...currentItem
             })
+        }
+    }
+    onLoginPress = () => {
+        if (this.props.navigation) {
+            this.props.navigation.navigate('Login')
+        } else {
+            console.log('onLoginPress_error')
         }
     }
 
@@ -151,12 +160,31 @@ class Details extends React.Component<IDetailsProps> {
 
     keyExtractor = (item: IDataItem) => item.id
 
+
+
     render() {
-        let dataItems: IDataItem[] = this.props.signalData?.valueSeq()?.toJS() || []
+        const { signalData, user } = this.props;
+        let dataItems: IDataItem[] = signalData?.valueSeq()?.toJS() || []
         if (this.state.id && dataItems) {
             dataItems = dataItems.filter(item => item.id === this.state.id)
         }
-        if ((!this.props.signalData || this.props.signalData.size === 0)) {
+        const validUser = user?.token?.length > 0
+
+        if (!validUser) {
+            return (
+                <View style={styles.loadContainer}>
+                    <View style={{ ...styles.loadContainer, height: 100 }}>
+                        <Text style={{ fontSize: 22, fontWeight: '600' }}>Only register user</Text>
+                        <TouchableOpacity
+                            activeOpacity={0.5}
+                            style={{}}
+                            onPress={this.onLoginPress}>
+                            <Text style={{ color: '#62aee5', fontSize: 20, marginTop: 30 }}>Go to login</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>)
+        }
+        if ((!signalData || signalData.size === 0)) {
             return (<View style={styles.loadContainer}>
                 <View style={{ ...styles.loadContainer, height: 200 }}>
                             <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#dbdbd7' }}>No data...</Text>
@@ -267,8 +295,10 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state: any) => {
     const signalData = state.entities.get('signalData')?.sort()
+    const user = state.identity.user || null
     return {
-        signalData
+        signalData,
+        user
     };
 }
 

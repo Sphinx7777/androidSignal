@@ -80,8 +80,6 @@ class DataEntity extends Entity {
         } else {
             showToastWithGravityAndOffset('No internet connect !!!');
         }
-
-
         console.log('setSubmitData', submitData)
         // yield put(setSubmitData({ submitData }));
     }

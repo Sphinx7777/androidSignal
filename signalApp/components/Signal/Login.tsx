@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
-        height: 500,
+        height: 400,
         padding: 20,
     },
     inputsContainer: {
