@@ -15,12 +15,13 @@ interface ICallMenuProps {
     pausePress: (pause?: boolean) => void;
     pause: boolean;
     getDataSignal?: () => void;
+    currentElement: ISingleDataItem;
 }
 interface ICallMenuState {
     callStart: boolean;
 }
 const CallMenu = (props: ICallMenuProps) => {
-    const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, pausePress, pause, getDataSignal } = props;
+    const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, pausePress, pause, getDataSignal, currentElement } = props;
     const [sendAllSMSVisible, setSendAllSMSVisible] = useState(false)
 
     const [state, setState] = useState<ICallMenuState>({
@@ -97,6 +98,7 @@ const CallMenu = (props: ICallMenuProps) => {
         count = isSMSCount?.size - isValidSMS?.size;
     }
     const dialogDescription = `You confirm the sending of all messages ? ${isValidSMS?.size} SMS will be sent. ${count && count > 0 ? count === 1 ? count + ' message' +  ' have incorrect number format or empty message body' : count + ' messages' +  ' have incorrect number format or empty message body' : ''}`
+
     return (
         <>
             <View style={styles.container}>
@@ -173,7 +175,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#f7faf7',
         borderWidth: 2,
         padding: 5,
-        borderRadius: 10
+        borderRadius: 10,
+        marginBottom: 10
     },
     textBlock: {
         display: 'flex',

@@ -515,6 +515,7 @@ class Signal extends React.Component<ISignalProps> {
                             getDataSignal={this.getDataSignal}
                             pausePress={this.pausePress}
                             sendAllSMS={this.sendDirectSms}
+                            currentElement={currentElement}
                             dataSmsArray={dataSmsArray}
                             setCurrentItemIndex={this.setCurrentItemIndex}
                             currentItemIndex={currentItemIndex}
