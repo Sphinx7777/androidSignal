@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 import { EntityList } from '../../models/entity';
 import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
 import MobileDropdown from '../MobileDropdown';
+import IsMobileDatePicker from '../DatePicker';
 
 const dialogOptions = [
     { label: 'auto-dial ON', value: 1 },
@@ -93,6 +94,10 @@ class Details extends React.Component<IDetailsProps> {
         this.props.setSubmitData({ id: this.state.id, needToSendSMS: value === 0 ? false : true })
     }
 
+    handlePickerOkClick = (date: Date, itemKey: string) => {
+        this.props.setSubmitData({ id: this.state.id, [itemKey]: Math.round(date.getTime() / 1000) })
+    }
+
     renderItem = (data: any) => {
         const item: IDataItem = data.item
         const onLongPress: (event: GestureResponderEvent) => void = () => this.showOne(item.id)
@@ -148,8 +153,22 @@ class Details extends React.Component<IDetailsProps> {
                                             <Text style={styles.text}>{String(item[o])}</Text>
                                         </View>}</>
                                 }
-                                {['allBrokersBaseDate', 'teamDate', 'createdAt', 'updatedAt'].includes(String(o)) &&
-                                    <View style={styles.itemLine}>
+                                {['allBrokersBaseDate', 'teamDate', 'taskCreated'].includes(String(o)) &&
+                                <>
+                                {this.state.id && <IsMobileDatePicker
+                                elDate={Number(item[o])}
+                                handleOkClick={this.handlePickerOkClick}
+                                itemKey={String(o)}
+                                containerStile={{marginVertical: 2}}
+                                />}
+                                {!this.state.id && <View style={styles.itemLine}>
+                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                        <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
+                                    </View>}
+                                </>
+                                }
+                                {['createdAt', 'updatedAt'].includes(String(o)) &&
+                                <View style={styles.itemLine}>
                                         <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
                                         <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
                                     </View>
