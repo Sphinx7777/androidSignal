@@ -6,6 +6,12 @@ import { ICallLog } from './index';
 import { ISingleDataItem } from '../../models/DataEntity';
 import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
 import ModalDialog from '../Dialog';
+import MobileDropdown from '../MobileDropdown';
+
+const dialogOptions = [
+    {label: 'auto-dial ON', value: 1},
+    {label: 'auto-dial OFF', value: 0},
+]
 
 interface ICustomInputProps {
     currentElement: ISingleDataItem | undefined;
@@ -31,11 +37,9 @@ interface ICustomInputState {
 const CustomInput = (props: ICustomInputProps) => {
     const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement } = props;
     const [finishedVisible, setFinishedVisible] = useState(false)
-
     const [addTaskDateVisible, setAddTaskDateVisible] = useState(false)
     const [addTeamDateVisible, setAddTeamDateVisible] = useState(false)
     const [addBrokersDateVisible, setAddBrokersDateVisible] = useState(false)
-
     const [sendCustomSMSVisible, setSendCustomSMSVisible] = useState(false)
     const currentElTaskCreated = currentElement?.get('taskCreated') || null;
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
@@ -45,7 +49,6 @@ const CustomInput = (props: ICustomInputProps) => {
     const currentElTeamDate = currentElement?.get('teamDate') ? currentElement?.get('teamDate') : null;
     const currentElBrokersDate = currentElement?.get('allBrokersBaseDate') ? currentElement?.get('allBrokersBaseDate') : null;
     const currentElPhone = currentElement?.get('phone') ? currentElement?.get('phone') : null;
-
     const currentElSearchType = currentElement?.get('searchType') || '';
     const isAsanaType = currentElSearchType ? currentElSearchType.split(',').includes('AD') : false;
     const isTeamType = currentElSearchType ? currentElSearchType.split(',').includes('TD') : false;
@@ -187,6 +190,10 @@ const CustomInput = (props: ICustomInputProps) => {
         }
     };
 
+    const handleDropdown = (value: number | string) => {
+        setSubmitData({ id: currentElement?.get('id'), needToDialog: value === 0 ? false : true })
+    }
+
     const phone = currentElement?.get('phone') && currentElement?.get('phone')?.length > 0 ? currentElement?.get('phone') : '--------'
     const isPhone = currentElement?.get('phone') && currentElement?.get('phone').length >= 9 && currentElement?.get('phone').length <= 11;
     const currentElSMSBody = currentElement?.get('smsBody');
@@ -224,7 +231,6 @@ const CustomInput = (props: ICustomInputProps) => {
                             {currentElement?.get('needToDialog') && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
                         </View>
                     </View>
-
                     { isCurrentElResDialog &&
                         <View style={{ ...styles.inputContainer}}>
                         <Text style={{ ...styles.text, fontWeight: '700' }}>Last call:</Text>
@@ -232,8 +238,14 @@ const CustomInput = (props: ICustomInputProps) => {
                         <Text style={{ ...styles.text }}>Duration: {isCurrentElResDialog?.get('duration')}</Text>
                         <Text style={{ ...styles.text }}>Date: {getStringDate(new Date(isCurrentElResDialog?.get('dateTime')))}</Text>
                         </View>}
-
                 </TouchableOpacity>}
+
+                <MobileDropdown
+                value={currentElement?.get('needToDialog') ? 1 : 0}
+                onChange={handleDropdown}
+                options={dialogOptions}
+                />
+
                 {isAsanaType && <>
                     <Text style={styles.label}>Task created</Text>
                     <View style={styles.inputContainer}>
@@ -461,7 +473,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     label: {
-        color: 'black',
+        color: '#f56b45',
         fontSize: 12,
         fontWeight: '700'
     },
