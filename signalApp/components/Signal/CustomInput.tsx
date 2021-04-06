@@ -192,6 +192,8 @@ const CustomInput = (props: ICustomInputProps) => {
     const currentElSMSBody = currentElement?.get('smsBody');
     const isNeedSms = currentElement?.get('needToSendSMS');
     const dialogDescription = `Do you want to send this sms ? Number: ${phone} sms body: ${currentElSMSBody}`
+    const isCurrentElResDialog: ICallLog = currentElement?.get('responseDialog');
+    console.log('isCurrentElResDialog', isCurrentElResDialog)
 
     return (
         <>
@@ -223,6 +225,11 @@ const CustomInput = (props: ICustomInputProps) => {
                             {currentElement?.get('needToDialog') && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
                         </View>
                     </View>
+
+                    { isCurrentElResDialog && <View>
+                    <Text style={{ ...styles.text }}>{JSON.stringify(isCurrentElResDialog)}</Text>
+                    </View>}
+
                 </TouchableOpacity>}
                 {isAsanaType && <>
                     <Text style={styles.label}>Task created</Text>

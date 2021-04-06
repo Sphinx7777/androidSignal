@@ -4,6 +4,7 @@ import { call, put } from 'redux-saga/effects';
 import { ENTITY, HTTP_METHOD } from '../constants';
 import { setSubmitData, defaultSubmitData } from '../redux/actions';
 import { showToastWithGravityAndOffset, isNetworkAvailable } from 'signalApp/utils';
+import { ICallLog } from 'signalApp/components/Signal';
 
 export type ISingleDataItem = EntityMap<{
     id?: string;
@@ -27,6 +28,7 @@ export type ISingleDataItem = EntityMap<{
     teamDate?: number;
     taskCreated?: number;
     allBrokersBaseDate?: number;
+    responseDialog?: ICallLog;
     }>;
 
 export interface IDataItem {
@@ -51,6 +53,7 @@ export interface IDataItem {
     teamDate?: number;
     taskCreated?: number;
     allBrokersBaseDate?: number;
+    responseDialog?: ICallLog;
 }
 
 class DataEntity extends Entity {

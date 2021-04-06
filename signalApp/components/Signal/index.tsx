@@ -233,7 +233,7 @@ class Signal extends React.Component<ISignalProps> {
             console.log('currentElement -> ', currentElement);
             console.log('--------------------------------------------------------------------------------');
             this.setNextElement()
-            setTimeout(() => this.makeCall(nextElement?.get('phone')), 8000)
+            setTimeout(() => this.makeCall(nextElement?.get('phone')), 7000)
         }
         if (nextElement && response && response['phoneNumber'] === currentElement?.get('phone') && response['duration'] > 0) {
             console.log('--------------------------------------------------------------------------------');
@@ -246,6 +246,7 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     setDialog = (responseDialog: ICallLog) => {
+        console.log('responseDialog', JSON.stringify(responseDialog))
         this.setState((prevState) => {
             return {
                 ...prevState,

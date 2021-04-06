@@ -78,6 +78,7 @@ class Details extends React.Component<IDetailsProps> {
 
     renderItem = (data: any) => {
         const item: IDataItem = data.item
+        console.log('Details_renderItem', JSON.stringify(item.responseDialog))
         const onLongPress: (event: GestureResponderEvent) => void = () => this.showOne(item.id)
         const onPress: (event: GestureResponderEvent) => void = () => console.log('renderItem_onPress=', data)
         return (
