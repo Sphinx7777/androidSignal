@@ -125,11 +125,9 @@ const CustomInput = (props: ICustomInputProps) => {
         } else {
             showToastWithGravityAndOffset('No internet connect !!!');
         }
-        // clearSubmitData()
     };
     const editSubmit = async (e: any, name: string) => {
         e.preventDefault()
-        // const { text } = e.nativeEvent;
         const isConnected = await isNetworkAvailable()
         const data = { [name]: state[name], id: currentElement?.get('id') }
         isConnected.isConnected ? setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
@@ -248,7 +246,6 @@ const CustomInput = (props: ICustomInputProps) => {
                         <Text style={{ ...styles.text }}>Date: {getStringDate(new Date(isCurrentElResDialog?.get('dateTime')))}</Text>
                         </View>}
                 </TouchableOpacity>}
-
                 <MobileDropdown
                 value={currentElement?.get('needToDialog') ? 1 : 0}
                 onChange={handleDropdownDialog}
@@ -260,7 +257,6 @@ const CustomInput = (props: ICustomInputProps) => {
                 containerStile={{marginBottom: 5}}
                 options={smsOptions}
                 />
-
                 {isAsanaType && <>
                     <Text style={styles.label}>Task created</Text>
                     <View style={styles.inputContainer}>
@@ -329,7 +325,6 @@ const CustomInput = (props: ICustomInputProps) => {
                                 placeholder='set new date'
                                 value={state.allBrokersBaseDate ? getStringDate(new Date(state.allBrokersBaseDate * 1000)) : null}
                                 editable={false}
-                            // onChangeText={handleDateChange}
                             />
                             <View style={styles.dateButtons}>
                                 <TouchableOpacity

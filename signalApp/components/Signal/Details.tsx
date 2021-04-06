@@ -207,7 +207,6 @@ class Details extends React.Component<IDetailsProps> {
             dataItems = dataItems.filter(item => item.id === this.state.id)
         }
         const validUser = user?.token?.length > 0
-
         if (!validUser) {
             return (
                 <View style={styles.loadContainer}>

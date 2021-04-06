@@ -49,9 +49,9 @@ const ContactList = (props: IContactListProps) => {
         const currentElSMSBody = item.smsBody;
         const isNeedSms = item.needToSendSMS
         const isCurrentElResDialog = item.responseDialog;
-
         const onLongPress: (event: GestureResponderEvent) => void = () => handleLongPress(data)
         const onPress: (event: GestureResponderEvent) => void = () => handlePress(data)
+
         return (
             <TouchableOpacity
                 style={currentElement?.get('id') !== item.id ? styles.textContainer : styles.textContainerActive}
