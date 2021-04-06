@@ -192,8 +192,7 @@ const CustomInput = (props: ICustomInputProps) => {
     const currentElSMSBody = currentElement?.get('smsBody');
     const isNeedSms = currentElement?.get('needToSendSMS');
     const dialogDescription = `Do you want to send this sms ? Number: ${phone} sms body: ${currentElSMSBody}`
-    const isCurrentElResDialog: ICallLog = currentElement?.get('responseDialog');
-    console.log('isCurrentElResDialog', isCurrentElResDialog)
+    const isCurrentElResDialog = currentElement?.get('responseDialog');
 
     return (
         <>
@@ -226,9 +225,13 @@ const CustomInput = (props: ICustomInputProps) => {
                         </View>
                     </View>
 
-                    { isCurrentElResDialog && <View>
-                    <Text style={{ ...styles.text }}>{JSON.stringify(isCurrentElResDialog)}</Text>
-                    </View>}
+                    { isCurrentElResDialog &&
+                        <View style={{ ...styles.inputContainer}}>
+                        <Text style={{ ...styles.text, fontWeight: '700' }}>Last call:</Text>
+                        <Text style={{ ...styles.text }}>Type: {isCurrentElResDialog?.get('type')}</Text>
+                        <Text style={{ ...styles.text }}>Duration: {isCurrentElResDialog?.get('duration')}</Text>
+                        <Text style={{ ...styles.text }}>Date: {getStringDate(new Date(isCurrentElResDialog?.get('dateTime')))}</Text>
+                        </View>}
 
                 </TouchableOpacity>}
                 {isAsanaType && <>
@@ -439,6 +442,17 @@ const styles = StyleSheet.create({
         padding: 1,
         width: '100%',
         borderRadius: 10,
+    },
+    itemLine: {
+        display: 'flex',
+        flexDirection: 'row',
+        width: '100%',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        marginBottom: 2,
+        paddingBottom: 2,
+        borderBottomWidth: 1,
+        borderBottomColor: '#5eb337'
     },
     dialogContainer: {
         flex: 1,

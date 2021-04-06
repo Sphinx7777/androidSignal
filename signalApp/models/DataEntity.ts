@@ -28,7 +28,7 @@ export type ISingleDataItem = EntityMap<{
     teamDate?: number;
     taskCreated?: number;
     allBrokersBaseDate?: number;
-    responseDialog?: ICallLog;
+    responseDialog?: EntityMap<ICallLog>;
     }>;
 
 export interface IDataItem {

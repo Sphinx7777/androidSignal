@@ -78,7 +78,6 @@ class Details extends React.Component<IDetailsProps> {
 
     renderItem = (data: any) => {
         const item: IDataItem = data.item
-        console.log('Details_renderItem', JSON.stringify(item.responseDialog))
         const onLongPress: (event: GestureResponderEvent) => void = () => this.showOne(item.id)
         const onPress: (event: GestureResponderEvent) => void = () => console.log('renderItem_onPress=', data)
         return (
@@ -135,6 +134,12 @@ class Details extends React.Component<IDetailsProps> {
                                     <View style={styles.itemLine}>
                                         <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
                                         <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
+                                    </View>
+                                }
+                                {['responseDialog'].includes(String(o)) &&
+                                    <View style={styles.itemLine}>
+                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                        <Text style={styles.text}>{JSON.stringify(item.responseDialog)}</Text>
                                     </View>
                                 }
                                 {['needToSendSMS'].includes(String(o)) &&

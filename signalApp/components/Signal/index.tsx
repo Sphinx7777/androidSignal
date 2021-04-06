@@ -241,18 +241,18 @@ class Signal extends React.Component<ISignalProps> {
             console.log('--------------------------------------------------------------------------------');
             console.log('currentElement -> ', currentElement);
             console.log('--------------------------------------------------------------------------------');
-            this.setDialog(response)
+            this.setDialog(response, currentElement?.get('id'))
         }
     }
 
-    setDialog = (responseDialog: ICallLog) => {
-        console.log('responseDialog', JSON.stringify(responseDialog))
+    setDialog = (responseDialog: ICallLog, id: string) => {
         this.setState((prevState) => {
             return {
                 ...prevState,
                 responseDialog
             }
         })
+        this.props.setSubmitData({id, responseDialog})
     }
 
     startStopListener = async () => {
@@ -291,8 +291,10 @@ class Signal extends React.Component<ISignalProps> {
                         console.log('event -> ',
                         event + (num ? ' - ' + num : ''));
                     } else if (event === 'Missed') {
-                        console.log('event -> ',
-                        event + (num ? ' - ' + num : ''));
+                        const res = await this.fetchData();
+                        if (res && res.length > 0 && res[0]['type'] === 'OUTGOING') {
+                            this.makeNextDialogLogic(event, num, res);
+                        }
                     }
                 },
                 true, // To detect incoming calls [ANDROID]
@@ -532,7 +534,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#47f56a',
         paddingHorizontal: 5,
-        paddingTop: 5
+        paddingVertical: 5
     },
     container: {
         flex: 2

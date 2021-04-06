@@ -48,6 +48,7 @@ const ContactList = (props: IContactListProps) => {
         const isPhone = item.phone.length >= 9 && item.phone.length <= 11;
         const currentElSMSBody = item.smsBody;
         const isNeedSms = item.needToSendSMS
+        const isCurrentElResDialog = item.responseDialog;
 
         const onLongPress: (event: GestureResponderEvent) => void = () => handleLongPress(data)
         const onPress: (event: GestureResponderEvent) => void = () => handlePress(data)
@@ -77,6 +78,13 @@ const ContactList = (props: IContactListProps) => {
                         {item?.needToDialog && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
                     </View>
                 </View>
+                { isCurrentElResDialog &&
+                        <View style={{ ...styles.inputContainer}}>
+                        <Text style={{ ...styles.text, fontWeight: '700' }}>Last call:</Text>
+                        <Text style={{ ...styles.text }}>Type: {isCurrentElResDialog.type}</Text>
+                        <Text style={{ ...styles.text }}>Duration: {isCurrentElResDialog.duration}</Text>
+                        <Text style={{ ...styles.text }}>Date: {getStringDate(new Date(isCurrentElResDialog.dateTime))}</Text>
+                        </View>}
             </TouchableOpacity>
         )
     }
@@ -115,6 +123,13 @@ const styles = StyleSheet.create({
         height: 'auto',
         maxHeight: '50%',
         padding: 5
+    },
+    inputContainer: {
+        display: 'flex',
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
     },
     textContainer: {
         borderStyle: 'solid',
