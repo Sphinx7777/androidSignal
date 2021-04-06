@@ -37,6 +37,7 @@ const IsMobileDatePicker = (props: IDetailsProps) => {
             {show && (
                 <DateTimePicker
                     testID='dateTimePicker'
+                    maximumDate={new Date()}
                     value={date}
                     mode='date'
                     is24Hour={true}

@@ -153,7 +153,35 @@ class Details extends React.Component<IDetailsProps> {
                                             <Text style={styles.text}>{String(item[o])}</Text>
                                         </View>}</>
                                 }
-                                {['allBrokersBaseDate', 'teamDate', 'taskCreated'].includes(String(o)) &&
+                                {(String(o) === 'allBrokersBaseDate' && item.searchType.split(',').includes('BD')) &&
+                                <>
+                                {this.state.id && <IsMobileDatePicker
+                                elDate={Number(item[o])}
+                                handleOkClick={this.handlePickerOkClick}
+                                itemKey={String(o)}
+                                containerStile={{marginVertical: 2}}
+                                />}
+                                {!this.state.id && <View style={styles.itemLine}>
+                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                        <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
+                                    </View>}
+                                </>
+                                }
+                                {(String(o) === 'teamDate' && item.searchType.split(',').includes('TD')) &&
+                                <>
+                                {this.state.id && <IsMobileDatePicker
+                                elDate={Number(item[o])}
+                                handleOkClick={this.handlePickerOkClick}
+                                itemKey={String(o)}
+                                containerStile={{marginVertical: 2}}
+                                />}
+                                {!this.state.id && <View style={styles.itemLine}>
+                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                        <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
+                                    </View>}
+                                </>
+                                }
+                                {(String(o) === 'taskCreated' && item.searchType.split(',').includes('AD')) &&
                                 <>
                                 {this.state.id && <IsMobileDatePicker
                                 elDate={Number(item[o])}

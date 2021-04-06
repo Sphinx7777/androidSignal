@@ -38,6 +38,7 @@ interface ICustomInputState {
     teamDate: number;
     allBrokersBaseDate: number;
     phone: string;
+    taskName: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
     const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement } = props;
@@ -50,6 +51,7 @@ const CustomInput = (props: ICustomInputProps) => {
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
     const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
     const currentElTaskDescription = currentElement?.get('taskDescription') ? currentElement?.get('taskDescription') : '';
+    const currentElTaskName = currentElement?.get('taskName') ? currentElement?.get('taskName') : '';
     const currentElComment2020 = currentElement?.get('comment2020') ? currentElement?.get('comment2020') : '';
     const currentElTeamDate = currentElement?.get('teamDate') ? currentElement?.get('teamDate') : null;
     const currentElBrokersDate = currentElement?.get('allBrokersBaseDate') ? currentElement?.get('allBrokersBaseDate') : null;
@@ -67,7 +69,8 @@ const CustomInput = (props: ICustomInputProps) => {
         comment2020: currentElComment2020,
         teamDate: currentElTeamDate,
         allBrokersBaseDate: currentElBrokersDate,
-        phone: currentElPhone
+        phone: currentElPhone,
+        taskName: currentElTaskName
     })
 
     useEffect(() => {
@@ -81,11 +84,12 @@ const CustomInput = (props: ICustomInputProps) => {
                 comment2020: currentElComment2020,
                 teamDate: currentElTeamDate,
                 allBrokersBaseDate: currentElBrokersDate,
-                phone: currentElPhone
+                phone: currentElPhone,
+                taskName: currentElTaskName
             }
         })
     }, [currentElTaskCreated, currentElDetails, currentElSmsBody, currentElTaskDescription,
-        currentElComment2020, currentElTeamDate, currentElBrokersDate, currentElPhone])
+        currentElComment2020, currentElTeamDate, currentElBrokersDate, currentElPhone, currentElTaskName])
 
     const addNewDate = (dateType: string) => {
         setState((prevState) => {
@@ -273,6 +277,17 @@ const CustomInput = (props: ICustomInputProps) => {
                                 <Text style={styles.buttonText}>Set new date</Text>
                             </TouchableOpacity>
                         </View>
+                    </View>
+                    <Text style={styles.label}>Task name</Text>
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={{ ...styles.textInput, width: '100%' }}
+                            autoCorrect={false}
+                            placeholder='enter task name'
+                            value={state.taskName}
+                            onEndEditing={(e) => editSubmit(e, 'taskName')}
+                            onChangeText={text => handleInputChange(text, 'taskName')}
+                            multiline={true} />
                     </View>
                     <Text style={styles.label}>Task description</Text>
                     <View style={styles.inputContainer}>
