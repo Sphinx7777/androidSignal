@@ -96,7 +96,7 @@ class Details extends React.Component<IDetailsProps> {
     renderItem = (data: any) => {
         const item: IDataItem = data.item
         const onLongPress: (event: GestureResponderEvent) => void = () => this.showOne(item.id)
-        const onPress: (event: GestureResponderEvent) => void = () => console.log('renderItem_onPress=', data)
+        // const onPress: (event: GestureResponderEvent) => void = () => console.log('renderItem_onPress=', data)
         return (
             <>
                 {this.state.id &&
@@ -113,7 +113,8 @@ class Details extends React.Component<IDetailsProps> {
                     activeOpacity={0.6}
                     style={styles.item}
                     onLongPress={onLongPress}
-                    onPress={onPress}>
+                    // onPress={onPress}
+                >
                     {Object.keys(item).sort().map(o => {
                         return (
                             <View key={item['id'] + o}>
@@ -160,18 +161,31 @@ class Details extends React.Component<IDetailsProps> {
                                     </View>
                                 }
                                 {['needToSendSMS'].includes(String(o)) &&
-                                    <MobileDropdown
-                                        value={item.needToSendSMS ? 1 : 0}
-                                        onChange={this.handleDropdownSMS}
-                                        options={smsOptions}
-                                    />
+                                    <>
+                                        {this.state.id && <MobileDropdown
+                                            value={item.needToSendSMS ? 1 : 0}
+                                            onChange={this.handleDropdownSMS}
+                                            options={smsOptions}
+                                        />}
+                                        {!this.state.id && <View style={styles.itemLine}>
+                                            {item?.needToSendSMS && <>
+                                                <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                                <Image style={{ width: 22, height: 22 }} source={require('../../../assets/sms.png')} /></>}
+                                        </View>}
+                                    </>
                                 }
                                 {['needToDialog'].includes(String(o)) &&
-                                    <MobileDropdown
-                                        value={item.needToDialog ? 1 : 0}
-                                        onChange={this.handleDropdownDialog}
-                                        options={dialogOptions}
-                                    />
+                                    <>
+                                        {this.state.id && <MobileDropdown
+                                            value={item.needToDialog ? 1 : 0}
+                                            onChange={this.handleDropdownDialog}
+                                            options={dialogOptions}
+                                        />}
+                                        {!this.state.id && <View style={styles.itemLine}>
+                                            <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                            {item?.needToDialog && <Image style={{ width: 22, height: 22, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
+                                        </View>}
+                                    </>
                                 }
                             </View>
                         )
