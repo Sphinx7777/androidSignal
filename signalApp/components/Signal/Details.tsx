@@ -9,6 +9,16 @@ import DataEntity, { IDataItem, ISingleDataItem } from '../../models/DataEntity'
 import { connect } from 'react-redux';
 import { EntityList } from '../../models/entity';
 import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
+import MobileDropdown from '../MobileDropdown';
+
+const dialogOptions = [
+    { label: 'auto-dial ON', value: 1 },
+    { label: 'auto-dial OFF', value: 0 },
+]
+const smsOptions = [
+    { label: 'auto-SMS ON', value: 1 },
+    { label: 'auto-SMS OFF', value: 0 },
+]
 interface IDetailsProps {
     route: any;
     signalData: EntityList<ISingleDataItem>;
@@ -53,7 +63,7 @@ class Details extends React.Component<IDetailsProps> {
         e.preventDefault()
         const { text } = e.nativeEvent;
         const isConnected = await isNetworkAvailable()
-        const data = { [name]: text, id}
+        const data = { [name]: text, id }
         isConnected.isConnected ? this.props.setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
     }
 
@@ -74,6 +84,13 @@ class Details extends React.Component<IDetailsProps> {
         } else {
             console.log('onLoginPress_error')
         }
+    }
+
+    handleDropdownDialog = (value: number | string) => {
+        this.props.setSubmitData({ id: this.state.id, needToDialog: value === 0 ? false : true })
+    }
+    handleDropdownSMS = (value: number | string) => {
+        this.props.setSubmitData({ id: this.state.id, needToSendSMS: value === 0 ? false : true })
     }
 
     renderItem = (data: any) => {
@@ -107,28 +124,28 @@ class Details extends React.Component<IDetailsProps> {
                                     </View>
                                 }
                                 {['email', 'name', 'taskName', 'details', 'phone', 'segment', 'taskDescription', 'memberRating',
-                                'smsBody', 'emailBody', 'comment2020', 'group', 'price', 'calledAbout', 'comment2019'
+                                    'smsBody', 'emailBody', 'comment2020', 'group', 'price', 'calledAbout', 'comment2019'
                                 ].includes(String(o)) &&
                                     <>
-                                    {this.state.id && <>
-                                    <View style={styles.showLine}>
-                                    <Text style={{ ...styles.text, ...styles.textTitle, color: '#f56b45' }}>{String(o)} :</Text>
-                                    <Image style={{ width: 20, height: 20, marginLeft: 5 }} source={require('../../../assets/edit.png')} />
-                                    </View>
-                                        <View style={styles.inputContainer}>
-                                            <TextInput
-                                                style={{ ...styles.textInput}}
-                                                autoCorrect={false}
-                                                placeholder={String(o)}
-                                                value={String(this.state[o])}
-                                                onEndEditing={(e) => this.editSubmit(e, o, item['id'])}
-                                                onChangeText={text => this.handleInputChange(text, String(o))}
-                                                multiline={true} />
-                                        </View></>}
-                                    {!this.state.id && <View style={styles.itemLine}>
-                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
-                                        <Text style={styles.text}>{String(item[o])}</Text>
-                                    </View>}</>
+                                        {this.state.id && <>
+                                            <View style={styles.showLine}>
+                                                <Text style={{ ...styles.text, ...styles.textTitle, color: '#f77e59' }}>{String(o)} :</Text>
+                                                <Image style={{ width: 20, height: 20, marginLeft: 5 }} source={require('../../../assets/edit.png')} />
+                                            </View>
+                                            <View style={styles.inputContainer}>
+                                                <TextInput
+                                                    style={{ ...styles.textInput }}
+                                                    autoCorrect={false}
+                                                    placeholder={String(o)}
+                                                    value={String(this.state[o])}
+                                                    onEndEditing={(e) => this.editSubmit(e, o, item['id'])}
+                                                    onChangeText={text => this.handleInputChange(text, String(o))}
+                                                    multiline={true} />
+                                            </View></>}
+                                        {!this.state.id && <View style={styles.itemLine}>
+                                            <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                            <Text style={styles.text}>{String(item[o])}</Text>
+                                        </View>}</>
                                 }
                                 {['allBrokersBaseDate', 'teamDate', 'createdAt', 'updatedAt'].includes(String(o)) &&
                                     <View style={styles.itemLine}>
@@ -143,18 +160,19 @@ class Details extends React.Component<IDetailsProps> {
                                     </View>
                                 }
                                 {['needToSendSMS'].includes(String(o)) &&
-                                    <View style={styles.itemLine}>
-                                        {item?.needToSendSMS && <>
-                                            <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
-                                            <Image style={{ width: 18, height: 18 }} source={require('../../../assets/sms.png')} /></>}
-                                    </View>
+                                    <MobileDropdown
+                                        value={item.needToSendSMS ? 1 : 0}
+                                        onChange={this.handleDropdownSMS}
+                                        options={smsOptions}
+                                    />
                                 }
                                 {['needToDialog'].includes(String(o)) &&
-                                    <View style={styles.itemLine}>
-                                        {item?.needToDialog && <>
-                                            <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
-                                            <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} /></>}
-                                    </View>}
+                                    <MobileDropdown
+                                        value={item.needToDialog ? 1 : 0}
+                                        onChange={this.handleDropdownDialog}
+                                        options={dialogOptions}
+                                    />
+                                }
                             </View>
                         )
                     })
@@ -193,7 +211,7 @@ class Details extends React.Component<IDetailsProps> {
         if ((!signalData || signalData.size === 0)) {
             return (<View style={styles.loadContainer}>
                 <View style={{ ...styles.loadContainer, height: 200 }}>
-                            <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#dbdbd7' }}>No data...</Text>
+                    <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#dbdbd7' }}>No data...</Text>
                 </View>
             </View>)
         }

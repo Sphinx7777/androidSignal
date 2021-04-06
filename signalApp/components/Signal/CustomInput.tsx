@@ -13,6 +13,11 @@ const dialogOptions = [
     {label: 'auto-dial OFF', value: 0},
 ]
 
+const smsOptions = [
+    { label: 'auto-SMS ON', value: 1 },
+    { label: 'auto-SMS OFF', value: 0 },
+]
+
 interface ICustomInputProps {
     currentElement: ISingleDataItem | undefined;
     makeCall: (num: string, pauseDisable: string) => Promise<any>;
@@ -190,8 +195,12 @@ const CustomInput = (props: ICustomInputProps) => {
         }
     };
 
-    const handleDropdown = (value: number | string) => {
+    const handleDropdownDialog = (value: number | string) => {
         setSubmitData({ id: currentElement?.get('id'), needToDialog: value === 0 ? false : true })
+    }
+
+    const handleDropdownSMS = (value: number | string) => {
+        setSubmitData({ id: currentElement?.get('id'), needToSendSMS: value === 0 ? false : true })
     }
 
     const phone = currentElement?.get('phone') && currentElement?.get('phone')?.length > 0 ? currentElement?.get('phone') : '--------'
@@ -242,8 +251,14 @@ const CustomInput = (props: ICustomInputProps) => {
 
                 <MobileDropdown
                 value={currentElement?.get('needToDialog') ? 1 : 0}
-                onChange={handleDropdown}
+                onChange={handleDropdownDialog}
                 options={dialogOptions}
+                />
+                <MobileDropdown
+                value={currentElement?.get('needToSendSMS') ? 1 : 0}
+                onChange={handleDropdownSMS}
+                containerStile={{marginBottom: 5}}
+                options={smsOptions}
                 />
 
                 {isAsanaType && <>
@@ -473,7 +488,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     label: {
-        color: '#f56b45',
+        color: '#f77e59',
         fontSize: 12,
         fontWeight: '700'
     },
