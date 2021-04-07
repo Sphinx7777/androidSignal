@@ -119,7 +119,11 @@ const CustomInput = (props: ICustomInputProps) => {
             phone: currentElement?.get('phone'),
             smsBody: state.smsBody
         }
-        sendSMS(sms);
+        if (currentElement) {
+            sendSMS(sms);
+        } else {
+            showToastWithGravityAndOffset('No data to send !!!');
+        }
     }
     const finishedSubmit = async () => {
         const isConnected = await isNetworkAvailable()
@@ -135,7 +139,16 @@ const CustomInput = (props: ICustomInputProps) => {
         e.preventDefault()
         const isConnected = await isNetworkAvailable()
         const data = { [name]: state[name], id: currentElement?.get('id') }
-        isConnected.isConnected ? setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
+        if (isConnected.isConnected && currentElement) {
+            setSubmitData(data)
+        } else {
+            if (!isConnected.isConnected) {
+                showToastWithGravityAndOffset('No internet connect !!!');
+            }
+            if (!currentElement) {
+                showToastWithGravityAndOffset('No data for submit !!!');
+            }
+        }
     }
     const showDetails = () => onDetailsPress(currentElement.get('id'))
 
@@ -199,11 +212,15 @@ const CustomInput = (props: ICustomInputProps) => {
     };
 
     const handleDropdownDialog = (value: number | string) => {
-        setSubmitData({ id: currentElement?.get('id'), needToDialog: value === 0 ? false : true })
+        if (currentElement) {
+            setSubmitData({ id: currentElement?.get('id'), needToDialog: value === 0 ? false : true })
+        }
     }
 
     const handleDropdownSMS = (value: number | string) => {
-        setSubmitData({ id: currentElement?.get('id'), needToSendSMS: value === 0 ? false : true })
+        if (currentElement) {
+            setSubmitData({ id: currentElement?.get('id'), needToSendSMS: value === 0 ? false : true })
+        }
     }
 
     const phone = currentElement?.get('phone') && currentElement?.get('phone')?.length > 0 ? currentElement?.get('phone') : '--------'
@@ -388,15 +405,16 @@ const CustomInput = (props: ICustomInputProps) => {
                 </View>
                 <View style={styles.sendButtonContainer}>
                     <TouchableOpacity
-                        style={(state.smsBody.length !== 0)
+                        style={(state.smsBody.length !== 0 && currentElement)
                             ? { ...styles.button, ...styles.sendButton }
                             : { ...styles.button, ...styles.sendButton, ...styles.disabled }}
-                        disabled={state.smsBody.length === 0}
+                        disabled={state.smsBody.length === 0 || !currentElement}
                         onPress={() => showDialog('sendCustomSMS')}>
                         <Text style={styles.buttonText}>Custom sms</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={{ ...styles.button, ...styles.sendButton, backgroundColor: '#f26257', borderColor: '#f26257' }}
+                        style={{ ...styles.button, ...styles.sendButton, backgroundColor: currentElement ? '#f26257' : 'gray', borderColor: currentElement ? '#f26257' : 'gray' }}
+                        disabled={!currentElement}
                         onPress={() => showDialog('finished')}>
                         <Text style={styles.buttonText}>Finished</Text>
                     </TouchableOpacity>

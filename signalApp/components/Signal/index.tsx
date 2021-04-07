@@ -484,19 +484,19 @@ class Signal extends React.Component<ISignalProps> {
                     </View>
                 </View>)
         }
-        if ((!dataItems || dataItems.size === 0) && isInternet) {
-            return (<View style={styles.loadContainer}>
-                <View style={{ ...styles.loadContainer, height: 200 }}>
-                    <ActivityIndicator size='large' color='green' />
-                    <TouchableOpacity
-                            activeOpacity={0.5}
-                            style={{marginTop: 20}}
-                            onPress={this.getSignalData}>
-                            <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#fc9fa8' }}>No data to download, click to try again</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>)
-        }
+        // if ((!dataItems || dataItems.size === 0) && isInternet) {
+        //     return (<View style={styles.loadContainer}>
+        //         <View style={{ ...styles.loadContainer, height: 200 }}>
+        //             <ActivityIndicator size='large' color='green' />
+        //             <TouchableOpacity
+        //                     activeOpacity={0.5}
+        //                     style={{marginTop: 20}}
+        //                     onPress={this.getSignalData}>
+        //                     <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#fc9fa8' }}>No data to download, click to try again</Text>
+        //             </TouchableOpacity>
+        //         </View>
+        //     </View>)
+        // }
         if (!isInternet) {
             return (<View style={styles.loadContainer}>
                 <View style={{ ...styles.loadContainer, height: 200 }}>
@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state: any) => {
-    const dataItems = state.entities.get('signalData')?.sort()
+    const dataItems = state.entities.get('signalData')?.sort() || null;
     const user = state.identity.user || null
     const submitData = state.submitData.data || []
     return {

@@ -97,7 +97,7 @@ const CallMenu = (props: ICallMenuProps) => {
     if (isSMSCount && isValidSMS) {
         count = isSMSCount?.size - isValidSMS?.size;
     }
-    const dialogDescription = `You confirm the sending of all messages ? ${isValidSMS?.size} SMS will be sent. ${count && count > 0 ? count === 1 ? count + ' message' +  ' have incorrect number format or empty message body' : count + ' messages' +  ' have incorrect number format or empty message body' : ''}`
+    const dialogDescription = `You confirm the sending of all messages ? ${isValidSMS?.size} SMS will be sent. ${count && count > 0 ? count === 1 ? count + ' message' + ' have incorrect number format or empty message body' : count + ' messages' + ' have incorrect number format or empty message body' : ''}`
 
     return (
         <>
@@ -115,33 +115,41 @@ const CallMenu = (props: ICallMenuProps) => {
                 </View>
                 <View style={styles.buttonsBlock}>
                     <TouchableOpacity
-                        style={{ ...styles.button, marginTop: 1, marginBottom: 15 }}
-                        onPress={!pause ? handlePausePress : handleContinuePress}>
+                        style={currentElement ? { ...styles.button, marginTop: 1, marginBottom: 15 }
+                            : { ...styles.button, marginTop: 1, marginBottom: 15, ...styles.disabled }
+                        }
+                        onPress={!pause ? handlePausePress : handleContinuePress}
+                        disabled={!currentElement}
+                    >
                         <Text style={{ ...styles.buttonText, marginTop: 5 }}>{!pause ? 'Pause' : 'Continue'}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={{ ...styles.button, marginBottom: 15, paddingVertical: 3 }}
-                        onPress={handleNextPress}>
+                        style={currentElement ? { ...styles.button, marginBottom: 15, paddingVertical: 3 }
+                            : { ...styles.button, marginBottom: 15, paddingVertical: 3, ...styles.disabled }
+                        }
+                        onPress={handleNextPress}
+                        disabled={!currentElement}
+                    >
                         <Text style={styles.buttonText}>Next <Image style={{ width: 15, height: 15 }} source={require('../../../assets/phone-volume-solid.png')} /></Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={(dataSmsArray && dataSmsArray.size > 0)
+                        style={(dataSmsArray && dataSmsArray?.size > 0)
                             ? { ...styles.button, paddingVertical: 3 }
                             : { ...styles.button, paddingVertical: 3, ...styles.disabled }}
-                        disabled={!dataSmsArray || dataSmsArray.size === 0 ? true : false}
+                        disabled={!dataSmsArray || dataSmsArray?.size === 0 ? true : false}
                         onPress={() => showDialog('sendAllSMS')}>
-                        <Text style={styles.buttonText}>{`Send all sms: ${isSMSCount.size}`}</Text>
+                        <Text style={styles.buttonText}>{`Send all sms: ${isSMSCount?.size || 0}`}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
             <ModalDialog
-            handleCancel={handleCancel}
-            handleConfirm={handleConfirm}
-            dialogKey='sendAllSMS'
-            visible={sendAllSMSVisible}
-            title='Send all sms'
-            description={dialogDescription}
-            confirmButtonText='Send'
+                handleCancel={handleCancel}
+                handleConfirm={handleConfirm}
+                dialogKey='sendAllSMS'
+                visible={sendAllSMSVisible}
+                title='Send all sms'
+                description={dialogDescription}
+                confirmButtonText='Send'
             />
         </>
     );

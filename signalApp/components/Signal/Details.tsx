@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state: any) => {
-    const signalData = state.entities.get('signalData')?.sort()
+    const signalData = state.entities.get('signalData')?.sort() || null
     const user = state.identity.user || null
     return {
         signalData,
