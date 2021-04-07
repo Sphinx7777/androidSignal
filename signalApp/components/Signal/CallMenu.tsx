@@ -40,9 +40,9 @@ const CallMenu = (props: ICallMenuProps) => {
                         callStart: res
                     }
                 })
-                setCurrentItemIndex(currentItemIndex + 1)
-                setCurrentElement(element)
             }
+            setCurrentItemIndex(currentItemIndex + 1)
+            setCurrentElement(element)
         } else {
             if (callData) {
                 const phone = callData?.valueSeq()?.getIn([0, 'phone'])
@@ -55,9 +55,9 @@ const CallMenu = (props: ICallMenuProps) => {
                             callStart: res
                         }
                     })
-                    setCurrentItemIndex(0)
-                    setCurrentElement(element)
                 }
+                setCurrentItemIndex(0)
+                setCurrentElement(element)
             }
         }
     }

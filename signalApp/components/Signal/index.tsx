@@ -116,15 +116,19 @@ class Signal extends React.Component<ISignalProps> {
         })
     }
 
-    setNextElement = () => {
+    setNextElement = (nextElement, ind) => {
         const { dataItems } = this.props;
         const { currentItemIndex } = this.state;
-        if (dataItems) {
-            const arrLength = dataItems.size;
-            const nextIndex = currentItemIndex < arrLength - 1 ? currentItemIndex + 1 : 0;
-            const nextElement = dataItems?.valueSeq()?.get(nextIndex);
+        if (dataItems && !nextElement) {
+            const nextInd = currentItemIndex < dataItems.size - 1 ? currentItemIndex + 1 : 0;
+            const next = dataItems?.valueSeq()?.get(nextInd);
+            this.setCurrentElement(next);
+            this.setCurrentItemIndex(nextInd);
+
+        }
+        if (nextElement) {
             this.setCurrentElement(nextElement);
-            this.setCurrentItemIndex(nextIndex);
+            this.setCurrentItemIndex(ind);
         }
     }
 
@@ -223,27 +227,41 @@ class Signal extends React.Component<ISignalProps> {
         const { dataItems } = this.props;
         const response = res && res.length > 0 && res[0] || null;
         let nextElement = null;
-        // const isCallNeedItems = dataItems.filter(o => o.get('needToDialog') && o.get('phone').length >= 9 || o.get('phone').length <= 11)
-        // console.log('makeNextDialogLogic', dataItems, 'isCallNeedItems', isCallNeedItems)
+        let ind = null;
         if (dataItems) {
             const arrLength = dataItems.size;
             const nextIndex = currentItemIndex < arrLength - 1 ? currentItemIndex + 1 : 0;
-            nextElement = dataItems?.valueSeq()?.get(nextIndex);
+            let count = 0;
+            const getNextEl = (i: number) => {
+                const el = dataItems?.valueSeq()?.get(i)
+                if (el.get('needToDialog') && currentElement.get('id') !== el.get('id')) {
+                        count = 0;
+                        return {el, i};
+                    } else if (count <= arrLength) {
+                        count = count + 1;
+                        const nextInd = i < arrLength - 1 ? i + 1 : 0;
+                        return getNextEl(nextInd)
+                    }
+            }
+            const elem = getNextEl(nextIndex)
+            nextElement = elem?.el;
+            ind = elem?.i;
+
         }
         if (nextElement && response && response['phoneNumber'] === currentElement?.get('phone') && response['duration'] === 0) {
             console.log('--------------------------------------------------------------------------------');
             console.log('event -> ', event, 'num -> ', num, 'response -> ', response);
             console.log('--------------------------------------------------------------------------------');
-            console.log('currentElement -> ', currentElement);
+            console.log('currentElementPhone -> ', currentElement.get('phone'));
             console.log('--------------------------------------------------------------------------------');
-            this.setNextElement()
-            setTimeout(() => this.makeCall(nextElement?.get('phone')), 7000)
+            this.setNextElement(nextElement, ind)
+            setTimeout(() => this.makeCall(nextElement?.get('phone')), 10000)
         }
         if (nextElement && response && response['phoneNumber'] === currentElement?.get('phone') && response['duration'] > 0) {
             console.log('--------------------------------------------------------------------------------');
             console.log('event -> ', event, 'num -> ', num, 'response -> ', response);
             console.log('--------------------------------------------------------------------------------');
-            console.log('currentElement -> ', currentElement);
+            console.log('currentElementPhone -> ', currentElement.get('phone'));
             console.log('--------------------------------------------------------------------------------');
             this.setDialog(response, currentElement?.get('id'))
         }
@@ -353,7 +371,8 @@ class Signal extends React.Component<ISignalProps> {
         );
         if (grantedCall === PermissionsAndroid.RESULTS.GRANTED && grantedLog === PermissionsAndroid.RESULTS.GRANTED && !currentPause) {
             if (num && (num.length >= 9 && num.length <= 11)) {
-                await DirectDial.createDial(num)
+                const res = await DirectDial.createDial(num)
+                return Promise.resolve(res)
             } else {
                 showToastWithGravityAndOffset(`Error, incorrect number : ${num}`)
             }
@@ -505,6 +524,7 @@ class Signal extends React.Component<ISignalProps> {
                     />
                     <ScrollView style={styles.container}>
                         <CustomInput
+                        dataItems={dataItems}
                         setNextElement={this.setNextElement}
                         onDetailsPress={onDetailsPress}
                         responseDialog={responseDialog}

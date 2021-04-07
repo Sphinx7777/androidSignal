@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
-import { CRUD } from 'signalApp/models/entity';
+import { CRUD, EntityList } from 'signalApp/models/entity';
 import { ICallLog } from './index';
 import { ISingleDataItem } from '../../models/DataEntity';
 import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
@@ -27,7 +27,8 @@ interface ICustomInputProps {
     submitData: any;
     responseDialog: ICallLog;
     onDetailsPress?: (id: string) => void;
-    setNextElement: () => void;
+    setNextElement: (a: any, b: any) => void;
+    dataItems: EntityList<ISingleDataItem>;
 }
 interface ICustomInputState {
     taskCreated: number;
@@ -41,7 +42,7 @@ interface ICustomInputState {
     taskName: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
-    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement } = props;
+    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement, dataItems } = props;
     const [finishedVisible, setFinishedVisible] = useState(false)
     const [addTaskDateVisible, setAddTaskDateVisible] = useState(false)
     const [addTeamDateVisible, setAddTeamDateVisible] = useState(false)
@@ -125,7 +126,7 @@ const CustomInput = (props: ICustomInputProps) => {
         const data = { ...state, id: currentElement?.get('id'), responseDialog, needToDialog: false, needToSendSMS: false, crud: CRUD.DELETE }
         if (isConnected.isConnected) {
             setSubmitData(data);
-            setNextElement();
+            setNextElement(null, null);
         } else {
             showToastWithGravityAndOffset('No internet connect !!!');
         }
