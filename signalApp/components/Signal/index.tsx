@@ -162,7 +162,7 @@ class Signal extends React.Component<ISignalProps> {
         const { dataItems } = this.props;
         let dataSmsArray = [];
         if (dataItems && dataItems.size > 0 && !data) {
-        dataSmsArray = dataItems.valueSeq().filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0)?.toJS() || []
+        dataSmsArray = dataItems.valueSeq().filter(obj => obj.get('needToSendSMS'))?.toJS() || []
         }
         if (data && data.smsBody && data.smsBody.length > 0) {
             dataSmsArray = [{
@@ -223,6 +223,8 @@ class Signal extends React.Component<ISignalProps> {
         const { dataItems } = this.props;
         const response = res && res.length > 0 && res[0] || null;
         let nextElement = null;
+        // const isCallNeedItems = dataItems.filter(o => o.get('needToDialog') && o.get('phone').length >= 9 || o.get('phone').length <= 11)
+        // console.log('makeNextDialogLogic', dataItems, 'isCallNeedItems', isCallNeedItems)
         if (dataItems) {
             const arrLength = dataItems.size;
             const nextIndex = currentItemIndex < arrLength - 1 ? currentItemIndex + 1 : 0;
