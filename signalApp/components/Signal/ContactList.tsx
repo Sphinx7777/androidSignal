@@ -45,7 +45,7 @@ const ContactList = (props: IContactListProps) => {
         const isAsanaType = currentElSearchType ? currentElSearchType.split(',').includes('AD') : false;
         const isTeamType = currentElSearchType ? currentElSearchType.split(',').includes('TD') : false;
         const isBrokersType = currentElSearchType ? currentElSearchType.split(',').includes('BD') : false;
-        const isPhone = item.phone.length >= 9 && item.phone.length <= 11;
+        const isPhone = item.phone?.length >= 9 && item.phone?.length <= 11;
         const currentElSMSBody = item.smsBody;
         const isNeedSms = item.needToSendSMS
         const isCurrentElResDialog = item.responseDialog;
@@ -59,7 +59,7 @@ const ContactList = (props: IContactListProps) => {
                 onPress={onPress}>
                 <View style={styles.nameLine}>
                     <Text numberOfLines={1} style={{...styles.text, maxWidth: 220}}>{item.asanaDataType ? item?.taskName : item?.name}</Text>
-                    <Text style={{...styles.text, color: isPhone ? 'black' : '#bf0416'}}>{item.phone && item.phone.length > 0 ? item.phone : '--------'}</Text>
+                    <Text style={{...styles.text, color: isPhone ? 'black' : '#bf0416'}}>{item.phone && item.phone?.length > 0 ? item.phone : '--------'}</Text>
                     {item?.asanaDataType
                         ? <Image style={{ width: 25, height: 25 }} source={require('../../../assets/asana.png')} />
                         : <Text style={{ ...styles.text, color: '#0d1180', fontWeight: '700' }}>{item?.searchType}</Text>

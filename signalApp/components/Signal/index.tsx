@@ -536,6 +536,7 @@ class Signal extends React.Component<ISignalProps> {
                         sendSMS={this.sendDirectSms}/>
                         <CallMenu
                             pause={pause}
+                            getData={this.props.getData}
                             getDataSignal={this.getDataSignal}
                             pausePress={this.pausePress}
                             sendAllSMS={this.sendDirectSms}

@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput } from 'react-native';
+import { showToastWithGravityAndOffset } from 'signalApp/utils';
 import { ISingleDataItem } from '../../models/DataEntity';
 import { EntityList } from '../../models/entity';
 import ModalDialog from '../Dialog';
@@ -16,16 +17,28 @@ interface ICallMenuProps {
     pause: boolean;
     getDataSignal?: () => void;
     currentElement: ISingleDataItem;
+    getData?: (data: any) => void;
 }
 interface ICallMenuState {
     callStart: boolean;
 }
+
+interface ICallMenuFilter {
+    phone: string;
+}
+
+
 const CallMenu = (props: ICallMenuProps) => {
-    const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, pausePress, pause, getDataSignal, currentElement } = props;
+    const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, pausePress,
+            pause, getDataSignal, currentElement, getData } = props;
     const [sendAllSMSVisible, setSendAllSMSVisible] = useState(false)
+
 
     const [state, setState] = useState<ICallMenuState>({
         callStart: false
+    })
+    const [filter, setFilter] = useState<ICallMenuFilter>({
+        phone: '',
     })
 
     const handleNextPress = async () => {
@@ -91,6 +104,31 @@ const CallMenu = (props: ICallMenuProps) => {
         }
     };
 
+    const handleInputSearch = (text: string) => {
+        setFilter((prevState) => {
+            return {
+                ...prevState,
+                phone: text,
+            }
+        })
+    }
+    const handleSearchPress = () => {
+        if (filter.phone && filter.phone.length >= 5 && filter.phone.length <= 11) {
+            getData({ pageName: 'signal', perPage: 100, filter: {phone: filter.phone}})
+            setFilter((prevState) => {
+                return {
+                    ...prevState,
+                    phone: '',
+                }
+            })
+        }
+        if (filter.phone.length < 5) {
+            showToastWithGravityAndOffset ('Min 5 digits')
+        }
+        if (filter.phone.length > 11) {
+            showToastWithGravityAndOffset ('Max 11 digits')
+        }
+    }
     const isSMSCount = callData?.filter(obj => obj.get('needToSendSMS'));
     const isValidSMS = callData?.filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0 && obj.get('phone') && (obj.get('phone').length >= 9 && obj.get('phone').length <= 11));
     let count = 0;
@@ -101,44 +139,64 @@ const CallMenu = (props: ICallMenuProps) => {
 
     return (
         <>
-            <View style={styles.container}>
-                <View style={styles.textBlock}>
-                    <Text>Info block</Text>
-                    <Text>Info block</Text>
-                    <Text>Info block</Text>
-                    <Text>Info block</Text>
-                    <TouchableOpacity
-                        style={{ ...styles.button, maxWidth: 100, marginTop: 25 }}
-                        onPress={getDataSignal}>
-                        <Text style={{ ...styles.buttonText, marginTop: 5 }}>Reload data</Text>
-                    </TouchableOpacity>
+            <View style={styles.wrapper}>
+                <View style={styles.container}>
+                    <View style={styles.textBlock}>
+                        <Text>Info block</Text>
+                        <Text>Info block</Text>
+                        <Text>Info block</Text>
+                        <Text>Info block</Text>
+                        <TouchableOpacity
+                            style={{ ...styles.button, maxWidth: 100, marginTop: 25 }}
+                            onPress={getDataSignal}>
+                            <Text style={{ ...styles.buttonText, marginTop: 5 }}>Reload data</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.buttonsBlock}>
+                        <TouchableOpacity
+                            style={currentElement ? { ...styles.button, marginTop: 1, marginBottom: 15 }
+                                : { ...styles.button, marginTop: 1, marginBottom: 15, ...styles.disabled }
+                            }
+                            onPress={!pause ? handlePausePress : handleContinuePress}
+                            disabled={!currentElement}
+                        >
+                            <Text style={{ ...styles.buttonText, marginTop: 5 }}>{!pause ? 'Pause' : 'Continue'}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={currentElement ? { ...styles.button, marginBottom: 15, paddingVertical: 3 }
+                                : { ...styles.button, marginBottom: 15, paddingVertical: 3, ...styles.disabled }
+                            }
+                            onPress={handleNextPress}
+                            disabled={!currentElement}
+                        >
+                            <Text style={styles.buttonText}>Next <Image style={{ width: 15, height: 15 }} source={require('../../../assets/phone-volume-solid.png')} /></Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={(dataSmsArray && dataSmsArray?.size > 0)
+                                ? { ...styles.button, paddingVertical: 3 }
+                                : { ...styles.button, paddingVertical: 3, ...styles.disabled }}
+                            disabled={!dataSmsArray || dataSmsArray?.size === 0 ? true : false}
+                            onPress={() => showDialog('sendAllSMS')}>
+                            <Text style={styles.buttonText}>{`Send all sms: ${isSMSCount?.size || 0}`}</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-                <View style={styles.buttonsBlock}>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={{ ...styles.textInput, width: '100%' }}
+                        autoCorrect={false}
+                        maxLength={11}
+                        keyboardType='numeric'
+                        placeholder='Phone search min 5 digits'
+                        value={filter.phone}
+                        onChangeText={text => handleInputSearch(text)}
+                        multiline={true}
+                    />
                     <TouchableOpacity
-                        style={currentElement ? { ...styles.button, marginTop: 1, marginBottom: 15 }
-                            : { ...styles.button, marginTop: 1, marginBottom: 15, ...styles.disabled }
-                        }
-                        onPress={!pause ? handlePausePress : handleContinuePress}
-                        disabled={!currentElement}
-                    >
-                        <Text style={{ ...styles.buttonText, marginTop: 5 }}>{!pause ? 'Pause' : 'Continue'}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={currentElement ? { ...styles.button, marginBottom: 15, paddingVertical: 3 }
-                            : { ...styles.button, marginBottom: 15, paddingVertical: 3, ...styles.disabled }
-                        }
-                        onPress={handleNextPress}
-                        disabled={!currentElement}
-                    >
-                        <Text style={styles.buttonText}>Next <Image style={{ width: 15, height: 15 }} source={require('../../../assets/phone-volume-solid.png')} /></Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={(dataSmsArray && dataSmsArray?.size > 0)
-                            ? { ...styles.button, paddingVertical: 3 }
-                            : { ...styles.button, paddingVertical: 3, ...styles.disabled }}
-                        disabled={!dataSmsArray || dataSmsArray?.size === 0 ? true : false}
-                        onPress={() => showDialog('sendAllSMS')}>
-                        <Text style={styles.buttonText}>{`Send all sms: ${isSMSCount?.size || 0}`}</Text>
+                        style={{width: '20%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
+                        onPress={handleSearchPress}
+                        disabled={!currentElement}>
+                        <Image style={{ width: 20, height: 20, padding: 10 }} source={require('../../../assets/search.png')} />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -155,6 +213,8 @@ const CallMenu = (props: ICallMenuProps) => {
     );
 }
 
+
+
 const styles = StyleSheet.create({
     button: {
         display: 'flex',
@@ -165,6 +225,22 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         overflow: 'hidden',
         backgroundColor: '#1f6b4e'
+    },
+    inputContainer: {
+        display: 'flex',
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        marginTop: 12,
+    },
+    textInput: {
+        borderStyle: 'solid',
+        paddingVertical: 5,
+        marginBottom: 5,
+        maxWidth: '80%',
+        borderBottomWidth: 2,
+        borderBottomColor: 'lightgrey',
     },
     buttonText: {
         color: 'white',
@@ -178,13 +254,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
-        marginTop: 5,
-        borderColor: '#a5a8a5',
-        backgroundColor: '#f7faf7',
-        borderWidth: 2,
-        padding: 5,
-        borderRadius: 10,
-        marginBottom: 10
+
     },
     textBlock: {
         display: 'flex',
@@ -194,6 +264,18 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         width: '40%',
+    },
+    wrapper: {
+        display: 'flex',
+        backgroundColor: '#f7faf7',
+        flexDirection: 'column',
+        marginTop: 5,
+        borderColor: '#a5a8a5',
+        borderWidth: 2,
+        padding: 5,
+        borderRadius: 10,
+        marginBottom: 10,
+        width: '100%',
     },
     disabled: {
         backgroundColor: 'gray',

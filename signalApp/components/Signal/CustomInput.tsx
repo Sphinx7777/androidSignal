@@ -385,6 +385,7 @@ const CustomInput = (props: ICustomInputProps) => {
                         style={{ ...styles.textInput, width: '100%' }}
                         autoCorrect={false}
                         placeholder='phone'
+                        keyboardType='numeric'
                         value={state.phone}
                         onEndEditing={(e) => editSubmit(e, 'phone')}
                         onChangeText={text => handleInputChange(text, 'phone')}
@@ -396,7 +397,6 @@ const CustomInput = (props: ICustomInputProps) => {
                         style={{ ...styles.textInput, width: '100%' }}
                         autoCorrect={false}
                         placeholder='sms body'
-                        data-name='bar'
                         value={state.smsBody}
                         onEndEditing={(e) => editSubmit(e, 'smsBody')}
                         onChangeText={text => handleInputChange(text, 'smsBody')}
