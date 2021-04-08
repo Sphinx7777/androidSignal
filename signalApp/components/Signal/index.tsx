@@ -204,7 +204,7 @@ class Signal extends React.Component<ISignalProps> {
                 for await (const one of dataSmsArray) {
                     console.log('send_sms_to ', one.phone, one.smsBody)
                     console.log('--------------------------------------')
-                    if (one.phone && (one.phone.length >= 9 && one.phone.length <= 11) && one.smsBody && one.smsBody.length > 0) {
+                    if (one.phone && (one.phone.length >= 8 && one.phone.length <= 12) && one.smsBody && one.smsBody.length > 0) {
                         DirectSms.sendDirectSms(one.phone, one.smsBody);
                         // this.props.setSubmitData({id: one.id, needToSendSMS: false})
                         this.props.setSubmitData(
@@ -370,7 +370,7 @@ class Signal extends React.Component<ISignalProps> {
             },
         );
         if (grantedCall === PermissionsAndroid.RESULTS.GRANTED && grantedLog === PermissionsAndroid.RESULTS.GRANTED && !currentPause) {
-            if (num && (num.length >= 9 && num.length <= 11)) {
+            if (num && (num.length >= 8 && num.length <= 12)) {
                 const res = await DirectDial.createDial(num)
                 return Promise.resolve(res)
             } else {
