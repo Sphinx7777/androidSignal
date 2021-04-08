@@ -206,9 +206,9 @@ class Signal extends React.Component<ISignalProps> {
                     console.log('--------------------------------------')
                     if (one.phone && (one.phone.length >= 9 && one.phone.length <= 11) && one.smsBody && one.smsBody.length > 0) {
                         DirectSms.sendDirectSms(one.phone, one.smsBody);
-                        this.props.setSubmitData({id: one.id, needToSendSMS: false})
-                        // this.props.setSubmitData(
-                        //     {id: one.id, needToSendSMS: false, smsSend: {sendDate: Math.round(new Date().getTime() / 1000), phoneNumber: one.phone, smsBody: one.smsBody}})
+                        // this.props.setSubmitData({id: one.id, needToSendSMS: false})
+                        this.props.setSubmitData(
+                            {id: one.id, needToSendSMS: false, smsSend: {sendDate: Math.round(new Date().getTime() / 1000), phoneNumber: one.phone, smsBody: one.smsBody}})
                     } else {
                         showToastWithGravityAndOffset(`ERROR, incorrect number ${one.phone} or empty sms body`)
                     }
