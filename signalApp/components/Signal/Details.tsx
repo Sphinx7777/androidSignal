@@ -63,9 +63,16 @@ class Details extends React.Component<IDetailsProps> {
     editSubmit = async (e: any, name: string, id: string) => {
         e.preventDefault()
         const { text } = e.nativeEvent;
+        const currentItem = this.props.signalData.valueSeq().find(o => o.get('id') === id)?.toJS();
+        const isChanged = JSON.stringify(this.state[name]) !== JSON.stringify(currentItem[name])
         const isConnected = await isNetworkAvailable()
         const data = { [name]: text, id }
-        isConnected.isConnected ? this.props.setSubmitData(data) : showToastWithGravityAndOffset('No internet connect !!!');
+        if (isConnected.isConnected && isChanged) {
+            this.props.setSubmitData(data)
+        }
+        if (!isConnected.isConnected) {
+            showToastWithGravityAndOffset('No internet connect !!!');
+        }
     }
 
     showAll = () => this.setState({ id: null, currentItem: null })

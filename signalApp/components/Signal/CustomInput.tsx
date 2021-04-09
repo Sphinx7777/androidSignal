@@ -135,11 +135,12 @@ const CustomInput = (props: ICustomInputProps) => {
             showToastWithGravityAndOffset('No internet connect !!!');
         }
     };
-    const editSubmit = async (e: any, name: string) => {
+    const editSubmit = async (e: any, name: any) => {
         e.preventDefault()
         const isConnected = await isNetworkAvailable()
         const data = { [name]: state[name], id: currentElement?.get('id') }
-        if (isConnected.isConnected && currentElement) {
+        const isChanged = state[name] !== currentElement?.get(name)
+        if (isConnected.isConnected && currentElement && isChanged) {
             setSubmitData(data)
         } else {
             if (!isConnected.isConnected) {
