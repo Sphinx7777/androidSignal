@@ -147,7 +147,7 @@ class Details extends React.Component<IDetailsProps> {
                                             </View>
                                             <View style={styles.inputContainer}>
                                                 <TextInput
-                                                    style={{ ...styles.textInput }}
+                                                    style={styles.textInput}
                                                     autoCorrect={false}
                                                     placeholder={String(o)}
                                                     value={String(this.state[o])}
@@ -334,11 +334,6 @@ const styles = StyleSheet.create({
         paddingBottom: 2,
         borderBottomWidth: 1,
         borderBottomColor: '#5eb337'
-    },
-    dataType: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
     },
     text: {
         color: 'black',

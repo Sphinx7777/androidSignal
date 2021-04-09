@@ -7,6 +7,7 @@ import { ISingleDataItem } from '../../models/DataEntity';
 import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
 import ModalDialog from '../Dialog';
 import MobileDropdown from '../MobileDropdown';
+import MobileInput from '../MobileInput';
 
 const dialogOptions = [
     {label: 'auto-dial ON', value: 1},
@@ -189,7 +190,7 @@ const CustomInput = (props: ICustomInputProps) => {
         }
     };
 
-    const handleDelete = async (dialogKey: string) => {
+    const handleDelete = (dialogKey: string) => {
         if (dialogKey === 'finished') {
             finishedSubmit();
             setFinishedVisible(false);
@@ -262,11 +263,11 @@ const CustomInput = (props: ICustomInputProps) => {
                         </View>
                     </View>
                     { isCurrentElResDialog &&
-                        <View style={{ ...styles.inputContainer}}>
+                        <View style={{...styles.inputContainer, marginTop: 2, borderTopColor: '#1b6b2f', borderTopWidth: 1}}>
                         <Text style={{ ...styles.text, fontWeight: '700' }}>Last call:</Text>
-                        <Text style={{ ...styles.text }}>Type: {isCurrentElResDialog?.get('type')}</Text>
-                        <Text style={{ ...styles.text }}>Duration: {isCurrentElResDialog?.get('duration')}</Text>
-                        <Text style={{ ...styles.text }}>Date: {getStringDate(new Date(isCurrentElResDialog?.get('dateTime')))}</Text>
+                        <Text style={styles.text}>Type: {isCurrentElResDialog?.get('type')}</Text>
+                        <Text style={styles.text}>Duration: {isCurrentElResDialog?.get('duration')}</Text>
+                        <Text style={styles.text}>Date: {getStringDate(new Date(isCurrentElResDialog?.get('dateTime')))}</Text>
                         </View>}
                 </TouchableOpacity>}
                 <MobileDropdown
@@ -280,11 +281,12 @@ const CustomInput = (props: ICustomInputProps) => {
                 containerStile={{marginBottom: 5}}
                 options={smsOptions}
                 />
-                {isAsanaType && <>
+                {isAsanaType &&
+                <>
                     <Text style={styles.label}>Task created</Text>
                     <View style={styles.inputContainer}>
                         <TextInput
-                            style={{ ...styles.textInput }}
+                            style={styles.textInput}
                             placeholder='set new date'
                             value={getStringDate(new Date(state.taskCreated * 1000))}
                             editable={false}
@@ -297,35 +299,27 @@ const CustomInput = (props: ICustomInputProps) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <Text style={styles.label}>Task name</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={{ ...styles.textInput, width: '100%' }}
-                            autoCorrect={false}
-                            placeholder='enter task name'
-                            value={state.taskName}
-                            onEndEditing={(e) => editSubmit(e, 'taskName')}
-                            onChangeText={text => handleInputChange(text, 'taskName')}
-                            multiline={true} />
-                    </View>
-                    <Text style={styles.label}>Task description</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={{ ...styles.textInput, width: '100%' }}
-                            autoCorrect={false}
-                            placeholder='enter task description'
-                            value={state.taskDescription}
-                            onEndEditing={(e) => editSubmit(e, 'taskDescription')}
-                            onChangeText={text => handleInputChange(text, 'taskDescription')}
-                            multiline={true} />
-                    </View>
+                    <MobileInput
+                    value={state.taskName}
+                    label='Task name'
+                    placeholder='enter task name'
+                    textKey='taskName'
+                    onEndEditing={editSubmit}
+                    onChangeText={handleInputChange} />
+                    <MobileInput
+                    value={state.taskDescription}
+                    label='Task description'
+                    placeholder='enter task description'
+                    textKey='taskDescription'
+                    onEndEditing={editSubmit}
+                    onChangeText={handleInputChange} />
                 </>}
                 {isTeamType &&
                     <>
                         <Text style={styles.label}>Team base date</Text>
                         <View style={styles.inputContainer}>
                             <TextInput
-                                style={{ ...styles.textInput }}
+                                style={styles.textInput}
                                 placeholder='set new date'
                                 value={state.teamDate ? getStringDate(new Date(state.teamDate * 1000)) : null}
                                 editable={false}
@@ -338,24 +332,20 @@ const CustomInput = (props: ICustomInputProps) => {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                        <Text style={styles.label}>Details</Text>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={{ ...styles.textInput, width: '100%' }}
-                                autoCorrect={false}
-                                placeholder='enter details'
-                                value={state.details}
-                                onEndEditing={(e) => editSubmit(e, 'details')}
-                                onChangeText={text => handleInputChange(text, 'details')}
-                                multiline={true} />
-                        </View>
+                        <MobileInput
+                    value={state.details}
+                    label='Details'
+                    placeholder='enter details'
+                    textKey='details'
+                    onEndEditing={editSubmit}
+                    onChangeText={handleInputChange} />
                     </>}
                 {isBrokersType &&
                     <>
                         <Text style={styles.label}>All brokers base date</Text>
                         <View style={styles.inputContainer}>
                             <TextInput
-                                style={{ ...styles.textInput }}
+                                style={styles.textInput}
                                 placeholder='set new date'
                                 value={state.allBrokersBaseDate ? getStringDate(new Date(state.allBrokersBaseDate * 1000)) : null}
                                 editable={false}
@@ -368,42 +358,29 @@ const CustomInput = (props: ICustomInputProps) => {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                        <Text style={styles.label}>Comment 2020</Text>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={{ ...styles.textInput, width: '100%' }}
-                                autoCorrect={false}
-                                placeholder='comment 2020'
-                                value={state.comment2020}
-                                onEndEditing={(e) => editSubmit(e, 'comment2020')}
-                                onChangeText={text => handleInputChange(text, 'comment2020')}
-                                multiline={true} />
-                        </View>
+                        <MobileInput
+                    value={state.comment2020}
+                    label='Comment 2020'
+                    placeholder='comment 2020'
+                    textKey='comment2020'
+                    onEndEditing={editSubmit}
+                    onChangeText={handleInputChange} />
                     </>}
-                <Text style={styles.label}>Phone</Text>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={{ ...styles.textInput, width: '100%' }}
-                        autoCorrect={false}
-                        placeholder='phone'
-                        keyboardType='numeric'
-                        value={state.phone}
-                        onEndEditing={(e) => editSubmit(e, 'phone')}
-                        onChangeText={text => handleInputChange(text, 'phone')}
-                        multiline={true} />
-                </View>
-                <Text style={styles.label}>sms body</Text>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={{ ...styles.textInput, width: '100%' }}
-                        autoCorrect={false}
-                        placeholder='sms body'
-                        value={state.smsBody}
-                        onEndEditing={(e) => editSubmit(e, 'smsBody')}
-                        onChangeText={text => handleInputChange(text, 'smsBody')}
-                        multiline={true}
-                    />
-                </View>
+                    <MobileInput
+                    value={state.phone}
+                    label='Phone'
+                    placeholder='phone'
+                    textKey='phone'
+                    keyboardType='numeric'
+                    onEndEditing={editSubmit}
+                    onChangeText={handleInputChange} />
+                    <MobileInput
+                    value={state.smsBody}
+                    label='Sms body'
+                    placeholder='sms body'
+                    textKey='smsBody'
+                    onEndEditing={editSubmit}
+                    onChangeText={handleInputChange} />
                 <View style={styles.sendButtonContainer}>
                     <TouchableOpacity
                         style={(state.smsBody.length !== 0 && currentElement)
@@ -499,23 +476,6 @@ const styles = StyleSheet.create({
         padding: 1,
         width: '100%',
         borderRadius: 10,
-    },
-    itemLine: {
-        display: 'flex',
-        flexDirection: 'row',
-        width: '100%',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        marginBottom: 2,
-        paddingBottom: 2,
-        borderBottomWidth: 1,
-        borderBottomColor: '#5eb337'
-    },
-    dialogContainer: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
     },
     label: {
         color: '#f77e59',
