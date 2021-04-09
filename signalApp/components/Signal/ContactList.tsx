@@ -25,11 +25,11 @@ const ContactList = (props: IContactListProps) => {
         const { index } = data
         const phone = callData?.valueSeq()?.getIn([index, 'phone'])
         const element = callData?.valueSeq()?.get(index)
-        makeCall(phone)
-        // if (res) {
-        //     setCurrentElement(element)
-        //     setCurrentItemIndex(index)
-        // }
+        const res = await makeCall(phone)
+        if (res) {
+            setCurrentElement(element)
+            setCurrentItemIndex(index)
+        }
     }
 
     const handlePress = (data: any) => {
