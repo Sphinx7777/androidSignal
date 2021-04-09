@@ -21,12 +21,8 @@ interface ICallMenuProps {
 }
 interface ICallMenuState {
     callStart: boolean;
+    mobileSearch: string;
 }
-
-interface ICallMenuFilter {
-    phone: string;
-}
-
 
 const CallMenu = (props: ICallMenuProps) => {
     const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, pausePress,
@@ -35,10 +31,8 @@ const CallMenu = (props: ICallMenuProps) => {
 
 
     const [state, setState] = useState<ICallMenuState>({
-        callStart: false
-    })
-    const [filter, setFilter] = useState<ICallMenuFilter>({
-        phone: '',
+        callStart: false,
+        mobileSearch: ''
     })
 
     const handleNextPress = async () => {
@@ -105,28 +99,30 @@ const CallMenu = (props: ICallMenuProps) => {
     };
 
     const handleInputSearch = (text: string) => {
-        setFilter((prevState) => {
+        setState((prevState) => {
             return {
                 ...prevState,
-                phone: text,
+                mobileSearch: text,
             }
-        })
+        });
     }
     const handleSearchPress = () => {
-        if (filter.phone && filter.phone.length >= 5 && filter.phone.length <= 11) {
-            getData({ pageName: 'signal', perPage: 100, filter: {phone: filter.phone}})
-            setFilter((prevState) => {
+        if (state.mobileSearch && state.mobileSearch.length >= 5 && state.mobileSearch.length <= 20) {
+            const mobileSearch = state.mobileSearch.trim();
+            const data = { pageName: 'signal', perPage: 20, filter: {mobileSearch}};
+            getData(data);
+            setState((prevState) => {
                 return {
                     ...prevState,
-                    phone: '',
+                    mobileSearch: '',
                 }
-            })
+            });
         }
-        if (filter.phone.length < 5) {
+        if (state.mobileSearch.length < 5) {
             showToastWithGravityAndOffset ('Min 5 digits')
         }
-        if (filter.phone.length > 11) {
-            showToastWithGravityAndOffset ('Max 11 digits')
+        if (state.mobileSearch.length > 11) {
+            showToastWithGravityAndOffset ('Max 20 digits')
         }
     }
     const isSMSCount = callData?.filter(obj => obj.get('needToSendSMS'));
@@ -185,10 +181,9 @@ const CallMenu = (props: ICallMenuProps) => {
                     <TextInput
                         style={{ ...styles.textInput, width: '100%' }}
                         autoCorrect={false}
-                        maxLength={11}
-                        keyboardType='numeric'
-                        placeholder='Phone search min 5 digits'
-                        value={filter.phone}
+                        maxLength={20}
+                        placeholder='Phone or email search'
+                        value={state.mobileSearch}
                         onChangeText={text => handleInputSearch(text)}
                         multiline={true}
                     />
