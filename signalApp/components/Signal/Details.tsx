@@ -161,46 +161,13 @@ class Details extends React.Component<IDetailsProps> {
                                         </View>}</>
                                 }
                                 {(String(o) === 'allBrokersBaseDate' && item.searchType.split(',').includes('BD')) &&
-                                <>
-                                {this.state.id && <IsMobileDatePicker
-                                elDate={Number(item[o])}
-                                handleOkClick={this.handlePickerOkClick}
-                                itemKey={String(o)}
-                                containerStile={{marginVertical: 2}}
-                                />}
-                                {!this.state.id && <View style={styles.itemLine}>
-                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
-                                        <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
-                                    </View>}
-                                </>
+                                <DateChanged stateId={this.state.id} item={item} o={String(o)} handlePickerOkClick={this.handlePickerOkClick}/>
                                 }
                                 {(String(o) === 'teamDate' && item.searchType.split(',').includes('TD')) &&
-                                <>
-                                {this.state.id && <IsMobileDatePicker
-                                elDate={Number(item[o])}
-                                handleOkClick={this.handlePickerOkClick}
-                                itemKey={String(o)}
-                                containerStile={{marginVertical: 2}}
-                                />}
-                                {!this.state.id && <View style={styles.itemLine}>
-                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
-                                        <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
-                                    </View>}
-                                </>
+                                <DateChanged stateId={this.state.id} item={item} o={String(o)} handlePickerOkClick={this.handlePickerOkClick}/>
                                 }
                                 {(String(o) === 'taskCreated' && item.searchType.split(',').includes('AD')) &&
-                                <>
-                                {this.state.id && <IsMobileDatePicker
-                                elDate={Number(item[o])}
-                                handleOkClick={this.handlePickerOkClick}
-                                itemKey={String(o)}
-                                containerStile={{marginVertical: 2}}
-                                />}
-                                {!this.state.id && <View style={styles.itemLine}>
-                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
-                                        <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
-                                    </View>}
-                                </>
+                                <DateChanged stateId={this.state.id} item={item} o={String(o)} handlePickerOkClick={this.handlePickerOkClick}/>
                                 }
                                 {['createdAt', 'updatedAt'].includes(String(o)) &&
                                 <View style={styles.itemLine}>
@@ -294,6 +261,31 @@ class Details extends React.Component<IDetailsProps> {
             </View>
         )
     }
+}
+
+interface IDateChangedProps {
+    stateId: string;
+    item: IDataItem;
+    handlePickerOkClick: (date: Date, itemKey: string) => void;
+    o: string;
+}
+
+const DateChanged = (props: IDateChangedProps) => {
+    const { stateId, item, o, handlePickerOkClick} = props;
+    return (
+        <>
+        {stateId && <IsMobileDatePicker
+        elDate={Number(item[o])}
+        handleOkClick={handlePickerOkClick}
+        itemKey={o}
+        containerStile={{marginVertical: 2}}
+        />}
+        {!stateId && <View style={styles.itemLine}>
+                <Text style={{ ...styles.text, ...styles.textTitle }}>{o}:</Text>
+                <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
+            </View>}
+        </>
+    )
 }
 
 const styles = StyleSheet.create({
