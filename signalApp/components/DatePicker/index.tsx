@@ -9,10 +9,11 @@ interface IDetailsProps {
     itemKey: string;
     title?: string;
     containerStile?: object;
+    noMaxDate?: boolean;
 }
 
 const IsMobileDatePicker = (props: IDetailsProps) => {
-    const { handleOkClick, elDate, itemKey, title = itemKey, containerStile = {} } = props
+    const { handleOkClick, elDate, itemKey, title = itemKey, containerStile = {}, noMaxDate = false} = props
     const [date, setDate] = useState(elDate > 0 ? new Date(elDate * 1000) : new Date());
     const [show, setShow] = useState(false);
 
@@ -37,7 +38,7 @@ const IsMobileDatePicker = (props: IDetailsProps) => {
             {show && (
                 <DateTimePicker
                     testID='dateTimePicker'
-                    maximumDate={new Date()}
+                    maximumDate={!noMaxDate ? new Date() : null}
                     value={date}
                     mode='date'
                     is24Hour={true}

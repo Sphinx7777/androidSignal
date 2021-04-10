@@ -29,6 +29,7 @@ export type ISingleDataItem = EntityMap<{
     taskCreated?: number;
     allBrokersBaseDate?: number;
     responseDialog?: EntityMap<ICallLog>;
+    dueDate?: string;
     }>;
 
 export interface IDataItem {
@@ -54,6 +55,7 @@ export interface IDataItem {
     taskCreated?: number;
     allBrokersBaseDate?: number;
     responseDialog?: ICallLog;
+    dueDate?: string;
 }
 
 class DataEntity extends Entity {

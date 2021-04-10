@@ -9,7 +9,7 @@ export const isNetworkAvailable = async () => {
 export const getStringDate: (date: Date) => string = (date: Date) => {
     const m = date.getMonth() + 1;
     const d = date.getDate()
-    return `${(d < 10 ? '0' : '') + d}/${(m < 10 ? '0' : '') + m}/${date.getFullYear()}`;
+    return `${date.getFullYear()}-${(m < 10 ? '0' : '') + m}-${(d < 10 ? '0' : '') + d}`;
 }
 
 export const showToastWithGravityAndOffset = (text: string) => {

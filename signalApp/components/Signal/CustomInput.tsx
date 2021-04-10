@@ -243,18 +243,19 @@ const CustomInput = (props: ICustomInputProps) => {
                         <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 220 }}>{currentElement?.get('asanaDataType') ? currentElement?.get('taskName') : currentElement?.get('name')}</Text>
                         <Text style={{...styles.text, color: isPhone ? 'black' : '#bf0416'}}>{phone}</Text>
                         {currentElement?.get('asanaDataType')
-                            ? <Image style={{ width: 25, height: 25, marginRight: 5 }} source={require('../../../assets/asana.png')} />
+                            ? <Text style={{ ...styles.text, color: '#0d1180', fontWeight: '700', marginRight: 5 }}><Image style={{ width: 25, height: 25, marginRight: 5 }} source={require('../../../assets/asana.png')} /> {currentElement?.get('searchType').replace('AD', '')}</Text>
                             : <Text style={{ ...styles.text, color: '#0d1180', fontWeight: '700', marginRight: 5 }}>{currentElement?.get('searchType')}</Text>
                         }
                     </View>
-                    <View style={styles.nameLine}>
+                    {currentElement?.get('email').length > 0 && <View style={styles.nameLine}>
                         <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 200 }}>{currentElement?.get('email')}</Text>
-                    </View>
+                    </View>}
                     <View style={styles.nameLine}>
                         <View style={{ display: 'flex', flexDirection: 'column' }}>
-                            {isAsanaType && <Text style={styles.text}>Asana create: {currentElTaskCreated > 0 ? getStringDate(new Date(currentElTaskCreated * 1000)) : 'no info'}</Text>}
-                            {isTeamType && <Text style={styles.text}>TD date: {currentElTeamDate > 0 ? getStringDate(new Date(currentElTeamDate * 1000)) : 'no info'}</Text>}
-                            {isBrokersType && <Text style={styles.text}>BD date: {currentElBrokersDate > 0 ? getStringDate(new Date(currentElBrokersDate * 1000)) : 'no info'}</Text>}
+                            {isAsanaType && <Text style={styles.text}>Task created: {currentElTaskCreated > 0 ? getStringDate(new Date(currentElTaskCreated * 1000)) : 'no info'}</Text>}
+                            {isAsanaType && currentElement?.get('dueDate') && <Text style={styles.text}>Due date: {currentElement?.get('dueDate') ? currentElement?.get('dueDate'): 'no info'}</Text>}
+                            {isTeamType && currentElTeamDate > 0 && <Text style={styles.text}>TD date: {currentElTeamDate > 0 ? getStringDate(new Date(currentElTeamDate * 1000)) : 'no info'}</Text>}
+                            {isBrokersType && currentElBrokersDate > 0 && <Text style={styles.text}>BD date: {currentElBrokersDate > 0 ? getStringDate(new Date(currentElBrokersDate * 1000)) : 'no info'}</Text>}
                         </View>
                         <View style={styles.dataType}>
                         {(!currentElSMSBody || currentElSMSBody.length === 0 && isNeedSms) && <Text style={{color: '#bf0416', paddingVertical: 2, marginRight: 4, fontWeight: '600'}}>Empty sms body</Text>}
