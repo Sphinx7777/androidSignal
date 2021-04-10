@@ -69,7 +69,13 @@ const ContactList = (props: IContactListProps) => {
                 <View style={styles.nameLine}>
                     <View style={{display: 'flex', flexDirection: 'column'}}>
                     {isAsanaType && <Text style={styles.text}>Task created: {item?.taskCreated > 0 ? getStringDate(new Date(item?.taskCreated * 1000)) : 'no info'}</Text>}
-                    {isAsanaType && item?.dueDate && <Text style={styles.text}>Due date: {item?.dueDate ? item?.dueDate : 'no info'}</Text>}
+                    {isAsanaType &&
+                    <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                        <Text style={styles.text}>Due date: {item?.dueDate ? item?.dueDate : 'no info'}</Text>
+                        {item.taskCompleted ? <Image style={{ width: 14, height: 14, marginLeft: 5 }} source={require('../../../assets/yes.png')} />
+                                            : <Image style={{ width: 14, height: 14, marginLeft: 5 }} source={require('../../../assets/no.png')} />} 
+                    </View>
+                    }
                     {isTeamType && item?.teamDate > 0 && <Text style={styles.text}>TD date: {item?.teamDate > 0 ? getStringDate(new Date(item?.teamDate * 1000)) : 'no info'}</Text>}
                     {isBrokersType && item?.allBrokersBaseDate > 0 && <Text style={styles.text}>BD date: {item?.allBrokersBaseDate > 0 ? getStringDate(new Date(item?.allBrokersBaseDate * 1000)) : 'no info'}</Text>}
                     </View>

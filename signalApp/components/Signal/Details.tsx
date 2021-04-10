@@ -10,12 +10,15 @@ import { connect } from 'react-redux';
 import { EntityList } from '../../models/entity';
 import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
 import MobileDropdown from '../MobileDropdown';
-import IsMobileDatePicker from '../DatePicker';
 import DateChanged from '../DatePicker/DateChanged';
 
 const dialogOptions = [
     { label: 'auto-dial ON', value: 1 },
     { label: 'auto-dial OFF', value: 0 },
+]
+const taskCompletedOptions = [
+    { label: 'Task completed', value: 1 },
+    { label: 'Task no completed', value: 0 },
 ]
 const smsOptions = [
     { label: 'auto-SMS ON', value: 1 },
@@ -97,6 +100,9 @@ class Details extends React.Component<IDetailsProps> {
 
     handleDropdownDialog = (value: number | string) => {
         this.props.setSubmitData({ id: this.state.id, needToDialog: value === 0 ? false : true })
+    }
+    handleDropdownTaskCompleted = (value: number | string) => {
+        this.props.setSubmitData({ id: this.state.id, taskCompleted: value === 0 ? false : true })
     }
     handleDropdownSMS = (value: number | string) => {
         this.props.setSubmitData({ id: this.state.id, needToSendSMS: value === 0 ? false : true })
@@ -228,6 +234,20 @@ class Details extends React.Component<IDetailsProps> {
                                         {!this.state.id && <View style={styles.itemLine}>
                                             <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
                                             {item?.needToDialog && <Image style={{ width: 22, height: 22, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
+                                        </View>}
+                                    </>
+                                }
+                                {['taskCompleted'].includes(String(o)) &&
+                                    <>
+                                        {this.state.id && <MobileDropdown
+                                            value={item.taskCompleted ? 1 : 0}
+                                            onChange={this.handleDropdownTaskCompleted}
+                                            options={taskCompletedOptions}
+                                        />}
+                                        {!this.state.id && <View style={styles.itemLine}>
+                                            <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                            {item.taskCompleted ? <Image style={{ width: 22, height: 22, marginLeft: 5 }} source={require('../../../assets/yes.png')} />
+                                            : <Image style={{ width: 22, height: 22, marginLeft: 5 }} source={require('../../../assets/no.png')} />}                                           
                                         </View>}
                                     </>
                                 }
