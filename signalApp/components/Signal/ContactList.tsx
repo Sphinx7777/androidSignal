@@ -57,12 +57,15 @@ const ContactList = (props: IContactListProps) => {
                 style={currentElement?.get('id') !== item.id ? styles.textContainer : styles.textContainerActive}
                 onLongPress={onLongPress}
                 onPress={onPress}>
-                <View style={styles.nameLine}>
+                <View style={{...styles.nameLine}}>
                     <Text numberOfLines={1} style={{...styles.text, maxWidth: 220}}>{item.asanaDataType ? item?.taskName : item?.name}</Text>
                     <Text style={{...styles.text, color: isPhone ? 'black' : '#bf0416'}}>{item.phone && item.phone?.length > 0 ? item.phone : '--------'}</Text>
                     {item?.asanaDataType
-                        ? <Text style={{ ...styles.text, color: '#0d1180', fontWeight: '700' }}><Image style={{ width: 25, height: 25 }} source={require('../../../assets/asana.png')} /> {item?.searchType.replace('AD', '')}</Text> 
-                        : <Text style={{ ...styles.text, color: '#0d1180', fontWeight: '700' }}>{item?.searchType}</Text>
+                        ? <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                            <Image style={{ width: 25, height: 25 }} source={require('../../../assets/asana.png')} />
+                            <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700', marginLeft: 5 }}>{item?.searchType.replace('AD', '')}</Text>
+                            </View> 
+                        : <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700' }}>{item?.searchType}</Text>
                     }
                 </View>
                 {item?.email && item?.email?.length > 0 && <Text style={styles.text}>{item?.email}</Text>}
@@ -72,7 +75,7 @@ const ContactList = (props: IContactListProps) => {
                     {isAsanaType &&
                     <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                         <Text style={styles.text}>Due date: {item?.dueDate ? item?.dueDate : 'no info'}</Text>
-                        {item.taskCompleted ? <Image style={{ width: 14, height: 14, marginLeft: 5 }} source={require('../../../assets/yes.png')} />
+                        {item.taskCompleted ? <Image style={{ width: 16, height: 16, marginLeft: 5 }} source={require('../../../assets/yes.png')} />
                                             : <Image style={{ width: 14, height: 14, marginLeft: 5 }} source={require('../../../assets/no.png')} />} 
                     </View>
                     }

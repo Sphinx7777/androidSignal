@@ -18,7 +18,7 @@ const dialogOptions = [
 ]
 const taskCompletedOptions = [
     { label: 'Task completed', value: 1 },
-    { label: 'Task no completed', value: 0 },
+    { label: 'Task not completed', value: 0 },
 ]
 const smsOptions = [
     { label: 'auto-SMS ON', value: 1 },
@@ -138,6 +138,12 @@ class Details extends React.Component<IDetailsProps> {
                     onLongPress={onLongPress}
                     // onPress={onPress}
                 >
+                    <View style={{...styles.showLine, marginBottom: 10}}>
+                    {item?.asanaDataType
+                        ? <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700', fontSize: 18 }}><Image style={{ width: 30, height: 30 }} source={require('../../../assets/asana.png')} /> {item?.searchType.replace('AD', '')}</Text> 
+                        : <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700' }}>{item?.searchType}</Text>
+                    }
+                    </View>
                     {Object.keys(item).sort().map(o => {
                         return (
                             <View key={item['id'] + o}>

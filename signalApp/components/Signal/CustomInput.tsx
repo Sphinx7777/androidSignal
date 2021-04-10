@@ -208,8 +208,11 @@ const CustomInput = (props: ICustomInputProps) => {
                         <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 220 }}>{currentElement?.get('asanaDataType') ? currentElement?.get('taskName') : currentElement?.get('name')}</Text>
                         <Text style={{ ...styles.text, color: isPhone ? 'black' : '#bf0416' }}>{phone}</Text>
                         {currentElement?.get('asanaDataType')
-                            ? <Text style={{ ...styles.text, color: '#0d1180', fontWeight: '700', marginRight: 5 }}><Image style={{ width: 25, height: 25, marginRight: 5 }} source={require('../../../assets/asana.png')} /> {currentElement?.get('searchType').replace('AD', '')}</Text>
-                            : <Text style={{ ...styles.text, color: '#0d1180', fontWeight: '700', marginRight: 5 }}>{currentElement?.get('searchType')}</Text>
+                            ? <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <Image style={{ width: 25, height: 25 }} source={require('../../../assets/asana.png')} />
+                                <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700', marginHorizontal: 5 }}>{currentElement?.get('searchType').replace('AD', '')}</Text>
+                            </View>
+                            : <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700' }}>{currentElement?.get('searchType')}</Text>
                         }
                     </View>
                     {currentElement?.get('email')?.length > 0 && <View style={styles.nameLine}>
@@ -218,7 +221,13 @@ const CustomInput = (props: ICustomInputProps) => {
                     <View style={styles.nameLine}>
                         <View style={{ display: 'flex', flexDirection: 'column' }}>
                             {isAsanaType && <Text style={styles.text}>Task created: {currentElTaskCreated > 0 ? getStringDate(new Date(currentElTaskCreated * 1000)) : 'no info'}</Text>}
-                            {isAsanaType && currentElement?.get('dueDate') && <Text style={styles.text}>Due date: {currentElement?.get('dueDate') ? currentElement?.get('dueDate') : 'no info'}</Text>}
+                            {isAsanaType &&
+                                <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={styles.text}>Due date: {currentElement?.get('dueDate') ? currentElement?.get('dueDate') : 'no info'}</Text>
+                                    {currentElement?.get('taskCompleted') ? <Image style={{ width: 16, height: 16, marginLeft: 5 }} source={require('../../../assets/yes.png')} />
+                                        : <Image style={{ width: 14, height: 14, marginLeft: 5 }} source={require('../../../assets/no.png')} />}
+                                </View>
+                            }
                             {isTeamType && currentElTeamDate > 0 && <Text style={styles.text}>TD date: {currentElTeamDate > 0 ? getStringDate(new Date(currentElTeamDate * 1000)) : 'no info'}</Text>}
                             {isBrokersType && currentElBrokersDate > 0 && <Text style={styles.text}>BD date: {currentElBrokersDate > 0 ? getStringDate(new Date(currentElBrokersDate * 1000)) : 'no info'}</Text>}
                         </View>
