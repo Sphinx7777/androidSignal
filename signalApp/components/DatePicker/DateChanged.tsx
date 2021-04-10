@@ -1,44 +1,38 @@
+
 import React from 'react';
-import {
-    StyleSheet, Text, View, FlatList, TextInput,
-    TouchableOpacity, GestureResponderEvent, Image
-} from 'react-native';
-import saga from '../../decoradors/saga';
-import DataEntity, { IDataItem, ISingleDataItem } from '../../models/DataEntity';
-import { connect } from 'react-redux';
-import { EntityList } from '../../models/entity';
-import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
-import MobileDropdown from '../MobileDropdown';
+import { StyleSheet, Text, View } from 'react-native';
+import { IDataItem } from '../../models/DataEntity';
+import { getStringDate } from '../../utils';
 import IsMobileDatePicker from '../DatePicker';
-
-
-
 
 interface IDateChangedProps {
     stateId: string | boolean;
     item: IDataItem;
     handlePickerOkClick: (date: Date, itemKey: string) => void;
-    o: string;
+    field: string;
     noMaxDate?: boolean;
+    title?: string;
+    containerStile?: object;
 }
 
 const DateChanged = (props: IDateChangedProps) => {
-    const { stateId, item, o, handlePickerOkClick, noMaxDate} = props;
-    let date = Number(item[o]);
-    if (o === 'dueDate') {
-        date = Math.round(new Date(item[o]).getTime() / 1000)
+    const { stateId, item, field, handlePickerOkClick, noMaxDate, title, containerStile} = props;
+    let date = Number(item[field]);
+    if (field === 'dueDate') {
+        date = Math.round(new Date(item[field]).getTime() / 1000)
     }
     return (
         <>
         {stateId && <IsMobileDatePicker
         noMaxDate={noMaxDate}
         elDate={date}
+        title={title}
         handleOkClick={handlePickerOkClick}
-        itemKey={o}
-        containerStile={{marginVertical: 2}}
+        itemKey={field}
+        containerStile={containerStile}
         />}
         {!stateId && <View style={styles.itemLine}>
-                <Text style={{ ...styles.text, ...styles.textTitle }}>{o}:</Text>
+                <Text style={{ ...styles.text, ...styles.textTitle }}>{field}:</Text>
                 <Text style={styles.text}>{date > 0 ? getStringDate(new Date(Number(date * 1000))) : 'no info'}</Text>
             </View>}
         </>

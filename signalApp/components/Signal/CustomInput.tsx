@@ -8,10 +8,11 @@ import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from
 import ModalDialog from '../Dialog';
 import MobileDropdown from '../MobileDropdown';
 import MobileInput from '../MobileInput';
+import IsMobileDatePicker from '../DatePicker';
 
 const dialogOptions = [
-    {label: 'auto-dial ON', value: 1},
-    {label: 'auto-dial OFF', value: 0},
+    { label: 'auto-dial ON', value: 1 },
+    { label: 'auto-dial OFF', value: 0 },
 ]
 
 const smsOptions = [
@@ -90,8 +91,7 @@ const CustomInput = (props: ICustomInputProps) => {
                 taskName: currentElTaskName
             }
         })
-    }, [currentElTaskCreated, currentElDetails, currentElSmsBody, currentElTaskDescription,
-        currentElComment2020, currentElTeamDate, currentElBrokersDate, currentElPhone, currentElTaskName])
+    }, [currentElement])
 
     const addNewDate = (dateType: string) => {
         setState((prevState) => {
@@ -225,6 +225,14 @@ const CustomInput = (props: ICustomInputProps) => {
         }
     }
 
+    const handlePickerOkClick = (date: Date, itemKey: string) => {
+        let sendDate: string | number = Math.round(date.getTime() / 1000);
+        if (itemKey === 'dueDate') {
+            sendDate = getStringDate(date);
+        }
+        setSubmitData({ id: currentElement?.get('id'), [itemKey]: sendDate });
+    }
+
     const phone = currentElement?.get('phone') && currentElement?.get('phone')?.length > 0 ? currentElement?.get('phone') : '--------'
     const isPhone = currentElement?.get('phone') && currentElement?.get('phone').length >= 8 && currentElement?.get('phone').length <= 12;
     const currentElSMSBody = currentElement?.get('smsBody');
@@ -241,7 +249,7 @@ const CustomInput = (props: ICustomInputProps) => {
                     style={styles.textContainer}>
                     <View style={styles.nameLine}>
                         <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 220 }}>{currentElement?.get('asanaDataType') ? currentElement?.get('taskName') : currentElement?.get('name')}</Text>
-                        <Text style={{...styles.text, color: isPhone ? 'black' : '#bf0416'}}>{phone}</Text>
+                        <Text style={{ ...styles.text, color: isPhone ? 'black' : '#bf0416' }}>{phone}</Text>
                         {currentElement?.get('asanaDataType')
                             ? <Text style={{ ...styles.text, color: '#0d1180', fontWeight: '700', marginRight: 5 }}><Image style={{ width: 25, height: 25, marginRight: 5 }} source={require('../../../assets/asana.png')} /> {currentElement?.get('searchType').replace('AD', '')}</Text>
                             : <Text style={{ ...styles.text, color: '#0d1180', fontWeight: '700', marginRight: 5 }}>{currentElement?.get('searchType')}</Text>
@@ -253,121 +261,100 @@ const CustomInput = (props: ICustomInputProps) => {
                     <View style={styles.nameLine}>
                         <View style={{ display: 'flex', flexDirection: 'column' }}>
                             {isAsanaType && <Text style={styles.text}>Task created: {currentElTaskCreated > 0 ? getStringDate(new Date(currentElTaskCreated * 1000)) : 'no info'}</Text>}
-                            {isAsanaType && currentElement?.get('dueDate') && <Text style={styles.text}>Due date: {currentElement?.get('dueDate') ? currentElement?.get('dueDate'): 'no info'}</Text>}
+                            {isAsanaType && currentElement?.get('dueDate') && <Text style={styles.text}>Due date: {currentElement?.get('dueDate') ? currentElement?.get('dueDate') : 'no info'}</Text>}
                             {isTeamType && currentElTeamDate > 0 && <Text style={styles.text}>TD date: {currentElTeamDate > 0 ? getStringDate(new Date(currentElTeamDate * 1000)) : 'no info'}</Text>}
                             {isBrokersType && currentElBrokersDate > 0 && <Text style={styles.text}>BD date: {currentElBrokersDate > 0 ? getStringDate(new Date(currentElBrokersDate * 1000)) : 'no info'}</Text>}
                         </View>
                         <View style={styles.dataType}>
-                        {(!currentElSMSBody || currentElSMSBody?.length === 0 && isNeedSms) && <Text style={{color: '#bf0416', paddingVertical: 2, marginRight: 4, fontWeight: '600'}}>Empty sms body</Text>}
+                            {(!currentElSMSBody || currentElSMSBody?.length === 0 && isNeedSms) && <Text style={{ color: '#bf0416', paddingVertical: 2, marginRight: 4, fontWeight: '600' }}>Empty sms body</Text>}
                             {currentElement?.get('needToSendSMS') && <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} />}
                             {currentElement?.get('needToDialog') && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
                         </View>
                     </View>
-                    { isCurrentElResDialog &&
-                        <View style={{...styles.inputContainer, marginTop: 2, borderTopColor: '#1b6b2f', borderTopWidth: 1}}>
-                        <Text style={{ ...styles.text, fontWeight: '700' }}>Last call:</Text>
-                        <Text style={styles.text}>Type: {isCurrentElResDialog?.get('type')}</Text>
-                        <Text style={styles.text}>Duration: {isCurrentElResDialog?.get('duration')}</Text>
-                        <Text style={styles.text}>Date: {getStringDate(new Date(isCurrentElResDialog?.get('dateTime')))}</Text>
+                    {isCurrentElResDialog &&
+                        <View style={{ ...styles.inputContainer, marginTop: 2, borderTopColor: '#1b6b2f', borderTopWidth: 1 }}>
+                            <Text style={{ ...styles.text, fontWeight: '700' }}>Last call:</Text>
+                            <Text style={styles.text}>Type: {isCurrentElResDialog?.get('type')}</Text>
+                            <Text style={styles.text}>Duration: {isCurrentElResDialog?.get('duration')}</Text>
+                            <Text style={styles.text}>Date: {getStringDate(new Date(isCurrentElResDialog?.get('dateTime')))}</Text>
                         </View>}
                 </TouchableOpacity>}
                 <MobileDropdown
-                value={currentElement?.get('needToDialog') ? 1 : 0}
-                onChange={handleDropdownDialog}
-                options={dialogOptions}
+                    value={currentElement?.get('needToDialog') ? 1 : 0}
+                    onChange={handleDropdownDialog}
+                    options={dialogOptions}
                 />
                 <MobileDropdown
-                value={currentElement?.get('needToSendSMS') ? 1 : 0}
-                onChange={handleDropdownSMS}
-                containerStile={{marginBottom: 5}}
-                options={smsOptions}
+                    value={currentElement?.get('needToSendSMS') ? 1 : 0}
+                    onChange={handleDropdownSMS}
+                    containerStile={{ marginBottom: 5 }}
+                    options={smsOptions}
                 />
                 {isAsanaType &&
-                <>
-                    <Text style={styles.label}>Task created</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder='set new date'
-                            value={getStringDate(new Date(state.taskCreated * 1000))}
-                            editable={false}
-                        />
-                        <View style={styles.dateButtons}>
-                            <TouchableOpacity
-                                style={styles.button}
-                                onPress={() => showDialog('taskCreated')}>
-                                <Text style={styles.buttonText}>Set new date</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                    <MobileInput
-                    value={state.taskName}
-                    label='Task name'
-                    placeholder='enter task name'
-                    textKey='taskName'
-                    onEndEditing={editSubmit}
-                    onChangeText={handleInputChange} />
-                    <MobileInput
-                    value={state.taskDescription}
-                    label='Task description'
-                    placeholder='enter task description'
-                    textKey='taskDescription'
-                    onEndEditing={editSubmit}
-                    onChangeText={handleInputChange} />
-                </>}
-                {isTeamType &&
                     <>
-                        <Text style={styles.label}>Team base date</Text>
                         <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder='set new date'
-                                value={state.teamDate ? getStringDate(new Date(state.teamDate * 1000)) : null}
-                                editable={false}
+                            <IsMobileDatePicker
+                                elDate={Math.round(new Date(currentElement?.get('dueDate')).getTime() / 1000)}
+                                handleOkClick={handlePickerOkClick}
+                                itemKey='dueDate'
+                                title='Due date'
+                                containerStile={{ marginBottom: 5 }}
                             />
-                            <View style={styles.dateButtons}>
-                                <TouchableOpacity
-                                    style={styles.button}
-                                    onPress={() => showDialog('teamDate')}>
-                                    <Text style={styles.buttonText}>Set new date</Text>
-                                </TouchableOpacity>
-                            </View>
                         </View>
                         <MobileInput
-                    value={state.details}
-                    label='Details'
-                    placeholder='enter details'
-                    textKey='details'
-                    onEndEditing={editSubmit}
-                    onChangeText={handleInputChange} />
+                            value={state.taskName}
+                            label='Task name'
+                            placeholder='enter task name'
+                            textKey='taskName'
+                            onEndEditing={editSubmit}
+                            onChangeText={handleInputChange} />
+                        <MobileInput
+                            value={state.taskDescription}
+                            label='Task description'
+                            placeholder='enter task description'
+                            textKey='taskDescription'
+                            onEndEditing={editSubmit}
+                            onChangeText={handleInputChange} />
+                    </>}
+                {isTeamType &&
+                    <>
+                        <View style={styles.inputContainer}>
+                            <IsMobileDatePicker
+                                elDate={currentElement?.get('teamDate')}
+                                handleOkClick={handlePickerOkClick}
+                                itemKey='teamDate'
+                                title='Team sheet date'
+                                containerStile={{ marginBottom: 5 }}
+                            />
+                        </View>
+                        <MobileInput
+                            value={state.details}
+                            label='Details'
+                            placeholder='enter details'
+                            textKey='details'
+                            onEndEditing={editSubmit}
+                            onChangeText={handleInputChange} />
                     </>}
                 {isBrokersType &&
                     <>
-                        <Text style={styles.label}>All brokers base date</Text>
                         <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder='set new date'
-                                value={state.allBrokersBaseDate ? getStringDate(new Date(state.allBrokersBaseDate * 1000)) : null}
-                                editable={false}
+                            <IsMobileDatePicker
+                                elDate={currentElement?.get('allBrokersBaseDate')}
+                                handleOkClick={handlePickerOkClick}
+                                itemKey='allBrokersBaseDate'
+                                title='All brokers sheet date'
+                                containerStile={{ marginVertical: 5 }}
                             />
-                            <View style={styles.dateButtons}>
-                                <TouchableOpacity
-                                    style={styles.button}
-                                    onPress={() => showDialog('allBrokersBaseDate')}>
-                                    <Text style={styles.buttonText}>Set new date</Text>
-                                </TouchableOpacity>
-                            </View>
                         </View>
                         <MobileInput
-                    value={state.comment2020}
-                    label='Comment 2020'
-                    placeholder='comment 2020'
-                    textKey='comment2020'
-                    onEndEditing={editSubmit}
-                    onChangeText={handleInputChange} />
+                            value={state.comment2020}
+                            label='Comment 2020'
+                            placeholder='comment 2020'
+                            textKey='comment2020'
+                            onEndEditing={editSubmit}
+                            onChangeText={handleInputChange} />
                     </>}
-                    <MobileInput
+                <MobileInput
                     value={state.phone}
                     label='Phone'
                     placeholder='phone'
@@ -375,7 +362,7 @@ const CustomInput = (props: ICustomInputProps) => {
                     keyboardType='numeric'
                     onEndEditing={editSubmit}
                     onChangeText={handleInputChange} />
-                    <MobileInput
+                <MobileInput
                     value={state.smsBody}
                     label='Sms body'
                     placeholder='sms body'
@@ -400,49 +387,49 @@ const CustomInput = (props: ICustomInputProps) => {
                 </View>
             </View>
             <ModalDialog
-            handleCancel={handleCancel}
-            handleConfirm={handleDelete}
-            dialogKey='finished'
-            visible={finishedVisible}
-            title='Finished'
-            description='Do you want to finished work with it object in mobile app ?'
-            confirmButtonText='Finished'
+                handleCancel={handleCancel}
+                handleConfirm={handleDelete}
+                dialogKey='finished'
+                visible={finishedVisible}
+                title='Finished'
+                description='Do you want to finished work with it object in mobile app ?'
+                confirmButtonText='Finished'
             />
             <ModalDialog
-            handleCancel={handleCancel}
-            handleConfirm={handleDelete}
-            dialogKey='sendCustomSMS'
-            visible={sendCustomSMSVisible}
-            title='Send custom sms'
-            description={dialogDescription}
-            confirmButtonText='Send'
+                handleCancel={handleCancel}
+                handleConfirm={handleDelete}
+                dialogKey='sendCustomSMS'
+                visible={sendCustomSMSVisible}
+                title='Send custom sms'
+                description={dialogDescription}
+                confirmButtonText='Send'
             />
             <ModalDialog
-            handleCancel={handleCancel}
-            handleConfirm={handleDelete}
-            dialogKey='allBrokersBaseDate'
-            visible={addBrokersDateVisible}
-            title='Change date'
-            description='Do you want to change the date ?'
-            confirmButtonText='Ok'
+                handleCancel={handleCancel}
+                handleConfirm={handleDelete}
+                dialogKey='allBrokersBaseDate'
+                visible={addBrokersDateVisible}
+                title='Change date'
+                description='Do you want to change the date ?'
+                confirmButtonText='Ok'
             />
             <ModalDialog
-            handleCancel={handleCancel}
-            handleConfirm={handleDelete}
-            dialogKey='teamDate'
-            visible={addTeamDateVisible}
-            title='Change date'
-            description='Do you want to change the date ?'
-            confirmButtonText='Ok'
+                handleCancel={handleCancel}
+                handleConfirm={handleDelete}
+                dialogKey='teamDate'
+                visible={addTeamDateVisible}
+                title='Change date'
+                description='Do you want to change the date ?'
+                confirmButtonText='Ok'
             />
             <ModalDialog
-            handleCancel={handleCancel}
-            handleConfirm={handleDelete}
-            dialogKey='taskCreated'
-            visible={addTaskDateVisible}
-            title='Change date'
-            description='Do you want to change the date ?'
-            confirmButtonText='Ok'
+                handleCancel={handleCancel}
+                handleConfirm={handleDelete}
+                dialogKey='taskCreated'
+                visible={addTaskDateVisible}
+                title='Change date'
+                description='Do you want to change the date ?'
+                confirmButtonText='Ok'
             />
         </>
     );
@@ -465,7 +452,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         width: '100%',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         flexDirection: 'row',
     },
     textContainer: {

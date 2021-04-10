@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Button, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getStringDate } from 'signalApp/utils';
@@ -17,6 +17,10 @@ const IsMobileDatePicker = (props: IDetailsProps) => {
     const [date, setDate] = useState(elDate > 0 ? new Date(elDate * 1000) : new Date());
     const [show, setShow] = useState(false);
 
+    useEffect(() => {
+        setDate(elDate > 0 ? new Date(elDate * 1000) : new Date())
+    }, [elDate, itemKey])
+
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;
         setShow(Platform.OS === 'ios');
@@ -32,7 +36,7 @@ const IsMobileDatePicker = (props: IDetailsProps) => {
 
     return (
         <View style={{...containerStile}}>
-            <View style={{marginHorizontal: 10, borderWidth: 2, borderColor: '#f77e59', borderRadius: 10, overflow: 'hidden'}}>
+            <View style={{ borderWidth: 2, borderColor: '#f77e59', borderRadius: 10, overflow: 'hidden'}}>
                 <Button onPress={showDatePicker} title={elDate > 0 ? `${title}: ${getStringDate(date)}` : `${title}: no info`} color='#f77e59'/>
             </View>
             {show && (

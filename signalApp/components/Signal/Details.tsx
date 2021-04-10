@@ -112,7 +112,6 @@ class Details extends React.Component<IDetailsProps> {
 
     renderItem = (data: any) => {
         const item: IDataItem = data.item
-        console.log('renderItem', item)
         const onLongPress: (event: GestureResponderEvent) => void = () => this.showOne(item.id)
         // const onPress: (event: GestureResponderEvent) => void = () => console.log('renderItem_onPress=', data)
         return (
@@ -167,13 +166,31 @@ class Details extends React.Component<IDetailsProps> {
                                         </View>}</>
                                 }
                                 {(String(o) === 'allBrokersBaseDate' && item.searchType.split(',').includes('BD')) &&
-                                <DateChanged stateId={this.state.id} item={item} o={String(o)} handlePickerOkClick={this.handlePickerOkClick}/>
+                                <DateChanged
+                                stateId={this.state.id}
+                                item={item}
+                                title='All brokers sheet date'
+                                field={String(o)}
+                                handlePickerOkClick={this.handlePickerOkClick}
+                                containerStile={{marginVertical: 2}}/>
                                 }
                                 {(String(o) === 'teamDate' && item.searchType.split(',').includes('TD')) &&
-                                <DateChanged stateId={this.state.id} item={item} o={String(o)} handlePickerOkClick={this.handlePickerOkClick}/>
+                                <DateChanged
+                                stateId={this.state.id}
+                                item={item}
+                                title='Team sheet date'
+                                field={String(o)}
+                                handlePickerOkClick={this.handlePickerOkClick}
+                                containerStile={{marginVertical: 2}}/>
                                 }
                                 {(String(o) === 'dueDate' && item.searchType.split(',').includes('AD')) &&
-                                <DateChanged stateId={this.state.id} item={item} o={String(o)} handlePickerOkClick={this.handlePickerOkClick}/>
+                                <DateChanged
+                                stateId={this.state.id}
+                                item={item}
+                                title='Due date'
+                                field={String(o)}
+                                handlePickerOkClick={this.handlePickerOkClick}
+                                containerStile={{marginVertical: 2}}/>
                                 }
                                 {['createdAt', 'updatedAt', 'taskCreated'].includes(String(o)) &&
                                 <View style={styles.itemLine}>
