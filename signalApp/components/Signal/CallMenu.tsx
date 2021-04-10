@@ -126,10 +126,17 @@ const CallMenu = (props: ICallMenuProps) => {
         }
     }
     const isSMSCount = callData?.filter(obj => obj.get('needToSendSMS'));
+    const isDialCount = callData?.filter(obj => obj.get('needToDialog'));
+    const isAllCount = callData?.filter(obj => obj.get('needToDialog') || obj.get('needToSendSMS'));
+    const isValidPhones = callData?.filter(obj => obj.get('phone') && (obj.get('phone').length >= 8 && obj.get('phone').length <= 12));
     const isValidSMS = callData?.filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0 && obj.get('phone') && (obj.get('phone').length >= 8 && obj.get('phone').length <= 12));
     let count = 0;
     if (isSMSCount && isValidSMS) {
         count = isSMSCount?.size - isValidSMS?.size;
+    }
+    let phoneCount = 0;
+    if (isAllCount && isValidPhones) {
+        phoneCount = isAllCount?.size - isValidPhones?.size;
     }
     const dialogDescription = `You confirm the sending of all messages ? ${isValidSMS?.size} SMS will be sent. ${count && count > 0 ? count === 1 ? count + ' message' + ' have incorrect number format or empty message body' : count + ' messages' + ' have incorrect number format or empty message body' : ''}`
 
@@ -138,12 +145,12 @@ const CallMenu = (props: ICallMenuProps) => {
             <View style={styles.wrapper}>
                 <View style={styles.container}>
                     <View style={styles.textBlock}>
-                        <Text>Info block</Text>
-                        <Text>Info block</Text>
-                        <Text>Info block</Text>
-                        <Text>Info block</Text>
+                        <Text style={{marginBottom: 2}}>{`Need send ${isSMSCount?.size || 0} sms`}</Text>
+                        <Text style={{marginBottom: 2}}>{`${count || 0} sms have incorrect number format or empty message body`}</Text>
+                        <Text style={{marginBottom: 2}}>{`Need to make ${isDialCount?.size || 0} calls`}</Text>
+                        <Text style={{}}>{`${phoneCount || 0} items have incorrect number format`}</Text>
                         <TouchableOpacity
-                            style={{ ...styles.button, maxWidth: 100, marginTop: 25 }}
+                            style={{ ...styles.button, maxWidth: 100, marginTop: 5 }}
                             onPress={getDataSignal}>
                             <Text style={{ ...styles.buttonText, marginTop: 5 }}>Reload data</Text>
                         </TouchableOpacity>
