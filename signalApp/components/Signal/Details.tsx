@@ -11,6 +11,7 @@ import { EntityList } from '../../models/entity';
 import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
 import MobileDropdown from '../MobileDropdown';
 import IsMobileDatePicker from '../DatePicker';
+import DateChanged from '../DatePicker/DateChanged';
 
 const dialogOptions = [
     { label: 'auto-dial ON', value: 1 },
@@ -102,7 +103,11 @@ class Details extends React.Component<IDetailsProps> {
     }
 
     handlePickerOkClick = (date: Date, itemKey: string) => {
-        this.props.setSubmitData({ id: this.state.id, [itemKey]: Math.round(date.getTime() / 1000) })
+        let sendDate: string | number = Math.round(date.getTime() / 1000);
+        if (itemKey === 'dueDate') {
+            sendDate = getStringDate(date);
+        }
+        this.props.setSubmitData({ id: this.state.id, [itemKey]: sendDate });
     }
 
     renderItem = (data: any) => {
@@ -167,10 +172,10 @@ class Details extends React.Component<IDetailsProps> {
                                 {(String(o) === 'teamDate' && item.searchType.split(',').includes('TD')) &&
                                 <DateChanged stateId={this.state.id} item={item} o={String(o)} handlePickerOkClick={this.handlePickerOkClick}/>
                                 }
-                                {(String(o) === 'taskCreated' && item.searchType.split(',').includes('AD')) &&
+                                {(String(o) === 'dueDate' && item.searchType.split(',').includes('AD')) &&
                                 <DateChanged stateId={this.state.id} item={item} o={String(o)} handlePickerOkClick={this.handlePickerOkClick}/>
                                 }
-                                {['createdAt', 'updatedAt'].includes(String(o)) &&
+                                {['createdAt', 'updatedAt', 'taskCreated'].includes(String(o)) &&
                                 <View style={styles.itemLine}>
                                         <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
                                         <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
@@ -262,31 +267,6 @@ class Details extends React.Component<IDetailsProps> {
             </View>
         )
     }
-}
-
-interface IDateChangedProps {
-    stateId: string;
-    item: IDataItem;
-    handlePickerOkClick: (date: Date, itemKey: string) => void;
-    o: string;
-}
-
-const DateChanged = (props: IDateChangedProps) => {
-    const { stateId, item, o, handlePickerOkClick} = props;
-    return (
-        <>
-        {stateId && <IsMobileDatePicker
-        elDate={Number(item[o])}
-        handleOkClick={handlePickerOkClick}
-        itemKey={o}
-        containerStile={{marginVertical: 2}}
-        />}
-        {!stateId && <View style={styles.itemLine}>
-                <Text style={{ ...styles.text, ...styles.textTitle }}>{o}:</Text>
-                <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
-            </View>}
-        </>
-    )
 }
 
 const styles = StyleSheet.create({

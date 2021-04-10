@@ -65,7 +65,7 @@ const ContactList = (props: IContactListProps) => {
                         : <Text style={{ ...styles.text, color: '#0d1180', fontWeight: '700' }}>{item?.searchType}</Text>
                     }
                 </View>
-                {item?.email && item?.email.length > 0 && <Text style={styles.text}>{item?.email}</Text>}
+                {item?.email && item?.email?.length > 0 && <Text style={styles.text}>{item?.email}</Text>}
                 <View style={styles.nameLine}>
                     <View style={{display: 'flex', flexDirection: 'column'}}>
                     {isAsanaType && <Text style={styles.text}>Task created: {item?.taskCreated > 0 ? getStringDate(new Date(item?.taskCreated * 1000)) : 'no info'}</Text>}
@@ -74,7 +74,7 @@ const ContactList = (props: IContactListProps) => {
                     {isBrokersType && item?.allBrokersBaseDate > 0 && <Text style={styles.text}>BD date: {item?.allBrokersBaseDate > 0 ? getStringDate(new Date(item?.allBrokersBaseDate * 1000)) : 'no info'}</Text>}
                     </View>
                     <View style={styles.dataType}>
-                        {(!currentElSMSBody || currentElSMSBody.length === 0 && isNeedSms) && <Text style={{color: '#bf0416', paddingVertical: 2, marginRight: 4, fontWeight: '600'}}>Empty sms body</Text>}
+                        {(!currentElSMSBody || currentElSMSBody?.length === 0 && isNeedSms) && <Text style={{color: '#bf0416', paddingVertical: 2, marginRight: 4, fontWeight: '600'}}>Empty sms body</Text>}
                         {item?.needToSendSMS && <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} />}
                         {item?.needToDialog && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
                     </View>

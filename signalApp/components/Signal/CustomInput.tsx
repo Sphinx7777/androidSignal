@@ -247,7 +247,7 @@ const CustomInput = (props: ICustomInputProps) => {
                             : <Text style={{ ...styles.text, color: '#0d1180', fontWeight: '700', marginRight: 5 }}>{currentElement?.get('searchType')}</Text>
                         }
                     </View>
-                    {currentElement?.get('email').length > 0 && <View style={styles.nameLine}>
+                    {currentElement?.get('email')?.length > 0 && <View style={styles.nameLine}>
                         <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 200 }}>{currentElement?.get('email')}</Text>
                     </View>}
                     <View style={styles.nameLine}>
@@ -258,7 +258,7 @@ const CustomInput = (props: ICustomInputProps) => {
                             {isBrokersType && currentElBrokersDate > 0 && <Text style={styles.text}>BD date: {currentElBrokersDate > 0 ? getStringDate(new Date(currentElBrokersDate * 1000)) : 'no info'}</Text>}
                         </View>
                         <View style={styles.dataType}>
-                        {(!currentElSMSBody || currentElSMSBody.length === 0 && isNeedSms) && <Text style={{color: '#bf0416', paddingVertical: 2, marginRight: 4, fontWeight: '600'}}>Empty sms body</Text>}
+                        {(!currentElSMSBody || currentElSMSBody?.length === 0 && isNeedSms) && <Text style={{color: '#bf0416', paddingVertical: 2, marginRight: 4, fontWeight: '600'}}>Empty sms body</Text>}
                             {currentElement?.get('needToSendSMS') && <Image style={{ width: 25, height: 25 }} source={require('../../../assets/sms.png')} />}
                             {currentElement?.get('needToDialog') && <Image style={{ width: 25, height: 25, marginLeft: 5 }} source={require('../../../assets/phone-call.png')} />}
                         </View>
