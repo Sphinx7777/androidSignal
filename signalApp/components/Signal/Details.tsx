@@ -192,7 +192,7 @@ class Details extends React.Component<IDetailsProps> {
                                 handlePickerOkClick={this.handlePickerOkClick}
                                 containerStile={{marginVertical: 2}}/>
                                 }
-                                {['createdAt', 'updatedAt', 'taskCreated'].includes(String(o)) &&
+                                {['taskCreated'].includes(String(o)) &&
                                 <View style={styles.itemLine}>
                                         <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
                                         <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
