@@ -154,7 +154,7 @@ class Details extends React.Component<IDetailsProps> {
                                     </View>
                                 }
                                 {['email', 'name', 'taskName', 'details', 'phone', 'segment', 'taskDescription', 'memberRating',
-                                    'smsBody', 'emailBody', 'comment2020', 'group', 'price', 'calledAbout', 'comment2019'
+                                    'smsBody', 'emailBody', 'currentYearComment', 'group', 'price', 'calledAbout', 'pastYearsComment'
                                 ].includes(String(o)) &&
                                     <>
                                         {this.state.id && <>

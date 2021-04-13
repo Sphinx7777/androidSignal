@@ -24,7 +24,7 @@ export type ISingleDataItem = EntityMap<{
     allBrokersDataType?: boolean;
     taskName?: string;
     taskDescription?: string;
-    comment2020?: string;
+    currentYearComment?: string;
     teamDate?: number;
     taskCreated?: number;
     allBrokersBaseDate?: number;
@@ -51,7 +51,7 @@ export interface IDataItem {
     allBrokersDataType?: boolean;
     taskName?: string;
     taskDescription?: string;
-    comment2020?: string;
+    currentYearComment?: string;
     teamDate?: number;
     taskCreated?: number;
     allBrokersBaseDate?: number;

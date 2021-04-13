@@ -37,7 +37,7 @@ interface ICustomInputState {
     details: string | undefined;
     smsBody: string;
     taskDescription: string;
-    comment2020: string;
+    currentYearComment: string;
     teamDate: number;
     allBrokersBaseDate: number;
     phone: string;
@@ -52,7 +52,7 @@ const CustomInput = (props: ICustomInputProps) => {
     const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
     const currentElTaskDescription = currentElement?.get('taskDescription') ? currentElement?.get('taskDescription') : '';
     const currentElTaskName = currentElement?.get('taskName') ? currentElement?.get('taskName') : '';
-    const currentElComment2020 = currentElement?.get('comment2020') ? currentElement?.get('comment2020') : '';
+    const currentElCurrentYearComment = currentElement?.get('currentYearComment') ? currentElement?.get('currentYearComment') : '';
     const currentElTeamDate = currentElement?.get('teamDate') ? currentElement?.get('teamDate') : null;
     const currentElBrokersDate = currentElement?.get('allBrokersBaseDate') ? currentElement?.get('allBrokersBaseDate') : null;
     const currentElPhone = currentElement?.get('phone') ? currentElement?.get('phone') : null;
@@ -66,7 +66,7 @@ const CustomInput = (props: ICustomInputProps) => {
         details: currentElDetails,
         smsBody: currentElSmsBody,
         taskDescription: currentElTaskDescription,
-        comment2020: currentElComment2020,
+        currentYearComment: currentElCurrentYearComment,
         teamDate: currentElTeamDate,
         allBrokersBaseDate: currentElBrokersDate,
         phone: currentElPhone,
@@ -81,7 +81,7 @@ const CustomInput = (props: ICustomInputProps) => {
                 details: currentElDetails,
                 smsBody: currentElSmsBody,
                 taskDescription: currentElTaskDescription,
-                comment2020: currentElComment2020,
+                currentYearComment: currentElCurrentYearComment,
                 teamDate: currentElTeamDate,
                 allBrokersBaseDate: currentElBrokersDate,
                 phone: currentElPhone,
@@ -313,10 +313,10 @@ const CustomInput = (props: ICustomInputProps) => {
                             />
                         </View>
                         <MobileInput
-                            value={state.comment2020}
-                            label='Comment 2020'
-                            placeholder='comment 2020'
-                            textKey='comment2020'
+                            value={state.currentYearComment}
+                            label='Comment current year'
+                            placeholder='Comment current year'
+                            textKey='currentYearComment'
                             onEndEditing={editSubmit}
                             onChangeText={handleInputChange} />
                     </>}
