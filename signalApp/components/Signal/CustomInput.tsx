@@ -238,7 +238,7 @@ const CustomInput = (props: ICustomInputProps) => {
                         </View>
                     </View>
                     {isCurrentElResDialog &&
-                        <View style={{ ...styles.inputContainer, marginTop: 2, borderTopColor: '#1b6b2f', borderTopWidth: 1, justifyContent: 'space-between', paddingHorizontal:2}}>
+                        <View style={{ ...styles.inputContainer, marginTop: 2, borderTopColor: '#1b6b2f', borderTopWidth: 1, justifyContent: 'space-between', paddingHorizontal: 2}}>
                             <Text style={{ ...styles.text, fontWeight: '700' }}>Last call:</Text>
                             <Text style={styles.text}>Type: {isCurrentElResDialog?.get('type')}</Text>
                             <Text style={styles.text}>Duration: {isCurrentElResDialog?.get('duration')}</Text>
