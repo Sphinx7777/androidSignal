@@ -118,6 +118,14 @@ class Details extends React.Component<IDetailsProps> {
 
     renderItem = (data: any) => {
         const item: IDataItem = data.item
+        let inputsArr = ['email', 'name', 'taskName', 'details', 'phone', 'segment', 'taskDescription', 'reference', 'currentComments',
+        'smsBody', 'currentYearComment', 'group', 'calledAbout', 'pastYearsComment', 'comments1', 'comments2', 'comments3', 'comments4'
+        ]
+        const viewArr = ['agentID', 'searchType', 'highNetWorth', 'year', 'source', 'id', 'memberRating', 'language', 'brokersTabId',
+        'price', 'language', 'taskLink']
+        if (!item.searchType.includes('TD')) {
+            inputsArr = inputsArr.filter(field => field !== 'email')
+        }
         const onLongPress: (event: GestureResponderEvent) => void = () => this.showOne(item.id)
         // const onPress: (event: GestureResponderEvent) => void = () => console.log('renderItem_onPress=', data)
         return (
@@ -140,22 +148,20 @@ class Details extends React.Component<IDetailsProps> {
                 >
                     <View style={{...styles.showLine, marginBottom: 10}}>
                     {item?.asanaDataType
-                        ? <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700', fontSize: 18 }}><Image style={{ width: 30, height: 30 }} source={require('../../../assets/asana.png')} /> {item?.searchType.replace('AD', '')}</Text> 
+                        ? <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700', fontSize: 18 }}><Image style={{ width: 30, height: 30 }} source={require('../../../assets/asana.png')} /> {item?.searchType.replace('AD', '')}</Text>
                         : <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700' }}>{item?.searchType}</Text>
                     }
                     </View>
                     {Object.keys(item).sort().map(o => {
                         return (
                             <View key={item['id'] + o}>
-                                {['agentID', 'searchType', 'reference', 'highNetWorth', 'year', 'source', 'id', 'language', 'brokersTabId'].includes(String(o)) &&
+                                {viewArr.includes(String(o)) &&
                                     <View style={styles.itemLine}>
                                         <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
                                         <Text style={styles.text}>{String(item[o])}</Text>
                                     </View>
                                 }
-                                {['email', 'name', 'taskName', 'details', 'phone', 'segment', 'taskDescription', 'memberRating',
-                                    'smsBody', 'emailBody', 'currentYearComment', 'group', 'price', 'calledAbout', 'pastYearsComment'
-                                ].includes(String(o)) &&
+                                {inputsArr.includes(String(o)) &&
                                     <>
                                         {this.state.id && <>
                                             <View style={styles.showLine}>
@@ -177,7 +183,7 @@ class Details extends React.Component<IDetailsProps> {
                                             <Text style={styles.text}>{String(item[o])}</Text>
                                         </View>}</>
                                 }
-                                {(String(o) === 'allBrokersBaseDate' && item.searchType.split(',').includes('BD')) &&
+                                {(String(o) === 'allBrokersBaseDate' && item.searchType.includes('BD')) &&
                                 <DateChanged
                                 stateId={this.state.id}
                                 item={item}
@@ -186,7 +192,7 @@ class Details extends React.Component<IDetailsProps> {
                                 handlePickerOkClick={this.handlePickerOkClick}
                                 containerStile={{marginVertical: 2}}/>
                                 }
-                                {(String(o) === 'teamDate' && item.searchType.split(',').includes('TD')) &&
+                                {(String(o) === 'teamDate' && item.searchType.includes('TD')) &&
                                 <DateChanged
                                 stateId={this.state.id}
                                 item={item}
@@ -195,7 +201,7 @@ class Details extends React.Component<IDetailsProps> {
                                 handlePickerOkClick={this.handlePickerOkClick}
                                 containerStile={{marginVertical: 2}}/>
                                 }
-                                {(String(o) === 'dueDate' && item.searchType.split(',').includes('AD')) &&
+                                {(String(o) === 'dueDate' && item.searchType.includes('AD')) &&
                                 <DateChanged
                                 stateId={this.state.id}
                                 item={item}
@@ -253,7 +259,7 @@ class Details extends React.Component<IDetailsProps> {
                                         {!this.state.id && <View style={styles.itemLine}>
                                             <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
                                             {item.taskCompleted ? <Image style={{ width: 22, height: 22, marginLeft: 5 }} source={require('../../../assets/yes.png')} />
-                                            : <Image style={{ width: 22, height: 22, marginLeft: 5 }} source={require('../../../assets/no.png')} />}                                           
+                                            : <Image style={{ width: 22, height: 22, marginLeft: 5 }} source={require('../../../assets/no.png')} />}
                                         </View>}
                                     </>
                                 }

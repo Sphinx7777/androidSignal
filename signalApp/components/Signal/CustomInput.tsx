@@ -42,6 +42,7 @@ interface ICustomInputState {
     allBrokersBaseDate: number;
     phone: string;
     taskName: string;
+    currentComments: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
     const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement, dataItems } = props;
@@ -51,6 +52,7 @@ const CustomInput = (props: ICustomInputProps) => {
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
     const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
     const currentElTaskDescription = currentElement?.get('taskDescription') ? currentElement?.get('taskDescription') : '';
+    const currentElCurrentComments = currentElement?.get('currentComments') ? currentElement?.get('currentComments') : '';
     const currentElTaskName = currentElement?.get('taskName') ? currentElement?.get('taskName') : '';
     const currentElCurrentYearComment = currentElement?.get('currentYearComment') ? currentElement?.get('currentYearComment') : '';
     const currentElTeamDate = currentElement?.get('teamDate') ? currentElement?.get('teamDate') : null;
@@ -70,7 +72,8 @@ const CustomInput = (props: ICustomInputProps) => {
         teamDate: currentElTeamDate,
         allBrokersBaseDate: currentElBrokersDate,
         phone: currentElPhone,
-        taskName: currentElTaskName
+        taskName: currentElTaskName,
+        currentComments: currentElCurrentComments
     })
 
     useEffect(() => {
@@ -85,7 +88,8 @@ const CustomInput = (props: ICustomInputProps) => {
                 teamDate: currentElTeamDate,
                 allBrokersBaseDate: currentElBrokersDate,
                 phone: currentElPhone,
-                taskName: currentElTaskName
+                taskName: currentElTaskName,
+                currentComments: currentElCurrentComments
             }
         })
     }, [currentElement])
@@ -294,6 +298,13 @@ const CustomInput = (props: ICustomInputProps) => {
                             />
                         </View>
                         <MobileInput
+                            value={state.currentComments}
+                            label='DBX_2 current comments'
+                            placeholder='DBX_2 current comments'
+                            textKey='currentComments'
+                            onEndEditing={editSubmit}
+                            onChangeText={handleInputChange} />
+                        <MobileInput
                             value={state.details}
                             label='Details'
                             placeholder='enter details'
@@ -314,8 +325,8 @@ const CustomInput = (props: ICustomInputProps) => {
                         </View>
                         <MobileInput
                             value={state.currentYearComment}
-                            label='Comment current year'
-                            placeholder='Comment current year'
+                            label='Past buyer comment current year'
+                            placeholder='Past buyer comment current year'
                             textKey='currentYearComment'
                             onEndEditing={editSubmit}
                             onChangeText={handleInputChange} />
