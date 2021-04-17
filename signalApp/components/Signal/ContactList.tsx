@@ -74,7 +74,7 @@ const ContactList = (props: IContactListProps) => {
                     {isAsanaType && <Text style={styles.text}>Task created: {item?.taskCreated > 0 ? getStringDate(new Date(item?.taskCreated * 1000)) : 'no info'}</Text>}
                     {isAsanaType &&
                     <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-                        <Text style={styles.text}>Due date: {item?.dueDate ? item?.dueDate : 'no info'}</Text>
+                        <Text style={styles.text}>Due date: {item?.dueDate ? getStringDate(new Date(item?.dueDate * 1000)) : 'no info'}</Text>
                         {item.taskCompleted ? <Image style={{ width: 16, height: 16, marginLeft: 5 }} source={require('../../../assets/yes.png')} />
                                             : <Image style={{ width: 14, height: 14, marginLeft: 5 }} source={require('../../../assets/no.png')} />} 
                     </View>

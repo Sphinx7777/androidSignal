@@ -43,6 +43,7 @@ interface ICustomInputState {
     phone: string;
     taskName: string;
     currentComments: string;
+    dueDate: number;
 }
 const CustomInput = (props: ICustomInputProps) => {
     const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement, dataItems } = props;
@@ -58,6 +59,7 @@ const CustomInput = (props: ICustomInputProps) => {
     const currentElTeamDate = currentElement?.get('teamDate') ? currentElement?.get('teamDate') : null;
     const currentElBrokersDate = currentElement?.get('allBrokersBaseDate') ? currentElement?.get('allBrokersBaseDate') : null;
     const currentElPhone = currentElement?.get('phone') ? currentElement?.get('phone') : null;
+    const currentElDueDate = currentElement?.get('dueDate') ? currentElement?.get('dueDate') : null;
     const currentElSearchType = currentElement?.get('searchType') || '';
     const isAsanaType = currentElSearchType ? currentElSearchType.split(',').includes('AD') : false;
     const isTeamType = currentElSearchType ? currentElSearchType.split(',').includes('TD') : false;
@@ -73,7 +75,8 @@ const CustomInput = (props: ICustomInputProps) => {
         allBrokersBaseDate: currentElBrokersDate,
         phone: currentElPhone,
         taskName: currentElTaskName,
-        currentComments: currentElCurrentComments
+        currentComments: currentElCurrentComments,
+        dueDate: currentElDueDate
     })
 
     useEffect(() => {
@@ -89,7 +92,8 @@ const CustomInput = (props: ICustomInputProps) => {
                 allBrokersBaseDate: currentElBrokersDate,
                 phone: currentElPhone,
                 taskName: currentElTaskName,
-                currentComments: currentElCurrentComments
+                currentComments: currentElCurrentComments,
+                dueDate: currentElDueDate
             }
         })
     }, [currentElement])
@@ -187,10 +191,7 @@ const CustomInput = (props: ICustomInputProps) => {
     }
 
     const handlePickerOkClick = (date: Date, itemKey: string) => {
-        let sendDate: string | number = Math.round(date.getTime() / 1000);
-        if (itemKey === 'dueDate') {
-            sendDate = getStringDate(date);
-        }
+        const sendDate: string | number = Math.round(date.getTime() / 1000);
         setSubmitData({ id: currentElement?.get('id'), [itemKey]: sendDate });
     }
 
@@ -200,7 +201,6 @@ const CustomInput = (props: ICustomInputProps) => {
     const isNeedSms = currentElement?.get('needToSendSMS');
     const dialogDescription = `Do you want to send this sms ? Number: ${phone} sms body: ${currentElSMSBody}`
     const isCurrentElResDialog = currentElement?.get('responseDialog');
-
     return (
         <>
             <View style={styles.container}>
@@ -227,7 +227,7 @@ const CustomInput = (props: ICustomInputProps) => {
                             {isAsanaType && <Text style={styles.text}>Task created: {currentElTaskCreated > 0 ? getStringDate(new Date(currentElTaskCreated * 1000)) : 'no info'}</Text>}
                             {isAsanaType &&
                                 <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                    <Text style={styles.text}>Due date: {currentElement?.get('dueDate') ? currentElement?.get('dueDate') : 'no info'}</Text>
+                                    <Text style={styles.text}>Due date: {currentElDueDate ? getStringDate(new Date(currentElDueDate * 1000)) : 'no info'}</Text>
                                     {currentElement?.get('taskCompleted') ? <Image style={{ width: 16, height: 16, marginLeft: 5 }} source={require('../../../assets/yes.png')} />
                                         : <Image style={{ width: 14, height: 14, marginLeft: 5 }} source={require('../../../assets/no.png')} />}
                                 </View>
@@ -264,7 +264,7 @@ const CustomInput = (props: ICustomInputProps) => {
                     <>
                         <View style={styles.inputContainer}>
                             <IsMobileDatePicker
-                                elDate={Math.round(new Date(currentElement?.get('dueDate')).getTime() / 1000)}
+                                elDate={currentElement?.get('dueDate')}
                                 handleOkClick={handlePickerOkClick}
                                 itemKey='dueDate'
                                 title='Due date'

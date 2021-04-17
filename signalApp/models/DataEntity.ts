@@ -29,7 +29,7 @@ export type ISingleDataItem = EntityMap<{
     taskCreated?: number;
     allBrokersBaseDate?: number;
     responseDialog?: EntityMap<ICallLog>;
-    dueDate?: string;
+    dueDate?: number;
     taskCompleted?: boolean;
     currentComments?: string;
     }>;
@@ -57,7 +57,7 @@ export interface IDataItem {
     taskCreated?: number;
     allBrokersBaseDate?: number;
     responseDialog?: ICallLog;
-    dueDate?: string;
+    dueDate?: number;
     taskCompleted?: boolean;
     currentComments?: string;
 }

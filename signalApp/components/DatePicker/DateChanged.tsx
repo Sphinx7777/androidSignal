@@ -17,10 +17,7 @@ interface IDateChangedProps {
 
 const DateChanged = (props: IDateChangedProps) => {
     const { stateId, item, field, handlePickerOkClick, noMaxDate, title, containerStile} = props;
-    let date = Number(item[field]);
-    if (field === 'dueDate') {
-        date = Math.round(new Date(item[field]).getTime() / 1000)
-    }
+    const date = Number(item[field]);
     return (
         <>
         {stateId && <IsMobileDatePicker

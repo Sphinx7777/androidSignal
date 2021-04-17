@@ -109,10 +109,7 @@ class Details extends React.Component<IDetailsProps> {
     }
 
     handlePickerOkClick = (date: Date, itemKey: string) => {
-        let sendDate: string | number = Math.round(date.getTime() / 1000);
-        if (itemKey === 'dueDate') {
-            sendDate = getStringDate(date);
-        }
+        const sendDate: string | number = Math.round(date.getTime() / 1000);
         this.props.setSubmitData({ id: this.state.id, [itemKey]: sendDate });
     }
 
