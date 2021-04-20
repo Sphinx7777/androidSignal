@@ -115,13 +115,16 @@ class Details extends React.Component<IDetailsProps> {
 
     renderItem = (data: any) => {
         const item: IDataItem = data.item
-        let inputsArr = ['email', 'name', 'taskName', 'details', 'phone', 'segment', 'taskDescription', 'reference', 'currentComments',
-        'smsBody', 'currentYearComment', 'group', 'calledAbout', 'pastYearsComment', 'comments1', 'comments2', 'comments3', 'comments4'
+        let inputsArr = ['email', 'name', 'taskName', 'details', 'phone', 'segment', 'taskDescription', 'reference', 'currentComments', 'price',
+        'smsBody', 'currentYearComment', 'group', 'calledAbout', 'pastYearsComment', 'comments1', 'comments2', 'comments3', 'comments4', 'memberRating',
+        'additionalPhones', 'additionalPhoneNames', 'additionalPhoneDetails', 'relativesPhones', 'relativesRelationship', 'highNetWorth'
         ]
-        const viewArr = ['agentID', 'searchType', 'highNetWorth', 'year', 'source', 'id', 'memberRating', 'language', 'brokersTabId',
-        'price', 'language', 'taskLink']
-        if (!item.searchType.includes('TD')) {
-            inputsArr = inputsArr.filter(field => field !== 'email')
+        const viewArr = ['agentID', 'searchType', 'year', 'source', 'id', 'language', 'brokersTabId',
+        'language', 'totalDialAtt', 'totalSmsSent',
+        'totalSuccessContact']
+        const pBInputsArr = ['name', 'phone', 'smsBody', 'currentYearComment', 'calledAbout', 'pastYearsComment', 'price']
+        if (!item.searchType.includes('TD') && !item.searchType.includes('AD')) {
+            inputsArr = inputsArr.filter(field => pBInputsArr.includes(field))
         }
         const onLongPress: (event: GestureResponderEvent) => void = () => this.showOne(item.id)
         // const onPress: (event: GestureResponderEvent) => void = () => console.log('renderItem_onPress=', data)
@@ -215,8 +218,14 @@ class Details extends React.Component<IDetailsProps> {
                                 }
                                 {['responseDialog'].includes(String(o)) &&
                                     <View style={styles.itemLine}>
-                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                        <Text style={{ ...styles.text, ...styles.textTitle }}>Last contact data:</Text>
                                         <Text style={styles.text}>{JSON.stringify(item.responseDialog)}</Text>
+                                    </View>
+                                }
+                                {['taskLink'].includes(String(o)) &&
+                                    <View style={styles.itemLine}>
+                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}</Text>
+                                        <Text style={styles.text}>{String(item[o])}</Text>
                                     </View>
                                 }
                                 {['needToSendSMS'].includes(String(o)) &&
