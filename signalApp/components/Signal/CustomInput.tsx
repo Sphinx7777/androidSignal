@@ -44,6 +44,7 @@ interface ICustomInputState {
     taskName: string;
     currentComments: string;
     dueDate: number;
+    reference: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
     const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement, dataItems } = props;
@@ -61,6 +62,7 @@ const CustomInput = (props: ICustomInputProps) => {
     const currentElPhone = currentElement?.get('phone') ? currentElement?.get('phone') : null;
     const currentElDueDate = currentElement?.get('dueDate') ? currentElement?.get('dueDate') : null;
     const currentElSearchType = currentElement?.get('searchType') || '';
+    const currentElReference = currentElement?.get('reference') || '';
     const isAsanaType = currentElSearchType ? currentElSearchType.split(',').includes('AD') : false;
     const isTeamType = currentElSearchType ? currentElSearchType.split(',').includes('TD') : false;
     const isBrokersType = currentElSearchType ? currentElSearchType.split(',').includes('BD') : false;
@@ -76,7 +78,8 @@ const CustomInput = (props: ICustomInputProps) => {
         phone: currentElPhone,
         taskName: currentElTaskName,
         currentComments: currentElCurrentComments,
-        dueDate: currentElDueDate
+        dueDate: currentElDueDate,
+        reference: currentElReference
     })
 
     useEffect(() => {
@@ -93,7 +96,8 @@ const CustomInput = (props: ICustomInputProps) => {
                 phone: currentElPhone,
                 taskName: currentElTaskName,
                 currentComments: currentElCurrentComments,
-                dueDate: currentElDueDate
+                dueDate: currentElDueDate,
+                reference: currentElReference
             }
         })
     }, [currentElement])
@@ -298,6 +302,13 @@ const CustomInput = (props: ICustomInputProps) => {
                             />
                         </View>
                         <MobileInput
+                            value={state.reference}
+                            label='DBX_2 reference'
+                            placeholder='DBX_2 reference'
+                            textKey='reference'
+                            onEndEditing={editSubmit}
+                            onChangeText={handleInputChange} />
+                        <MobileInput
                             value={state.currentComments}
                             label='DBX_2 current comments'
                             placeholder='DBX_2 current comments'
@@ -306,8 +317,8 @@ const CustomInput = (props: ICustomInputProps) => {
                             onChangeText={handleInputChange} />
                         <MobileInput
                             value={state.details}
-                            label='Details'
-                            placeholder='enter details'
+                            label='DBX_2 details'
+                            placeholder='DBX_2 details'
                             textKey='details'
                             onEndEditing={editSubmit}
                             onChangeText={handleInputChange} />

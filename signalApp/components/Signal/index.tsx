@@ -254,6 +254,7 @@ class Signal extends React.Component<ISignalProps> {
             console.log('--------------------------------------------------------------------------------');
             console.log('currentElementPhone -> ', currentElement.get('phone'));
             console.log('--------------------------------------------------------------------------------');
+            this.setDialog(response, currentElement?.get('id'))
             this.setNextElement(nextElement, ind)
             setTimeout(() => this.makeCall(nextElement?.get('phone')), 10000)
         }
@@ -313,10 +314,12 @@ class Signal extends React.Component<ISignalProps> {
                         console.log('event -> ',
                         event + (num ? ' - ' + num : ''));
                     } else if (event === 'Missed') {
-                        const res = await this.fetchData();
-                        if (res && res.length > 0 && res[0]['type'] === 'OUTGOING') {
-                            this.makeNextDialogLogic(event, num, res);
-                        }
+                        console.log('event -> ',
+                        event + (num ? ' - ' + num : ''));
+                        // const res = await this.fetchData();
+                        // if (res && res.length > 0 && res[0]['type'] === 'OUTGOING') {
+                        //     this.makeNextDialogLogic(event, num, res);
+                        // }
                     }
                 },
                 true, // To detect incoming calls [ANDROID]
