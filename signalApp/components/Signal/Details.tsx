@@ -11,6 +11,7 @@ import { EntityList } from '../../models/entity';
 import { getStringDate, isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
 import MobileDropdown from '../MobileDropdown';
 import DateChanged from '../DatePicker/DateChanged';
+import NavigateButton from '../NavigateButton';
 
 const dialogOptions = [
     { label: 'auto-dial ON', value: 1 },
@@ -224,8 +225,8 @@ class Details extends React.Component<IDetailsProps> {
                                 }
                                 {['taskLink'].includes(String(o)) &&
                                     <View style={styles.itemLine}>
-                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}</Text>
-                                        <Text style={styles.text}>{String(item[o])}</Text>
+                                                <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                                <NavigateButton url={String(item[o])}>{String(item[o])}</NavigateButton>
                                     </View>
                                 }
                                 {['needToSendSMS'].includes(String(o)) &&

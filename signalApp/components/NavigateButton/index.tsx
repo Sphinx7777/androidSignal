@@ -1,45 +1,44 @@
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import * as React from 'react';
+import { StyleSheet, Text, TouchableOpacity, Alert, Linking } from 'react-native';
+import React, { useCallback } from 'react';
 
 interface INavBtnProps {
-    navigation: any;
-    path: string;
-    title: string;
-    color?: string;
+    url: string;
+    children: any;
+    buttonStyle?: object;
+    textStyle?: object;
 }
 
-export const NavigateButton = (props: INavBtnProps) => {
-    const { navigation, path, title, color } = props;
-    const handlePress = () => {
-        if (navigation) {
-            navigation.navigate(path)
+const NavigateButton = (props: INavBtnProps) => {
+    const { url, children, buttonStyle, textStyle } = props;
+    const handlePress = useCallback(async () => {
+        const supported = await Linking.canOpenURL(url);
+        if (supported) {
+            await Linking.openURL(url);
         } else {
-            console.log('NavigateButton_error_navigation!!!')
+            Alert.alert(`Don't know how to open this URL: ${url}`);
         }
-    }
+    }, [url]);
     return (
         <TouchableOpacity
-        style={{...styles.button, borderColor: color || '#1f6b4e', backgroundColor: color || '#1f6b4e'}}
-        onPress={handlePress}>
-        <Text style={styles.buttonText}>{title || ''}</Text>
-    </TouchableOpacity>
+            style={{ ...styles.button, ...buttonStyle }}
+            onPress={handlePress}>
+            <Text style={{ ...styles.buttonText, ...textStyle }}>{children}</Text>
+        </TouchableOpacity>
     );
 };
 const styles = StyleSheet.create({
-
     button: {
         display: 'flex',
-        justifyContent: 'center',
+        flexDirection: 'row',
         alignItems: 'center',
-        borderWidth: 2,
-        width: 85,
-        paddingVertical: 2,
-        borderRadius: 10,
+        width: '100%',
+        padding: 2,
         overflow: 'hidden',
-        marginBottom: 5,
     },
     buttonText: {
-        color: 'white',
-        fontSize: 18
+        color: '#3a78f2',
+        fontSize: 14
     }
 });
+
+export default NavigateButton;
