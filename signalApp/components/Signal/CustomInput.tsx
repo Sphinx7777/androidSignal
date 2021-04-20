@@ -303,7 +303,7 @@ const CustomInput = (props: ICustomInputProps) => {
                         </View>
                         <MobileInput
                             value={state.reference}
-                            label='DBX_2 reference'
+                            label='DBX_2 name (reference)'
                             placeholder='DBX_2 reference'
                             textKey='reference'
                             onEndEditing={editSubmit}
