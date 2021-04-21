@@ -213,7 +213,7 @@ const CustomInput = (props: ICustomInputProps) => {
                     onLongPress={calling}
                     style={styles.textContainer}>
                     <View style={styles.nameLine}>
-                        <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 220 }}>{currentElement?.get('asanaDataType') ? currentElement?.get('taskName') : currentElement?.get('name')}</Text>
+                        <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 220 }}>{currentElement?.get('asanaDataType') ? currentElement?.get('taskName') : currentElement?.get('reference') ? currentElement?.get('reference') : currentElement?.get('name')}</Text>
                         <Text style={{ ...styles.text, color: isPhone ? 'black' : '#bf0416' }}>{phone}</Text>
                         {currentElement?.get('asanaDataType')
                             ? <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>

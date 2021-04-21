@@ -58,7 +58,7 @@ const ContactList = (props: IContactListProps) => {
                 onLongPress={onLongPress}
                 onPress={onPress}>
                 <View style={{...styles.nameLine}}>
-                    <Text numberOfLines={1} style={{...styles.text, maxWidth: 220}}>{item.asanaDataType ? item?.taskName : item?.name}</Text>
+                    <Text numberOfLines={1} style={{...styles.text, maxWidth: 220}}>{item.asanaDataType ? item?.taskName : item?.reference ? item?.reference : item?.name}</Text>
                     <Text style={{...styles.text, color: isPhone ? 'black' : '#bf0416'}}>{item.phone && item.phone?.length > 0 ? item.phone : '--------'}</Text>
                     {item?.asanaDataType
                         ? <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
