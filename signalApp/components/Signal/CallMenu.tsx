@@ -128,8 +128,8 @@ const CallMenu = (props: ICallMenuProps) => {
     const isSMSCount = callData?.filter(obj => obj.get('needToSendSMS'));
     const isDialCount = callData?.filter(obj => obj.get('needToDialog'));
     const isAllCount = callData?.filter(obj => obj.get('needToDialog') || obj.get('needToSendSMS'));
-    const isValidPhones = callData?.filter(obj => obj.get('phone') && (obj.get('phone').length >= 8 && obj.get('phone').length <= 12));
-    const isValidSMS = callData?.filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0 && obj.get('phone') && (obj.get('phone').length >= 8 && obj.get('phone').length <= 12));
+    const isValidPhones = callData?.filter(obj => obj.get('phone') && (obj.get('phone').length >= 8 && obj.get('phone').length <= 13));
+    const isValidSMS = callData?.filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0 && obj.get('phone') && (obj.get('phone').length >= 8 && obj.get('phone').length <= 13));
     let count = 0;
     if (isSMSCount && isValidSMS) {
         count = isSMSCount?.size - isValidSMS?.size;

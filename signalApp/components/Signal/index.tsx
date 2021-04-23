@@ -4,7 +4,7 @@ import { StyleSheet, View, ScrollView, Text, TouchableOpacity, ActivityIndicator
 import { connect } from 'react-redux';
 import CallMenu from './CallMenu';
 import CustomInput from './CustomInput';
-import DataEntity, { ISingleDataItem } from '../../models/DataEntity';
+import DataEntity, { ISingleDataItem, IDataItem } from '../../models/DataEntity';
 import saga from '../../decoradors/saga';
 import { EntityList } from '../../models/entity';
 import ContactList from './ContactList';
@@ -164,11 +164,36 @@ class Signal extends React.Component<ISignalProps> {
 
     sendDirectSms = async (data: {id: string, phone: string, smsBody: string} | null = null) => {
         const { dataItems } = this.props;
-        let dataSmsArray = [];
+        let dataSmsArray = [] as IDataItem[];
+        const tempDataSmsArray: IDataItem[] = dataItems.valueSeq().filter(obj => obj.get('needToSendSMS'))?.toJS() || []
         if (dataItems && dataItems.size > 0 && !data) {
-        dataSmsArray = dataItems.valueSeq().filter(obj => obj.get('needToSendSMS'))?.toJS() || []
+        dataSmsArray = tempDataSmsArray.map(item => {
+            if (item.smsBody && item.smsBody.length > 0) {
+                const tempBody = item.smsBody
+                const isDynamicName = tempBody.includes('[name]')
+                if (!isDynamicName) {
+                    item.smsBody = tempBody
+                }
+                if (isDynamicName) {
+                    const newBody = item.reference && item.reference.length > 0 ? tempBody.replace(/\[name]/, item.reference) : tempBody.replace(/\[name]/, ' ')
+                    item.smsBody = newBody
+                }
+                return item;
+            }
+            return item;
+        })
         }
         if (data && data.smsBody && data.smsBody.length > 0) {
+            const currentItem = tempDataSmsArray.find(o => o.id === data.id)
+            const tempBody = data.smsBody
+            const isDynamicName = tempBody.includes('[name]')
+            if (!isDynamicName) {
+                data.smsBody = tempBody
+            }
+            if (isDynamicName) {
+                const newBody = currentItem && currentItem.reference && currentItem.reference.length > 0 ? tempBody.replace(/\[name]/, currentItem.reference) : tempBody.replace(/\[name]/, ' ')
+                data.smsBody = newBody
+            }
             dataSmsArray = [{
                 id: data.id,
                 phone: data.phone,
@@ -204,7 +229,7 @@ class Signal extends React.Component<ISignalProps> {
                 for await (const one of dataSmsArray) {
                     console.log('send_sms_to ', one.phone, one.smsBody)
                     console.log('--------------------------------------')
-                    if (one.phone && (one.phone.length >= 8 && one.phone.length <= 12) && one.smsBody && one.smsBody.length > 0) {
+                    if (one.phone && (one.phone.length >= 8 && one.phone.length <= 13) && one.smsBody && one.smsBody.length > 0) {
                         DirectSms.sendDirectSms(one.phone, one.smsBody);
                         // this.props.setSubmitData({id: one.id, needToSendSMS: false})
                         this.props.setSubmitData(
@@ -373,7 +398,7 @@ class Signal extends React.Component<ISignalProps> {
             },
         );
         if (grantedCall === PermissionsAndroid.RESULTS.GRANTED && grantedLog === PermissionsAndroid.RESULTS.GRANTED && !currentPause) {
-            if (num && (num.length >= 8 && num.length <= 12)) {
+            if (num && (num.length >= 8 && num.length <= 13)) {
                 const res = await DirectDial.createDial(num)
                 return Promise.resolve(res)
             } else {

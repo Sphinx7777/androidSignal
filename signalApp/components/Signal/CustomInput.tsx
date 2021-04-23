@@ -51,8 +51,20 @@ const CustomInput = (props: ICustomInputProps) => {
     const [finishedVisible, setFinishedVisible] = useState(false)
     const [sendCustomSMSVisible, setSendCustomSMSVisible] = useState(false)
     const currentElTaskCreated = currentElement?.get('taskCreated') || null;
+    const currentElReference = currentElement?.get('reference') || '';
     const currentElDetails = currentElement?.get('details') ? currentElement?.get('details') : '';
-    const currentElSmsBody = currentElement?.get('smsBody') ? currentElement?.get('smsBody') : '';
+    let currentElSmsBody = ''
+    if (currentElement?.get('smsBody') && currentElement?.get('smsBody').length > 0) {
+        const tempBody = currentElement?.get('smsBody')
+        const isDynamicName = tempBody.includes('[name]')
+        if (!isDynamicName) {
+            currentElSmsBody = tempBody
+        }
+        if (isDynamicName) {
+            const newBody = currentElReference && currentElReference.length > 0 ? tempBody.replace(/\[name]/, currentElReference) : tempBody.replace(/\[name]/, ' ')
+            currentElSmsBody = newBody
+        }
+    }
     const currentElTaskDescription = currentElement?.get('taskDescription') ? currentElement?.get('taskDescription') : '';
     const currentElCurrentComments = currentElement?.get('currentComments') ? currentElement?.get('currentComments') : '';
     const currentElTaskName = currentElement?.get('taskName') ? currentElement?.get('taskName') : '';
@@ -62,7 +74,6 @@ const CustomInput = (props: ICustomInputProps) => {
     const currentElPhone = currentElement?.get('phone') ? currentElement?.get('phone') : null;
     const currentElDueDate = currentElement?.get('dueDate') ? currentElement?.get('dueDate') : null;
     const currentElSearchType = currentElement?.get('searchType') || '';
-    const currentElReference = currentElement?.get('reference') || '';
     const isAsanaType = currentElSearchType ? currentElSearchType.split(',').includes('AD') : false;
     const isTeamType = currentElSearchType ? currentElSearchType.split(',').includes('TD') : false;
     const isBrokersType = currentElSearchType ? currentElSearchType.split(',').includes('BD') : false;
@@ -200,7 +211,7 @@ const CustomInput = (props: ICustomInputProps) => {
     }
 
     const phone = currentElement?.get('phone') && currentElement?.get('phone')?.length > 0 ? currentElement?.get('phone') : '--------'
-    const isPhone = currentElement?.get('phone') && currentElement?.get('phone').length >= 8 && currentElement?.get('phone').length <= 12;
+    const isPhone = currentElement?.get('phone') && currentElement?.get('phone').length >= 8 && currentElement?.get('phone').length <= 13;
     const currentElSMSBody = currentElement?.get('smsBody');
     const isNeedSms = currentElement?.get('needToSendSMS');
     const dialogDescription = `Do you want to send this sms ? Number: ${phone} sms body: ${currentElSMSBody}`
