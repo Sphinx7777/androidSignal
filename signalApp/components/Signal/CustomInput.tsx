@@ -214,7 +214,7 @@ const CustomInput = (props: ICustomInputProps) => {
     const isPhone = currentElement?.get('phone') && currentElement?.get('phone').length >= 8 && currentElement?.get('phone').length <= 13;
     const currentElSMSBody = currentElement?.get('smsBody');
     const isNeedSms = currentElement?.get('needToSendSMS');
-    const dialogDescription = `Do you want to send this sms ? Number: ${phone} sms body: ${currentElSMSBody}`
+    const dialogDescription = `Do you want to send this sms ? Number: ${phone} sms body: ${state.smsBody}`
     const isCurrentElResDialog = currentElement?.get('responseDialog');
     return (
         <>
