@@ -189,6 +189,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: 'lightgrey',
         paddingVertical: 5,
+        color: 'black',
         width: '100%',
     },
     button: {

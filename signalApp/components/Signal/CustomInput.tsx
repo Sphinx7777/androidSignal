@@ -56,12 +56,12 @@ const CustomInput = (props: ICustomInputProps) => {
     let currentElSmsBody = ''
     if (currentElement?.get('smsBody') && currentElement?.get('smsBody').length > 0) {
         const tempBody = currentElement?.get('smsBody')
-        const isDynamicName = tempBody.includes('[name]')
+        const isDynamicName = tempBody.includes('[N]')
         if (!isDynamicName) {
             currentElSmsBody = tempBody
         }
         if (isDynamicName) {
-            const newBody = currentElReference && currentElReference.length > 0 ? tempBody.replace(/\[name]/, currentElReference) : tempBody.replace(/\[name]/, ' ')
+            const newBody = currentElReference && currentElReference.length > 0 ? tempBody.replace(/\[N]/, currentElReference) : tempBody.replace(/\[N]/, ' ')
             currentElSmsBody = newBody
         }
     }
