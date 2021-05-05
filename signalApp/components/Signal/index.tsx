@@ -170,12 +170,12 @@ class Signal extends React.Component<ISignalProps> {
         dataSmsArray = tempDataSmsArray.map(item => {
             if (item.smsBody && item.smsBody.length > 0) {
                 const tempBody = item.smsBody
-                const isDynamicName = tempBody.includes('[N]')
+                const isDynamicName = tempBody.includes('[name]')
                 if (!isDynamicName) {
                     item.smsBody = tempBody
                 }
                 if (isDynamicName) {
-                    const newBody = item.reference && item.reference.length > 0 ? tempBody.replace(/\[N]/, item.reference) : tempBody.replace(/\[N]/, ' ')
+                    const newBody = item.reference && item.reference.length > 0 ? tempBody.replace(/\[name]/, item.reference) : tempBody.replace(/\[name]/, ' ')
                     item.smsBody = newBody
                 }
                 return item;
@@ -186,12 +186,12 @@ class Signal extends React.Component<ISignalProps> {
         if (data && data.smsBody && data.smsBody.length > 0) {
             const currentItem = tempDataSmsArray.find(o => o.id === data.id)
             const tempBody = data.smsBody
-            const isDynamicName = tempBody.includes('[N]')
+            const isDynamicName = tempBody.includes('[name]')
             if (!isDynamicName) {
                 data.smsBody = tempBody
             }
             if (isDynamicName) {
-                const newBody = currentItem && currentItem.reference && currentItem.reference.length > 0 ? tempBody.replace(/\[N]/, currentItem.reference) : tempBody.replace(/\[N]/, ' ')
+                const newBody = currentItem && currentItem.reference && currentItem.reference.length > 0 ? tempBody.replace(/\[name]/, currentItem.reference) : tempBody.replace(/\[name]/, ' ')
                 data.smsBody = newBody
             }
             dataSmsArray = [{
