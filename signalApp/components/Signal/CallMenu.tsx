@@ -5,6 +5,7 @@ import { showToastWithGravityAndOffset } from 'signalApp/utils';
 import { ISingleDataItem } from '../../models/DataEntity';
 import { EntityList } from '../../models/entity';
 import ModalDialog from '../Dialog';
+import { count } from 'sms-length';
 interface ICallMenuProps {
     setCurrentItemIndex: (currentItemIndex: number) => void;
     currentItemIndex: number;
@@ -125,30 +126,32 @@ const CallMenu = (props: ICallMenuProps) => {
             showToastWithGravityAndOffset ('Max 20 digits')
         }
     }
+
     const isSMSCount = callData?.filter(obj => obj.get('needToSendSMS'));
     const isDialCount = callData?.filter(obj => obj.get('needToDialog'));
     const isAllCount = callData?.filter(obj => obj.get('needToDialog') || obj.get('needToSendSMS'));
     const isValidPhones = callData?.filter(obj => obj.get('phone') && (obj.get('phone').length >= 8 && obj.get('phone').length <= 13));
-    const isValidSMS = callData?.filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0 && obj.get('phone') && (obj.get('phone').length >= 8 && obj.get('phone').length <= 13));
-    let count = 0;
+    const isValidSMS = callData?.filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0 && obj.get('smsBody').length < count(obj.get('smsBody')).characterPerMessage && obj.get('phone') && (obj.get('phone').length >= 8 && obj.get('phone').length <= 13));
+    let countSms = 0;
     if (isSMSCount && isValidSMS) {
-        count = isSMSCount?.size - isValidSMS?.size;
+        countSms = isSMSCount?.size - isValidSMS?.size;
     }
     let phoneCount = 0;
     if (isAllCount && isValidPhones) {
-        phoneCount = isAllCount?.size - isValidPhones?.size;
+        const tempPhoneCount = isAllCount?.size - isValidPhones?.size;
+        phoneCount = tempPhoneCount >= 0 ? tempPhoneCount : 0
     }
-    const dialogDescription = `You confirm the sending of all messages ? ${isValidSMS?.size} SMS will be sent. ${count && count > 0 ? count === 1 ? count + ' message' + ' have incorrect number format or empty message body' : count + ' messages' + ' have incorrect number format or empty message body' : ''}`
+    const dialogDescription = `You confirm the sending of all messages ? ${isValidSMS?.size} SMS will be sent. ${countSms && countSms > 0 ? countSms === 1 ? countSms + ' message' + ' have incorrect number format or empty message body' : countSms + ' messages' + ' have incorrect number format or empty message body' : ''}`
 
     return (
         <>
             <View style={styles.wrapper}>
                 <View style={styles.container}>
                     <View style={styles.textBlock}>
-                        <Text style={{marginBottom: 2}}>{`Need send ${isSMSCount?.size || 0} sms`}</Text>
-                        <Text style={{marginBottom: 2}}>{`${count || 0} sms have incorrect number format or empty message body`}</Text>
-                        <Text style={{marginBottom: 2}}>{`Need to make ${isDialCount?.size || 0} calls`}</Text>
-                        <Text style={{}}>{`${phoneCount || 0} items have incorrect number format`}</Text>
+                        <Text style={{marginBottom: 2, color: isSMSCount?.size > 0 ? 'green' : 'black'}}>{`Need send ${isSMSCount?.size || 0} sms`}</Text>
+                        <Text style={{marginBottom: 2, color: countSms > 0 ? 'red' : 'black'}}>{`${countSms || 0} sms have incorrect number format or wrong sms length for 1 msg`}</Text>
+                        <Text style={{marginBottom: 2, color: isDialCount?.size > 0 ? 'green' : 'black'}}>{`Need to make ${isDialCount?.size || 0} calls`}</Text>
+                        <Text style={{color: phoneCount > 0 ? 'red' : 'black'}}>{`${phoneCount || 0} items have incorrect number format`}</Text>
                         <TouchableOpacity
                             style={{ ...styles.button, maxWidth: 100, marginTop: 5 }}
                             onPress={getDataSignal}>

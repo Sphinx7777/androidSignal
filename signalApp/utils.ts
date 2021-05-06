@@ -12,10 +12,10 @@ export const getStringDate: (date: Date) => string = (date: Date) => {
     return `${date.getFullYear()}-${(m < 10 ? '0' : '') + m}-${(d < 10 ? '0' : '') + d}`;
 }
 
-export const showToastWithGravityAndOffset = (text: string) => {
+export const showToastWithGravityAndOffset = (text: string, duration = ToastAndroid.SHORT) => {
     ToastAndroid.showWithGravityAndOffset(
         text,
-        ToastAndroid.SHORT,
+        duration,
         ToastAndroid.BOTTOM,
         50,
         150

@@ -6570,6 +6570,11 @@ slice-ansi@^2.0.0, slice-ansi@^2.1.0:
     astral-regex "^1.0.0"
     is-fullwidth-code-point "^2.0.0"
 
+sms-length@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/sms-length/-/sms-length-0.0.6.tgz#b6437a8ebcda8421c0df0fb33d59de9b98fc7b61"
+  integrity sha512-yJB7GsXk103e6U8yqwEsA+TLrhcXCKxornZrTZvXkAEU7tg+L73dTld6OFejqM1UmwYnWeuTGqa6sfieP8VXZg==
+
 snapdragon-node@^2.0.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/snapdragon-node/-/snapdragon-node-2.1.1.tgz#6c175f86ff14bdb0724563e8f3c1b021a286853b"

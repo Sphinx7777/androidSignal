@@ -10,10 +10,20 @@ import { EntityList } from '../../models/entity';
 import ContactList from './ContactList';
 import CallDetectorManager from 'react-native-call-detection';
 import CallLogs from 'react-native-call-log';
-import {isNetworkAvailable, showToastWithGravityAndOffset} from '../../utils';
+import { isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
+import { count } from 'sms-length';
+import { ToastAndroid } from 'react-native';
 const DirectSms = NativeModules.DirectSms;
 const DirectDial = NativeModules.DirectDial;
 
+export interface IGsmLength {
+    encoding: 'GSM_7BIT' | 'GSM_7BIT_EXT' | 'UTF16';
+    length: number;
+    characterPerMessage: number;
+    inCurrentMessage: number;
+    remaining: number;
+    messages: number;
+}
 export interface ICallLog {
     dateTime: string;
     duration: number;
@@ -60,7 +70,7 @@ class Signal extends React.Component<ISignalProps> {
                     isInternet: true,
                 }
             })
-        }else {
+        } else {
             showToastWithGravityAndOffset('No internet connect !!!');
             this.setState((prevState) => {
                 return {
@@ -87,7 +97,7 @@ class Signal extends React.Component<ISignalProps> {
 
     getDataSignal = () => {
         const { getData } = this.props;
-        getData({ pageName: 'signal', perPage: 100, filter: {mobileInfo: ['needToDialog', 'needToSendSMS']}})
+        getData({ pageName: 'signal', perPage: 100, filter: { mobileInfo: ['needToDialog', 'needToSendSMS'] } })
     }
 
     setIsStart = (isStart: boolean) => {
@@ -162,26 +172,26 @@ class Signal extends React.Component<ISignalProps> {
         }
     };
 
-    sendDirectSms = async (data: {id: string, phone: string, smsBody: string} | null = null) => {
+    sendDirectSms = async (data: { id: string, phone: string, smsBody: string } | null = null) => {
         const { dataItems } = this.props;
         let dataSmsArray = [] as IDataItem[];
         const tempDataSmsArray: IDataItem[] = dataItems.valueSeq().filter(obj => obj.get('needToSendSMS'))?.toJS() || []
         if (dataItems && dataItems.size > 0 && !data) {
-        dataSmsArray = tempDataSmsArray.map(item => {
-            if (item.smsBody && item.smsBody.length > 0) {
-                const tempBody = item.smsBody
-                const isDynamicName = tempBody.includes('[name]')
-                if (!isDynamicName) {
-                    item.smsBody = tempBody
-                }
-                if (isDynamicName) {
-                    const newBody = item.reference && item.reference.length > 0 ? tempBody.replace(/\[name]/, item.reference) : tempBody.replace(/\[name]/, ' ')
-                    item.smsBody = newBody
+            dataSmsArray = tempDataSmsArray.map(item => {
+                if (item.smsBody && item.smsBody.length > 0) {
+                    const tempBody = item.smsBody
+                    const isDynamicName = tempBody.includes('[name]')
+                    if (!isDynamicName) {
+                        item.smsBody = tempBody
+                    }
+                    if (isDynamicName) {
+                        const newBody = item.reference && item.reference.length > 0 ? tempBody.replace(/\[name]/, item.reference) : tempBody.replace(/\[name]/, ' ')
+                        item.smsBody = newBody
+                    }
+                    return item;
                 }
                 return item;
-            }
-            return item;
-        })
+            })
         }
         if (data && data.smsBody && data.smsBody.length > 0) {
             const currentItem = tempDataSmsArray.find(o => o.id === data.id)
@@ -202,12 +212,10 @@ class Signal extends React.Component<ISignalProps> {
         }
         try {
             const grantedSendSms = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.SEND_SMS,
+                PermissionsAndroid.PERMISSIONS.SEND_SMS,
                 {
                     title: 'YourProject App Sms Permission',
-                    message:
-                    'YourProject App needs access to your inbox ' +
-                    'so you can send messages in background.',
+                    message: 'YourProject App needs access to your inbox so you can send messages in background.',
                     buttonNeutral: 'Ask Me Later',
                     buttonNegative: 'Cancel',
                     buttonPositive: 'OK',
@@ -215,30 +223,32 @@ class Signal extends React.Component<ISignalProps> {
             );
             const grantedReadSms = await PermissionsAndroid.request(
                 PermissionsAndroid.PERMISSIONS.READ_SMS,
-                    {
-                        title: 'YourProject App Sms Permission',
-                        message:
-                        'YourProject App needs access to your inbox ' +
-                        'so you can send messages in background.',
-                        buttonNeutral: 'Ask Me Later',
-                        buttonNegative: 'Cancel',
-                        buttonPositive: 'OK',
-                    },
-                );
+                {
+                    title: 'YourProject App Sms Permission',
+                    message: 'YourProject App needs access to your inbox so you can send messages in background.',
+                    buttonNeutral: 'Ask Me Later',
+                    buttonNegative: 'Cancel',
+                    buttonPositive: 'OK',
+                },
+            );
             if (grantedSendSms === PermissionsAndroid.RESULTS.GRANTED && grantedReadSms === PermissionsAndroid.RESULTS.GRANTED && dataSmsArray.length > 0) {
                 for await (const one of dataSmsArray) {
-                    console.log('send_sms_to ', one.phone, one.smsBody)
+                    const smsLength = count(one.smsBody)
                     console.log('--------------------------------------')
-                    if (one.phone && (one.phone.length >= 8 && one.phone.length <= 13) && one.smsBody && one.smsBody.length > 0) {
-                        DirectSms.sendDirectSms(one.phone, one.smsBody);
-                        // this.props.setSubmitData({id: one.id, needToSendSMS: false})
-                        this.props.setSubmitData(
-                            {id: one.id, needToSendSMS: false, smsSend: {sendDate: Math.round(new Date().getTime() / 1000), phoneNumber: one.phone, smsBody: one.smsBody}})
+                    console.log('send_sms_to --->', one.phone, 'body===', one.smsBody)
+                    console.log('smsLength===', smsLength)
+                    console.log('--------------------------------------')
+                    if (one.phone && (one.phone.length >= 8 && one.phone.length <= 13) && one.smsBody && one.smsBody.length > 0 && one.smsBody.length < smsLength.characterPerMessage) {
+                        const response = await DirectSms.sendDirectSms(one.phone, one.smsBody);
+                        if (response) {
+                            showToastWithGravityAndOffset(`Message sent to number: ${one.phone}`)
+                            this.props.setSubmitData(
+                                { id: one.id, needToSendSMS: false, smsSend: { sendDate: Math.round(new Date().getTime() / 1000), phoneNumber: one.phone, smsBody: one.smsBody } })
+                        }
                     } else {
-                        showToastWithGravityAndOffset(`ERROR, incorrect number ${one.phone} or empty sms body`)
+                        showToastWithGravityAndOffset(`ERROR, incorrect number ${one.phone} or wrong sms length`, ToastAndroid.LONG)
                     }
                 }
-                showToastWithGravityAndOffset(dataSmsArray.length > 1 ? 'All messages sent' : 'Message sent')
             } else {
                 console.log('SMS permission denied');
             }
@@ -260,13 +270,13 @@ class Signal extends React.Component<ISignalProps> {
             const getNextEl = (i: number) => {
                 const el = dataItems?.valueSeq()?.get(i)
                 if (el.get('needToDialog') && currentElement.get('id') !== el.get('id')) {
-                        count = 0;
-                        return {el, i};
-                    } else if (count <= arrLength) {
-                        count = count + 1;
-                        const nextInd = i < arrLength - 1 ? i + 1 : 0;
-                        return getNextEl(nextInd)
-                    }
+                    count = 0;
+                    return { el, i };
+                } else if (count <= arrLength) {
+                    count = count + 1;
+                    const nextInd = i < arrLength - 1 ? i + 1 : 0;
+                    return getNextEl(nextInd)
+                }
             }
             const elem = getNextEl(nextIndex)
             nextElement = elem?.el;
@@ -300,11 +310,11 @@ class Signal extends React.Component<ISignalProps> {
                 responseDialog
             }
         })
-        this.props.setSubmitData({id, responseDialog})
+        this.props.setSubmitData({ id, responseDialog })
     }
 
     startStopListener = async () => {
-        const { callStates, isStart} = this.state;
+        const { callStates, isStart } = this.state;
         let { callDetector } = this.state;
         if (isStart) {
             if (callDetector) {
@@ -327,20 +337,20 @@ class Signal extends React.Component<ISignalProps> {
                             this.makeNextDialogLogic(event, num, res);
                         }
                     } else if (event === 'Connected') {
-                    console.log('event -> ',
-                    event + (num ? ' - ' + num : ''));
+                        console.log('event -> ',
+                            event + (num ? ' - ' + num : ''));
                     } else if (event === 'Incoming') {
                         console.log('event -> ',
-                        event + (num ? ' - ' + num : ''));
+                            event + (num ? ' - ' + num : ''));
                     } else if (event === 'Dialing') {
                         console.log('event -> ',
-                        event + (num ? ' - ' + num : ''));
+                            event + (num ? ' - ' + num : ''));
                     } else if (event === 'Offhook') {
                         console.log('event -> ',
-                        event + (num ? ' - ' + num : ''));
+                            event + (num ? ' - ' + num : ''));
                     } else if (event === 'Missed') {
                         console.log('event -> ',
-                        event + (num ? ' - ' + num : ''));
+                            event + (num ? ' - ' + num : ''));
                         // const res = await this.fetchData();
                         // if (res && res.length > 0 && res[0]['type'] === 'OUTGOING') {
                         //     this.makeNextDialogLogic(event, num, res);
@@ -377,16 +387,16 @@ class Signal extends React.Component<ISignalProps> {
         }
         const grantedCall = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.CALL_PHONE,
-                {
-                    title: 'Your project app dialog permission',
-                    message:
+            {
+                title: 'Your project app dialog permission',
+                message:
                     'YourProject App needs access to dialog your phone ' +
                     'so you can dialog in background.',
-                    buttonNeutral: 'Ask Me Later',
-                    buttonNegative: 'Cancel',
-                    buttonPositive: 'OK',
-                },
-            );
+                buttonNeutral: 'Ask Me Later',
+                buttonNegative: 'Cancel',
+                buttonPositive: 'OK',
+            },
+        );
         const grantedLog = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
             {
@@ -493,7 +503,7 @@ class Signal extends React.Component<ISignalProps> {
         }
         const onDetailsPress = (id: string) => {
             if (navigation) {
-                navigation.navigate('Details', {id})
+                navigation.navigate('Details', { id })
             } else {
                 console.log('onLoginPress_error')
             }
@@ -530,10 +540,10 @@ class Signal extends React.Component<ISignalProps> {
                 <View style={{ ...styles.loadContainer, height: 200 }}>
                     <ActivityIndicator size='large' color='green' />
                     <TouchableOpacity
-                            activeOpacity={0.5}
-                            style={{marginTop: 20}}
-                            onPress={this.getSignalData}>
-                            <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#fc9fa8' }}>No internet connection, click to try again</Text>
+                        activeOpacity={0.5}
+                        style={{ marginTop: 20 }}
+                        onPress={this.getSignalData}>
+                        <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#fc9fa8' }}>No internet connection, click to try again</Text>
                     </TouchableOpacity>
                 </View>
             </View>)
@@ -552,16 +562,16 @@ class Signal extends React.Component<ISignalProps> {
                     />
                     <ScrollView style={styles.container}>
                         <CustomInput
-                        dataItems={dataItems}
-                        setNextElement={this.setNextElement}
-                        onDetailsPress={onDetailsPress}
-                        responseDialog={responseDialog}
-                        submitData={submitData}
-                        setSubmitData={setSubmitData}
-                        clearSubmitData={clearSubmitData}
-                        currentElement={currentElement}
-                        makeCall={this.makeCall}
-                        sendSMS={this.sendDirectSms}/>
+                            dataItems={dataItems}
+                            setNextElement={this.setNextElement}
+                            onDetailsPress={onDetailsPress}
+                            responseDialog={responseDialog}
+                            submitData={submitData}
+                            setSubmitData={setSubmitData}
+                            clearSubmitData={clearSubmitData}
+                            currentElement={currentElement}
+                            makeCall={this.makeCall}
+                            sendSMS={this.sendDirectSms} />
                         <CallMenu
                             pause={pause}
                             getData={this.props.getData}

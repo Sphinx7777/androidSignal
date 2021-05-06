@@ -9,6 +9,7 @@ import ModalDialog from '../Dialog';
 import MobileDropdown from '../MobileDropdown';
 import MobileInput from '../MobileInput';
 import IsMobileDatePicker from '../DatePicker';
+import { count } from 'sms-length';
 
 const dialogOptions = [
     { label: 'auto-dial ON', value: 1 },
@@ -257,7 +258,7 @@ const CustomInput = (props: ICustomInputProps) => {
                         </View>
                     </View>
                     {isCurrentElResDialog &&
-                        <View style={{ ...styles.inputContainer, marginTop: 2, borderTopColor: '#1b6b2f', borderTopWidth: 1, justifyContent: 'space-between', paddingHorizontal: 2}}>
+                        <View style={{ ...styles.inputContainer, marginTop: 2, borderTopColor: '#1b6b2f', borderTopWidth: 1, justifyContent: 'space-between', paddingHorizontal: 2 }}>
                             <Text style={{ ...styles.text, fontWeight: '700' }}>Last call:</Text>
                             <Text style={styles.text}>Type: {isCurrentElResDialog?.get('type')}</Text>
                             <Text style={styles.text}>Duration: {isCurrentElResDialog?.get('duration')}</Text>
@@ -368,6 +369,25 @@ const CustomInput = (props: ICustomInputProps) => {
                     textKey='smsBody'
                     onEndEditing={editSubmit}
                     onChangeText={handleInputChange} />
+                {(state.smsBody?.length > 0) ?
+                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center' }}>
+                        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center', marginRight: 6 }}>
+                            <Text style={{marginRight: 3}}>SMS count:</Text>
+                            <Text style={{fontWeight: '700', color: count(state.smsBody).messages > 1 ? 'red' : 'green'}}>{count(state.smsBody).messages}</Text>
+                        </View>
+                        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center', marginRight: 6 }}>
+                            <Text style={{marginRight: 3}}> / Length:</Text>
+                            <Text style={{fontWeight: '700'}}>{count(state.smsBody).length}</Text>
+                        </View>
+                        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center', marginRight: 6 }}>
+                            <Text style={{marginRight: 3}}> / Max length for 1 msg:</Text>
+                            <Text style={{fontWeight: '700'}}>{count(state.smsBody).characterPerMessage}</Text>
+                        </View>
+                    </View> : <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center', marginRight: 6 }}>
+                            <Text style={{marginRight: 3}}>Length:</Text>
+                            <Text style={{fontWeight: '700', color: 'red'}}>0</Text>
+                        </View>
+                }
                 <View style={styles.sendButtonContainer}>
                     <TouchableOpacity
                         style={(state.smsBody.length !== 0 && currentElement)
