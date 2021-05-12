@@ -217,6 +217,7 @@ const CustomInput = (props: ICustomInputProps) => {
     const isNeedSms = currentElement?.get('needToSendSMS');
     const dialogDescription = `Do you want to send this sms ? Number: ${phone} sms body: ${state.smsBody}`
     const isCurrentElResDialog = currentElement?.get('responseDialog');
+    const messagesCount = count(state.smsBody).messages
     return (
         <>
             <View style={styles.container}>
@@ -373,7 +374,7 @@ const CustomInput = (props: ICustomInputProps) => {
                     <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center' }}>
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center', marginRight: 6 }}>
                             <Text style={{marginRight: 3}}>SMS count:</Text>
-                            <Text style={{fontWeight: '700', color: count(state.smsBody).messages > 1 ? 'red' : 'green'}}>{count(state.smsBody).messages}</Text>
+                            <Text style={{fontWeight: '700', color: messagesCount > 1 ? 'red' : 'green'}}>{messagesCount}</Text>
                         </View>
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center', marginRight: 6 }}>
                             <Text style={{marginRight: 3}}> / Length:</Text>
@@ -417,9 +418,10 @@ const CustomInput = (props: ICustomInputProps) => {
             <ModalDialog
                 handleCancel={handleCancel}
                 handleConfirm={handleDelete}
+                wrong={messagesCount > 1 ? true : false}
                 dialogKey='sendCustomSMS'
                 visible={sendCustomSMSVisible}
-                title='Send custom sms'
+                title={messagesCount > 1 ? 'Will be paid ' + `${messagesCount} sms. Continue ?` : 'Send custom sms'}
                 description={dialogDescription}
                 confirmButtonText='Send'
             />

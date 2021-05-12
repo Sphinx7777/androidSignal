@@ -5,7 +5,6 @@ import { showToastWithGravityAndOffset } from 'signalApp/utils';
 import { ISingleDataItem } from '../../models/DataEntity';
 import { EntityList } from '../../models/entity';
 import ModalDialog from '../Dialog';
-import { count } from 'sms-length';
 interface ICallMenuProps {
     setCurrentItemIndex: (currentItemIndex: number) => void;
     currentItemIndex: number;
@@ -131,7 +130,7 @@ const CallMenu = (props: ICallMenuProps) => {
     const isDialCount = callData?.filter(obj => obj.get('needToDialog'));
     const isAllCount = callData?.filter(obj => obj.get('needToDialog') || obj.get('needToSendSMS'));
     const isValidPhones = callData?.filter(obj => obj.get('phone') && (obj.get('phone').length >= 8 && obj.get('phone').length <= 13));
-    const isValidSMS = callData?.filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0 && obj.get('smsBody').length < count(obj.get('smsBody')).characterPerMessage && obj.get('phone') && (obj.get('phone').length >= 8 && obj.get('phone').length <= 13));
+    const isValidSMS = callData?.filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0 && obj.get('smsBody').length < 900 && obj.get('phone') && (obj.get('phone').length >= 8 && obj.get('phone').length <= 13));
     let countSms = 0;
     if (isSMSCount && isValidSMS) {
         countSms = isSMSCount?.size - isValidSMS?.size;
@@ -141,7 +140,7 @@ const CallMenu = (props: ICallMenuProps) => {
         const tempPhoneCount = isAllCount?.size - isValidPhones?.size;
         phoneCount = tempPhoneCount >= 0 ? tempPhoneCount : 0
     }
-    const dialogDescription = `You confirm the sending of all messages ? ${isValidSMS?.size} SMS will be sent. ${countSms && countSms > 0 ? countSms === 1 ? countSms + ' message' + ' have incorrect number format or empty message body' : countSms + ' messages' + ' have incorrect number format or empty message body' : ''}`
+    const dialogDescription = `You confirm the sending of messages ? ${isValidSMS?.size} SMS will be sent. ${countSms && countSms > 0 ? countSms === 1 ? countSms + ' message' + ' have incorrect number format or message body' : countSms + ' messages' + ' have incorrect number format or message body' : ''}`
 
     return (
         <>
@@ -208,9 +207,10 @@ const CallMenu = (props: ICallMenuProps) => {
             <ModalDialog
                 handleCancel={handleCancel}
                 handleConfirm={handleConfirm}
+                wrong={countSms > 0 ? true : false}
                 dialogKey='sendAllSMS'
                 visible={sendAllSMSVisible}
-                title='Send all sms'
+                title={countSms > 0 ? 'Not all sms will be sent' : 'Send all sms'}
                 description={dialogDescription}
                 confirmButtonText='Send'
             />

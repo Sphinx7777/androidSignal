@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { StyleSheet, View, ScrollView, Text, TouchableOpacity, ActivityIndicator, PermissionsAndroid, Platform, NativeModules } from 'react-native';
+import { StyleSheet, View, ScrollView, Text, TouchableOpacity, ActivityIndicator, PermissionsAndroid, Platform, NativeModules, ToastAndroid } from 'react-native';
 import { connect } from 'react-redux';
 import CallMenu from './CallMenu';
 import CustomInput from './CustomInput';
@@ -11,8 +11,6 @@ import ContactList from './ContactList';
 import CallDetectorManager from 'react-native-call-detection';
 import CallLogs from 'react-native-call-log';
 import { isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
-import { count } from 'sms-length';
-import { ToastAndroid } from 'react-native';
 const DirectSms = NativeModules.DirectSms;
 const DirectDial = NativeModules.DirectDial;
 
@@ -233,12 +231,7 @@ class Signal extends React.Component<ISignalProps> {
             );
             if (grantedSendSms === PermissionsAndroid.RESULTS.GRANTED && grantedReadSms === PermissionsAndroid.RESULTS.GRANTED && dataSmsArray.length > 0) {
                 for await (const one of dataSmsArray) {
-                    const smsLength = count(one.smsBody)
-                    console.log('--------------------------------------')
-                    console.log('send_sms_to --->', one.phone, 'body===', one.smsBody)
-                    console.log('smsLength===', smsLength)
-                    console.log('--------------------------------------')
-                    if (one.phone && (one.phone.length >= 8 && one.phone.length <= 13) && one.smsBody && one.smsBody.length > 0 && one.smsBody.length < smsLength.characterPerMessage) {
+                    if (one.phone && (one.phone.length >= 8 && one.phone.length <= 13) && one.smsBody && one.smsBody.length > 0 && one.smsBody.length < 900) {
                         const response = await DirectSms.sendDirectSms(one.phone, one.smsBody);
                         if (response) {
                             showToastWithGravityAndOffset(`Message sent to number: ${one.phone}`)

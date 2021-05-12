@@ -7,6 +7,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 import android.telephony.SmsManager;
+import java.util.ArrayList;
 
 
 public class DirectSmsModule extends ReactContextBaseJavaModule {
@@ -25,7 +26,12 @@ public class DirectSmsModule extends ReactContextBaseJavaModule {
     public void sendDirectSms(String numbers, String msg, Promise res) {
         try {    
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(numbers, null, msg, null, null);
+
+            ArrayList<String> parts = smsManager.divideMessage(msg);
+            smsManager.sendMultipartTextMessage(numbers, null, parts, null, null);
+
+            // smsManager.sendTextMessage(numbers, null, msg, null, null);
+            
             res.resolve(true);
         } catch (Exception ex) {
             res.resolve(false);

@@ -11,15 +11,16 @@ interface IModalDialogProps {
     description?: string;
     confirmButtonText?: string;
     containerStile?: object;
+    wrong?: boolean;
 }
 
 const ModalDialog = (props: IModalDialogProps) => {
-    const { handleCancel, handleConfirm, dialogKey, title = 'Confirm', description = 'Do you confirm this action?', visible, containerStile = {}, confirmButtonText = 'Confirm' } = props;
+    const { wrong, handleCancel, handleConfirm, dialogKey, title = 'Confirm', description = 'Do you confirm this action?', visible, containerStile = {}, confirmButtonText = 'Confirm' } = props;
 
     return(
         <View style={{...styles.dialogContainer, ...containerStile}}>
         <Dialog.Container visible={visible}>
-            <Dialog.Title>{title}</Dialog.Title>
+            <Dialog.Title style={{color: wrong ? 'red' : 'green'}}>{title}</Dialog.Title>
             <Dialog.Description>{description}</Dialog.Description>
             <Dialog.Button label='Cancel' onPress={() => handleCancel(dialogKey)} />
             <Dialog.Button label={confirmButtonText} onPress={() => handleConfirm(dialogKey)} />
