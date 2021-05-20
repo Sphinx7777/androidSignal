@@ -2,7 +2,7 @@ import action from '../decoradors/action';
 import Entity, { CRUD, EntityMap } from './entity';
 import { call, put } from 'redux-saga/effects';
 import { ENTITY, HTTP_METHOD } from '../constants';
-import { setSubmitData, defaultSubmitData } from '../redux/actions';
+import { setSubmitData, defaultSubmitData, IMethod } from '../redux/actions';
 import { showToastWithGravityAndOffset, isNetworkAvailable } from 'signalApp/utils';
 import { ICallLog } from 'signalApp/components/Signal';
 
@@ -74,6 +74,19 @@ class DataEntity extends Entity {
     public * getData(data: any) {
         const isConnected = yield isNetworkAvailable()
         if (isConnected.isConnected) {
+            const { response } = yield call(this.xRead, 'http://ix.rebaltic.lt/api/signal', data, HTTP_METHOD.POST);
+            showToastWithGravityAndOffset(`${response?.pager?.count > 0 ? 'Successfully get data !' : 'No data for the Signal APP'}`);
+        } else {
+            showToastWithGravityAndOffset('No internet connect !!!');
+        }
+    }
+
+    @action()
+    public * reloadData(data: any) {
+        const isConnected = yield isNetworkAvailable()
+        if (isConnected.isConnected) {
+            const glob = { entity: this,  crud: IMethod.CLEAR }
+            yield put({type: ENTITY.SIGNAL_DATA, glob});
             const { response } = yield call(this.xRead, 'http://ix.rebaltic.lt/api/signal', data, HTTP_METHOD.POST);
             showToastWithGravityAndOffset(`${response?.pager?.count > 0 ? 'Successfully get data !' : 'No data for the Signal APP'}`);
         } else {

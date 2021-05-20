@@ -35,13 +35,14 @@ interface ISignalProps {
     dataItems?: EntityList<ISingleDataItem>;
     user?: any;
     getData?: (data: any) => void;
+    reloadData?: (data: any) => void;
     setSubmitData?: (data: any) => void;
     clearSubmitData?: () => void;
     navigation?: any;
     submitData: any;
     route?: any;
 }
-@saga(DataEntity, ['getData', 'setSubmitData', 'clearSubmitData'])
+@saga(DataEntity, ['getData', 'reloadData', 'setSubmitData', 'clearSubmitData'])
 class Signal extends React.Component<ISignalProps> {
 
     state = {
@@ -94,8 +95,8 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     getDataSignal = () => {
-        const { getData } = this.props;
-        getData({ pageName: 'signal', perPage: 100, filter: { mobileInfo: ['needToDialog', 'needToSendSMS'] } })
+        const { reloadData } = this.props;
+        reloadData({ pageName: 'signal', perPage: 200, filter: { mobileInfo: ['needToDialog', 'needToSendSMS'] } })
     }
 
     setIsStart = (isStart: boolean) => {
