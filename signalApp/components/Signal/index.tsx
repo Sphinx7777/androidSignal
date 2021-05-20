@@ -10,7 +10,7 @@ import { EntityList } from '../../models/entity';
 import ContactList from './ContactList';
 import CallDetectorManager from 'react-native-call-detection';
 import CallLogs from 'react-native-call-log';
-import { isNetworkAvailable, showToastWithGravityAndOffset } from '../../utils';
+import { isNetworkAvailable, showToastWithGravityAndOffset, sleep } from '../../utils';
 const DirectSms = NativeModules.DirectSms;
 const DirectDial = NativeModules.DirectDial;
 
@@ -56,7 +56,8 @@ class Signal extends React.Component<ISignalProps> {
         pause: false,
         responseDialog: null,
         isInternet: true,
-        currentElementId: null
+        currentElementId: null,
+        messagesUpload: false
     }
 
     getSignalData = async () => {
@@ -97,6 +98,7 @@ class Signal extends React.Component<ISignalProps> {
     getDataSignal = () => {
         const { reloadData } = this.props;
         reloadData({ pageName: 'signal', perPage: 200, filter: { mobileInfo: ['needToDialog', 'needToSendSMS'] } })
+        this.setCurrentElement(null)
     }
 
     setIsStart = (isStart: boolean) => {
@@ -231,24 +233,36 @@ class Signal extends React.Component<ISignalProps> {
                 },
             );
             if (grantedSendSms === PermissionsAndroid.RESULTS.GRANTED && grantedReadSms === PermissionsAndroid.RESULTS.GRANTED && dataSmsArray.length > 0) {
+                showToastWithGravityAndOffset(`Sending messages started`)
+                this.setState({messagesUpload: true})
+                let count = 0
                 for await (const one of dataSmsArray) {
                     if (one.phone && (one.phone.length >= 8 && one.phone.length <= 13) && one.smsBody && one.smsBody.length > 0 && one.smsBody.length < 900) {
-                        const response = await DirectSms.sendDirectSms(one.phone, one.smsBody);
+                        const response = await this.senOneSms(one.phone, one.smsBody)
                         if (response) {
                             showToastWithGravityAndOffset(`Message sent to number: ${one.phone}`)
+                            count = count + 1
                             this.props.setSubmitData(
                                 { id: one.id, needToSendSMS: false, smsSend: { sendDate: Math.round(new Date().getTime() / 1000), phoneNumber: one.phone, smsBody: one.smsBody } })
+                        } else {
+                            showToastWithGravityAndOffset(`Message not sent to number: ${one.phone}`)
                         }
-                    } else {
-                        showToastWithGravityAndOffset(`ERROR, incorrect number ${one.phone} or wrong sms length`, ToastAndroid.LONG)
                     }
                 }
+                showToastWithGravityAndOffset(`Sent ${count} messages`)
+                this.setState({messagesUpload: false})
             } else {
                 console.log('SMS permission denied');
             }
         } catch (err) {
             console.warn('SMS permission_ERROR', err);
         }
+    }
+
+    senOneSms = async (phone: string, smsBody: string) => {
+        const response = await DirectSms.sendDirectSms(phone, smsBody);
+        await sleep(10000)
+        return response;
     }
 
     makeNextDialogLogic = (event: string, num: string, res: ICallLog[]) => {
@@ -328,7 +342,29 @@ class Signal extends React.Component<ISignalProps> {
                     if (event === 'Disconnected') {
                         const res = await this.fetchData();
                         if (res && res.length > 0 && res[0]['type'] === 'OUTGOING') {
-                            this.makeNextDialogLogic(event, num, res);
+                            const { currentElement } = this.state;
+                            const response = res && res.length > 0 && res[0] || null;
+                            console.log('event -> ',
+                            event + (num ? ' - ' + num : ''));
+                            if (res && res['phoneNumber'] === currentElement?.get('phone') && response['duration'] === 0) {
+                                console.log('--------------------------------------------------------------------------------');
+                                console.log('event -> ', event, 'num -> ', num, 'response -> ', response);
+                                console.log('--------------------------------------------------------------------------------');
+                                console.log('currentElementPhone -> ', currentElement.get('phone'));
+                                console.log('--------------------------------------------------------------------------------');
+                                this.setDialog(response, currentElement?.get('id'))
+                            }
+                            if (response && response['phoneNumber'] === currentElement?.get('phone') && response['duration'] > 0) {
+                                console.log('--------------------------------------------------------------------------------');
+                                console.log('event -> ', event, 'num -> ', num, 'response -> ', response);
+                                console.log('--------------------------------------------------------------------------------');
+                                console.log('currentElementPhone -> ', currentElement.get('phone'));
+                                console.log('--------------------------------------------------------------------------------');
+                                this.setDialog(response, currentElement?.get('id'))
+                            }
+
+
+                            // this.makeNextDialogLogic(event, num, res);
                         }
                     } else if (event === 'Connected') {
                         console.log('event -> ',
@@ -557,6 +593,7 @@ class Signal extends React.Component<ISignalProps> {
                     <ScrollView style={styles.container}>
                         <CustomInput
                             dataItems={dataItems}
+                            messagesUpload={this.state.messagesUpload}
                             setNextElement={this.setNextElement}
                             onDetailsPress={onDetailsPress}
                             responseDialog={responseDialog}
@@ -568,6 +605,7 @@ class Signal extends React.Component<ISignalProps> {
                             sendSMS={this.sendDirectSms} />
                         <CallMenu
                             pause={pause}
+                            messagesUpload={this.state.messagesUpload}
                             getData={this.props.getData}
                             getDataSignal={this.getDataSignal}
                             pausePress={this.pausePress}

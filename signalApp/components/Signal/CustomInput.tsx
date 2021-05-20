@@ -32,6 +32,7 @@ interface ICustomInputProps {
     onDetailsPress?: (id: string) => void;
     setNextElement: (a: any, b: any) => void;
     dataItems: EntityList<ISingleDataItem>;
+    messagesUpload?: boolean;
 }
 interface ICustomInputState {
     taskCreated: number;
@@ -48,7 +49,7 @@ interface ICustomInputState {
     reference: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
-    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement, dataItems } = props;
+    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement, dataItems, messagesUpload } = props;
     const [finishedVisible, setFinishedVisible] = useState(false)
     const [sendCustomSMSVisible, setSendCustomSMSVisible] = useState(false)
     const currentElTaskCreated = currentElement?.get('taskCreated') || null;
@@ -391,10 +392,10 @@ const CustomInput = (props: ICustomInputProps) => {
                 }
                 <View style={styles.sendButtonContainer}>
                     <TouchableOpacity
-                        style={(state.smsBody.length !== 0 && currentElement)
+                        style={(state.smsBody.length !== 0 && currentElement && !messagesUpload)
                             ? { ...styles.button, ...styles.sendButton }
                             : { ...styles.button, ...styles.sendButton, ...styles.disabled }}
-                        disabled={state.smsBody.length === 0 || !currentElement}
+                        disabled={state.smsBody.length === 0 || !currentElement || messagesUpload}
                         onPress={() => showDialog('sendCustomSMS')}>
                         <Text style={styles.buttonText}>Custom sms</Text>
                     </TouchableOpacity>
@@ -418,10 +419,9 @@ const CustomInput = (props: ICustomInputProps) => {
             <ModalDialog
                 handleCancel={handleCancel}
                 handleConfirm={handleDelete}
-                wrong={messagesCount > 1 ? true : false}
                 dialogKey='sendCustomSMS'
                 visible={sendCustomSMSVisible}
-                title={messagesCount > 1 ? 'Will be paid ' + `${messagesCount} sms. Continue ?` : 'Send custom sms'}
+                title={'The following SMS will be sent, please confirm'}
                 description={dialogDescription}
                 confirmButtonText='Send'
             />

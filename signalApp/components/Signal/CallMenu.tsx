@@ -18,6 +18,7 @@ interface ICallMenuProps {
     getDataSignal?: () => void;
     currentElement: ISingleDataItem;
     getData?: (data: any) => void;
+    messagesUpload?: boolean;
 }
 interface ICallMenuState {
     callStart: boolean;
@@ -26,7 +27,7 @@ interface ICallMenuState {
 
 const CallMenu = (props: ICallMenuProps) => {
     const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, pausePress,
-            pause, getDataSignal, currentElement, getData } = props;
+            pause, getDataSignal, currentElement, getData, messagesUpload } = props;
     const [sendAllSMSVisible, setSendAllSMSVisible] = useState(false)
 
 
@@ -34,6 +35,8 @@ const CallMenu = (props: ICallMenuProps) => {
         callStart: false,
         mobileSearch: ''
     })
+
+    const calling = () => currentElement && makeCall(currentElement?.get('phone'), 'disable')
 
     const handleNextPress = async () => {
         if (callData && currentItemIndex < callData?.size - 1) {
@@ -148,7 +151,7 @@ const CallMenu = (props: ICallMenuProps) => {
                 <View style={styles.container}>
                     <View style={styles.textBlock}>
                         <Text style={{marginBottom: 2, color: isSMSCount?.size > 0 ? 'green' : 'black'}}>{`Need send ${isSMSCount?.size || 0} sms`}</Text>
-                        <Text style={{marginBottom: 2, color: countSms > 0 ? 'red' : 'black'}}>{`${countSms || 0} sms have incorrect number format or wrong sms length for 1 msg`}</Text>
+                        <Text style={{marginBottom: 2, color: countSms > 0 ? 'red' : 'black'}}>{`${countSms || 0} sms have incorrect number format or empty sms body`}</Text>
                         <Text style={{marginBottom: 2, color: isDialCount?.size > 0 ? 'green' : 'black'}}>{`Need to make ${isDialCount?.size || 0} calls`}</Text>
                         <Text style={{color: phoneCount > 0 ? 'red' : 'black'}}>{`${phoneCount || 0} items have incorrect number format`}</Text>
                         <TouchableOpacity
@@ -159,28 +162,40 @@ const CallMenu = (props: ICallMenuProps) => {
                     </View>
                     <View style={styles.buttonsBlock}>
                         <TouchableOpacity
-                            style={currentElement ? { ...styles.button, marginTop: 1, marginBottom: 15 }
+                            style={currentElement ? { ...styles.button,  backgroundColor: '#147d46', borderColor: '#147d46', marginTop: 1, marginBottom: 15 }
                                 : { ...styles.button, marginTop: 1, marginBottom: 15, ...styles.disabled }
                             }
-                            onPress={!pause ? handlePausePress : handleContinuePress}
+                            onPress={calling}
                             disabled={!currentElement}
                         >
-                            <Text style={{ ...styles.buttonText, marginTop: 5 }}>{!pause ? 'Pause' : 'Continue'}</Text>
+                            <View style={{ width: '100%', paddingHorizontal: 20, paddingVertical: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
+                            <Text style={{ marginRight: 5, color: 'white', fontSize: 20, fontWeight: '700', letterSpacing: 2}}>Call</Text>
+                            <Image style={{ width: 40, height: 40 }}
+                            source={require('../../../assets/phone_call_4.png')}
+                            />
+                            </View>
+                            {/* <Text style={{ ...styles.buttonText, marginTop: 5 }}>{!pause ? 'Pause' : 'Continue'}</Text> */}
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={currentElement ? { ...styles.button, marginBottom: 15, paddingVertical: 3 }
-                                : { ...styles.button, marginBottom: 15, paddingVertical: 3, ...styles.disabled }
+                            style={currentElement ? { ...styles.button, backgroundColor: '#147d46', borderColor: '#147d46', marginBottom: 15, marginTop: 5 }
+                                : { ...styles.button, marginBottom: 15, marginTop: 5, ...styles.disabled }
                             }
                             onPress={handleNextPress}
                             disabled={!currentElement}
                         >
-                            <Text style={styles.buttonText}>Next <Image style={{ width: 15, height: 15 }} source={require('../../../assets/phone-volume-solid.png')} /></Text>
+                            <View style={{width: '100%', paddingHorizontal: 20, paddingVertical: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
+                            <Text style={{ marginRight: 5, color: 'black', fontSize: 20, fontWeight: '700', letterSpacing: 2}}>Next</Text>
+                            <Image style={{ width: 35, height: 35 }}
+                            source={require('../../../assets/next_call.png')}
+                            />
+                            </View>
+                            {/* <Text style={styles.buttonText}>Next <Image style={{ width: 15, height: 15 }} source={require('../../../assets/phone-volume-solid.png')} /></Text> */}
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={(dataSmsArray && dataSmsArray?.size > 0)
-                                ? { ...styles.button, paddingVertical: 3 }
+                            style={(dataSmsArray && dataSmsArray?.size > 0 && !messagesUpload)
+                                ? { ...styles.button, paddingVertical: 3, paddingTop: 4 }
                                 : { ...styles.button, paddingVertical: 3, ...styles.disabled }}
-                            disabled={!dataSmsArray || dataSmsArray?.size === 0 ? true : false}
+                            disabled={!dataSmsArray || dataSmsArray?.size === 0 || messagesUpload ? true : false}
                             onPress={() => showDialog('sendAllSMS')}>
                             <Text style={styles.buttonText}>{`Send all sms: ${isSMSCount?.size || 0}`}</Text>
                         </TouchableOpacity>
@@ -200,7 +215,7 @@ const CallMenu = (props: ICallMenuProps) => {
                         style={{width: '20%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
                         onPress={handleSearchPress}
                         disabled={!currentElement}>
-                        <Image style={{ width: 20, height: 20, padding: 10 }} source={require('../../../assets/search.png')} />
+                        <Image style={{ width: 20, height: 20, padding: 10, backgroundColor: 'white' }}  source={require('../../../assets/search.png')} />
                     </TouchableOpacity>
                 </View>
             </View>

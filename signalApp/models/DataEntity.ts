@@ -100,11 +100,12 @@ class DataEntity extends Entity {
         const crud: CRUD = submitData.crud === CRUD.DELETE ? CRUD.DELETE : CRUD.UPDATE
         if (isConnected.isConnected) {
             yield call(this.xSave, 'http://ix.rebaltic.lt/api/signal', crud, submitData, HTTP_METHOD.PUT);
-            showToastWithGravityAndOffset('Successfully submit !');
+            if (!submitData.smsSend) {
+                showToastWithGravityAndOffset('Successfully submit !');
+            }
         } else {
             showToastWithGravityAndOffset('No internet connect !!!');
         }
-        console.log('setSubmitData', submitData)
         // yield put(setSubmitData({ submitData }));
     }
 

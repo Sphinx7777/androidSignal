@@ -6,6 +6,8 @@ export const isNetworkAvailable = async () => {
     return Promise.resolve(response);
 }
 
+export const sleep = (waitTimeInMs: number) => new Promise((resolve) => setTimeout(resolve, waitTimeInMs));
+
 export const getStringDate: (date: Date) => string = (date: Date) => {
     const m = date.getMonth() + 1;
     const d = date.getDate()
