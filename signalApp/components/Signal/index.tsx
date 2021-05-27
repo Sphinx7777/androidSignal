@@ -237,7 +237,7 @@ class Signal extends React.Component<ISignalProps> {
                 this.setState({messagesUpload: true})
                 let count = 0
                 for await (const one of dataSmsArray) {
-                    if (one.phone && (one.phone.length >= 8 && one.phone.length <= 13) && one.smsBody && one.smsBody.length > 0 && one.smsBody.length < 900) {
+                    if (one.phone && one.phone.length >= 9 && one.smsBody && one.smsBody.length > 0 && one.smsBody.length < 900) {
                         const response = await this.senOneSms(one.phone, one.smsBody)
                         if (response) {
                             showToastWithGravityAndOffset(`Message sent to number: ${one.phone}`)
@@ -438,7 +438,7 @@ class Signal extends React.Component<ISignalProps> {
             },
         );
         if (grantedCall === PermissionsAndroid.RESULTS.GRANTED && grantedLog === PermissionsAndroid.RESULTS.GRANTED && !currentPause) {
-            if (num && (num.length >= 8 && num.length <= 13)) {
+            if (num && num.length >= 9) {
                 const res = await DirectDial.createDial(num)
                 return Promise.resolve(res)
             } else {
