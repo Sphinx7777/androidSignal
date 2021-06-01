@@ -30,6 +30,7 @@ export interface ICallLog {
     rawType: number;
     timestamp: string;
     type: string;
+    userId?: string;
 }
 interface ISignalProps {
     dataItems?: EntityList<ISingleDataItem>;
@@ -174,7 +175,8 @@ class Signal extends React.Component<ISignalProps> {
     };
 
     sendDirectSms = async (data: { id: string, phone: string, smsBody: string } | null = null) => {
-        const { dataItems } = this.props;
+        const { dataItems, user } = this.props;
+        const userId = user && user.id
         let dataSmsArray = [] as IDataItem[];
         const tempDataSmsArray: IDataItem[] = dataItems.valueSeq().filter(obj => obj.get('needToSendSMS'))?.toJS() || []
         if (dataItems && dataItems.size > 0 && !data) {
@@ -243,7 +245,7 @@ class Signal extends React.Component<ISignalProps> {
                             showToastWithGravityAndOffset(`Message sent to number: ${one.phone}`)
                             count = count + 1
                             this.props.setSubmitData(
-                                { id: one.id, needToSendSMS: false, smsSend: { sendDate: Math.round(new Date().getTime() / 1000), phoneNumber: one.phone, smsBody: one.smsBody } })
+                                { id: one.id, needToSendSMS: false, smsSend: { sendDate: Math.round(new Date().getTime() / 1000), phoneNumber: one.phone, smsBody: one.smsBody, userId } })
                         } else {
                             showToastWithGravityAndOffset(`Message not sent to number: ${one.phone}`)
                         }
@@ -312,12 +314,15 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     setDialog = (responseDialog: ICallLog, id: string) => {
+        const { user } = this.props.user
         this.setState((prevState) => {
             return {
                 ...prevState,
                 responseDialog
             }
         })
+        const userId = user && user.id;
+        responseDialog['userId'] = userId;
         this.props.setSubmitData({ id, responseDialog })
     }
 
