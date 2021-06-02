@@ -31,6 +31,7 @@ export interface ICallLog {
     timestamp: string;
     type: string;
     userId?: string;
+    senderName?: string;
 }
 interface ISignalProps {
     dataItems?: EntityList<ISingleDataItem>;
@@ -176,7 +177,12 @@ class Signal extends React.Component<ISignalProps> {
 
     sendDirectSms = async (data: { id: string, phone: string, smsBody: string } | null = null) => {
         const { dataItems, user } = this.props;
-        const userId = user && user.id
+        let userId = ''
+        let senderName = ''
+        if (user) {
+            userId = user.id
+            senderName = `${user.firstName ? user.firstName : ''} ${user.lastName ? user.lastName : ''}`
+        }
         let dataSmsArray = [] as IDataItem[];
         const tempDataSmsArray: IDataItem[] = dataItems.valueSeq().filter(obj => obj.get('needToSendSMS'))?.toJS() || []
         if (dataItems && dataItems.size > 0 && !data) {
@@ -245,7 +251,12 @@ class Signal extends React.Component<ISignalProps> {
                             showToastWithGravityAndOffset(`Message sent to number: ${one.phone}`)
                             count = count + 1
                             this.props.setSubmitData(
-                                { id: one.id, needToSendSMS: false, smsSend: { sendDate: Math.round(new Date().getTime() / 1000), phoneNumber: one.phone, smsBody: one.smsBody, userId } })
+                                { id: one.id, needToSendSMS: false, smsSend: {
+                                    sendDate: Math.round(new Date().getTime() / 1000),
+                                    phoneNumber: one.phone,
+                                    smsBody: one.smsBody,
+                                    userId,
+                                    senderName } })
                         } else {
                             showToastWithGravityAndOffset(`Message not sent to number: ${one.phone}`)
                         }
@@ -321,8 +332,14 @@ class Signal extends React.Component<ISignalProps> {
                 responseDialog
             }
         })
-        const userId = user && user.id;
+        let userId = ''
+        let senderName = ''
+        if (user) {
+            userId = user.id
+            senderName = `${user.firstName ? user.firstName : ''} ${user.lastName ? user.lastName : ''}`
+        }
         responseDialog['userId'] = userId;
+        responseDialog['senderName'] = senderName;
         this.props.setSubmitData({ id, responseDialog })
     }
 
