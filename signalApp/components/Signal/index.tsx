@@ -250,8 +250,9 @@ class Signal extends React.Component<ISignalProps> {
                         if (response) {
                             showToastWithGravityAndOffset(`Message sent to number: ${one.phone}`)
                             count = count + 1
+                            this.props.setSubmitData({ id: one.id, needToSendSMS: false })
                             this.props.setSubmitData(
-                                { id: one.id, needToSendSMS: false, smsSend: {
+                                { id: one.id, smsSend: {
                                     sendDate: Math.round(new Date().getTime() / 1000),
                                     phoneNumber: one.phone,
                                     smsBody: one.smsBody,
@@ -325,21 +326,23 @@ class Signal extends React.Component<ISignalProps> {
     }
 
     setDialog = (responseDialog: ICallLog, id: string) => {
-        const { user } = this.props.user
-        this.setState((prevState) => {
-            return {
-                ...prevState,
-                responseDialog
-            }
-        })
+        const { user } = this.props
         let userId = ''
         let senderName = ''
         if (user) {
             userId = user.userId
             senderName = `${user.firstName ? user.firstName : ''} ${user.lastName ? user.lastName : ''}`
         }
+
         responseDialog['userId'] = userId;
         responseDialog['senderName'] = senderName;
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                responseDialog
+            }
+        })
+        console.log('responseDialog', responseDialog)
         this.props.setSubmitData({ id, responseDialog })
     }
 
@@ -368,7 +371,7 @@ class Signal extends React.Component<ISignalProps> {
                             const response = res && res.length > 0 && res[0] || null;
                             console.log('event -> ',
                             event + (num ? ' - ' + num : ''));
-                            if (res && res['phoneNumber'] === currentElement?.get('phone') && response['duration'] === 0) {
+                            if (response && response['phoneNumber'] === currentElement?.get('phone') && response['duration'] === 0) {
                                 console.log('--------------------------------------------------------------------------------');
                                 console.log('event -> ', event, 'num -> ', num, 'response -> ', response);
                                 console.log('--------------------------------------------------------------------------------');
