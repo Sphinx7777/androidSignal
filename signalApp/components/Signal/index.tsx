@@ -180,7 +180,7 @@ class Signal extends React.Component<ISignalProps> {
         let userId = ''
         let senderName = ''
         if (user) {
-            userId = user.id
+            userId = user.userId
             senderName = `${user.firstName ? user.firstName : ''} ${user.lastName ? user.lastName : ''}`
         }
         let dataSmsArray = [] as IDataItem[];
@@ -335,7 +335,7 @@ class Signal extends React.Component<ISignalProps> {
         let userId = ''
         let senderName = ''
         if (user) {
-            userId = user.id
+            userId = user.userId
             senderName = `${user.firstName ? user.firstName : ''} ${user.lastName ? user.lastName : ''}`
         }
         responseDialog['userId'] = userId;
