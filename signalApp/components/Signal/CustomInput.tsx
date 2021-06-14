@@ -47,6 +47,9 @@ interface ICustomInputState {
     currentComments: string;
     dueDate: number;
     reference: string;
+    pastYearsComment: string;
+    price: string;
+    calledAbout: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
     const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement, dataItems, messagesUpload } = props;
@@ -71,6 +74,9 @@ const CustomInput = (props: ICustomInputProps) => {
     const currentElCurrentComments = currentElement?.get('currentComments') ? currentElement?.get('currentComments') : '';
     const currentElTaskName = currentElement?.get('taskName') ? currentElement?.get('taskName') : '';
     const currentElCurrentYearComment = currentElement?.get('currentYearComment') ? currentElement?.get('currentYearComment') : '';
+    const currentElPastYearComment = currentElement?.get('pastYearsComment') ? currentElement?.get('pastYearsComment') : '';
+    const currentElPBCalledAbout = currentElement?.get('calledAbout') ? currentElement?.get('calledAbout') : '';
+    const currentElPBPrice = currentElement?.get('price') ? String(currentElement?.get('price')) : '';
     const currentElTeamDate = currentElement?.get('teamDate') ? currentElement?.get('teamDate') : null;
     const currentElBrokersDate = currentElement?.get('allBrokersBaseDate') ? currentElement?.get('allBrokersBaseDate') : null;
     const currentElPhone = currentElement?.get('phone') ? currentElement?.get('phone') : null;
@@ -86,13 +92,16 @@ const CustomInput = (props: ICustomInputProps) => {
         smsBody: currentElSmsBody,
         taskDescription: currentElTaskDescription,
         currentYearComment: currentElCurrentYearComment,
+        pastYearsComment: currentElPastYearComment,
         teamDate: currentElTeamDate,
         allBrokersBaseDate: currentElBrokersDate,
         phone: currentElPhone,
         taskName: currentElTaskName,
         currentComments: currentElCurrentComments,
         dueDate: currentElDueDate,
-        reference: currentElReference
+        reference: currentElReference,
+        price: currentElPBPrice,
+        calledAbout: currentElPBCalledAbout
     })
 
     useEffect(() => {
@@ -103,6 +112,7 @@ const CustomInput = (props: ICustomInputProps) => {
                 details: currentElDetails,
                 smsBody: currentElSmsBody,
                 taskDescription: currentElTaskDescription,
+                pastYearsComment: currentElPastYearComment,
                 currentYearComment: currentElCurrentYearComment,
                 teamDate: currentElTeamDate,
                 allBrokersBaseDate: currentElBrokersDate,
@@ -110,7 +120,9 @@ const CustomInput = (props: ICustomInputProps) => {
                 taskName: currentElTaskName,
                 currentComments: currentElCurrentComments,
                 dueDate: currentElDueDate,
-                reference: currentElReference
+                reference: currentElReference,
+                price: currentElPBPrice,
+                calledAbout: currentElPBCalledAbout
             }
         })
     }, [currentElement])
@@ -152,7 +164,11 @@ const CustomInput = (props: ICustomInputProps) => {
         e.preventDefault()
         const isConnected = await isNetworkAvailable()
         const data = { [name]: state[name], id: currentElement?.get('id') }
-        const isChanged = state[name] !== currentElement?.get(name)
+        let isChanged = state[name] !== currentElement?.get(name)
+        if (name === 'price') {
+            data['price'] = Number(data['price'])
+            isChanged = Number(state['price']) !== Number(currentElement?.get('price'))
+        }
         if (isConnected.isConnected && currentElement && isChanged) {
             setSubmitData(data)
         } else {
@@ -311,7 +327,7 @@ const CustomInput = (props: ICustomInputProps) => {
                                 elDate={currentElement?.get('teamDate')}
                                 handleOkClick={handlePickerOkClick}
                                 itemKey='teamDate'
-                                title='Team sheet date'
+                                title='DBX - 1st contact date'
                                 containerStile={{ marginBottom: 5 }}
                             />
                         </View>
@@ -339,15 +355,6 @@ const CustomInput = (props: ICustomInputProps) => {
                     </>}
                 {isBrokersType &&
                     <>
-                        <View style={styles.inputContainer}>
-                            <IsMobileDatePicker
-                                elDate={currentElement?.get('allBrokersBaseDate')}
-                                handleOkClick={handlePickerOkClick}
-                                itemKey='allBrokersBaseDate'
-                                title='All brokers sheet date'
-                                containerStile={{ marginVertical: 5 }}
-                            />
-                        </View>
                         <MobileInput
                             value={state.currentYearComment}
                             label='Past buyer comment current year'
@@ -355,6 +362,37 @@ const CustomInput = (props: ICustomInputProps) => {
                             textKey='currentYearComment'
                             onEndEditing={editSubmit}
                             onChangeText={handleInputChange} />
+                        <MobileInput
+                            value={state.pastYearsComment}
+                            label='Past buyer comment past year'
+                            placeholder='Past buyer comment past year'
+                            textKey='pastYearsComment'
+                            onEndEditing={editSubmit}
+                            onChangeText={handleInputChange} />
+                        <MobileInput
+                            value={state.price}
+                            label='Past buyers - Last property price'
+                            placeholder='Past buyers - Last property price'
+                            textKey='price'
+                            keyboardType='numeric'
+                            onEndEditing={editSubmit}
+                            onChangeText={handleInputChange} />
+                        <MobileInput
+                            value={state.calledAbout}
+                            label='Past buyers - Last property street'
+                            placeholder='Past buyers - Last property street'
+                            textKey='calledAbout'
+                            onEndEditing={editSubmit}
+                            onChangeText={handleInputChange} />
+                        <View style={styles.inputContainer}>
+                            <IsMobileDatePicker
+                                elDate={currentElement?.get('allBrokersBaseDate')}
+                                handleOkClick={handlePickerOkClick}
+                                itemKey='allBrokersBaseDate'
+                                title='PB - Last property date called'
+                                containerStile={{ marginVertical: 5 }}
+                            />
+                        </View>
                     </>}
                 <MobileInput
                     value={state.phone}

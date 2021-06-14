@@ -33,6 +33,9 @@ export type ISingleDataItem = EntityMap<{
     taskCompleted?: boolean;
     currentComments?: string;
     reference?: string;
+    pastYearsComment?: string;
+    price?: string;
+    calledAbout?: string;
     }>;
 
 export interface IDataItem {
@@ -62,6 +65,9 @@ export interface IDataItem {
     taskCompleted?: boolean;
     currentComments?: string;
     reference?: string;
+    pastYearsComment?: string;
+    price?: string;
+    calledAbout?: string;
 }
 
 class DataEntity extends Entity {

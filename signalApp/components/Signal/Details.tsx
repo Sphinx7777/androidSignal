@@ -150,7 +150,7 @@ class Details extends React.Component<IDetailsProps> {
                     <View style={{...styles.showLine, marginBottom: 10}}>
                     {item?.asanaDataType
                         ? <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700', fontSize: 18 }}><Image style={{ width: 30, height: 30 }} source={require('../../../assets/asana.png')} /> {item?.searchType.replace('AD', '')}</Text>
-                        : <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700' }}>{item?.searchType}</Text>
+                        : <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700' }}>{item?.searchType.replace('BD', 'PB').replace('TD', 'DBX')}</Text>
                     }
                     </View>
                     {Object.keys(item).sort().map(o => {
@@ -188,7 +188,7 @@ class Details extends React.Component<IDetailsProps> {
                                 <DateChanged
                                 stateId={this.state.id}
                                 item={item}
-                                title='All brokers sheet date'
+                                title='PB - Last property date called'
                                 field={String(o)}
                                 handlePickerOkClick={this.handlePickerOkClick}
                                 containerStile={{marginVertical: 2}}/>
@@ -197,7 +197,7 @@ class Details extends React.Component<IDetailsProps> {
                                 <DateChanged
                                 stateId={this.state.id}
                                 item={item}
-                                title='Team sheet date'
+                                title='DBX - 1st contact date'
                                 field={String(o)}
                                 handlePickerOkClick={this.handlePickerOkClick}
                                 containerStile={{marginVertical: 2}}/>
