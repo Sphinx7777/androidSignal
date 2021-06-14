@@ -253,17 +253,17 @@ const CustomInput = (props: ICustomInputProps) => {
                             : <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700' }}>{currentElement?.get('searchType')?.replace('TD', 'DBX')?.replace('BD', 'PB')}</Text>
                         }
                     </View>
-                    {currentElement?.get('email')?.length > 0 && <View style={styles.nameLine}>
-                        <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 200 }}>{currentElement?.get('email')}</Text>
+                    {<View style={styles.nameLine}>
+                        <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 300 }}>Email: {currentElement?.get('email') ? currentElement?.get('email') : 'no info'}</Text>
+                        {!currentElement?.get('teamDataType') && <Text>not in the DBX <Image style={{ width: 18, height: 18 }} source={require('../../../assets/no.png')} /></Text>}
                     </View>}
+                    {}
                     <View style={styles.nameLine}>
                         <View style={{ display: 'flex', flexDirection: 'column' }}>
                             {isAsanaType && <Text style={styles.text}>Task created: {currentElTaskCreated > 0 ? getStringDate(new Date(currentElTaskCreated * 1000)) : 'no info'}</Text>}
                             {isAsanaType &&
                                 <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                     <Text style={styles.text}>Due date: {currentElDueDate ? getStringDate(new Date(currentElDueDate * 1000)) : 'no info'}</Text>
-                                    {currentElement?.get('taskCompleted') ? <Image style={{ width: 16, height: 16, marginLeft: 5 }} source={require('../../../assets/yes.png')} />
-                                        : <Image style={{ width: 14, height: 14, marginLeft: 5 }} source={require('../../../assets/no.png')} />}
                                 </View>
                             }
                             {isTeamType && currentElTeamDate > 0 && <Text style={styles.text}>TD date: {currentElTeamDate > 0 ? getStringDate(new Date(currentElTeamDate * 1000)) : 'no info'}</Text>}
@@ -301,7 +301,7 @@ const CustomInput = (props: ICustomInputProps) => {
                                 elDate={currentElement?.get('dueDate')}
                                 handleOkClick={handlePickerOkClick}
                                 itemKey='dueDate'
-                                title='Due date'
+                                title='Asana due date'
                                 containerStile={{ marginBottom: 5 }}
                             />
                         </View>

@@ -62,21 +62,22 @@ const ContactList = (props: IContactListProps) => {
                     <Text style={{...styles.text, color: isPhone ? 'black' : '#bf0416'}}>{item.phone && item.phone?.length > 0 ? item.phone : '--------'}</Text>
                     {item?.asanaDataType
                         ? <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-                            <Image style={{ width: 25, height: 25 }} source={require('../../../assets/asana.png')} />
-                            <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700', marginLeft: 5 }}>{item?.searchType?.replace('AD', '')?.replace('TD', 'DBX')?.replace('BD', 'PB')}</Text>
+                            <Image style={{ width: 25, height: 25, marginRight: 5 }} source={require('../../../assets/asana.png')} />
+                            <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700'}}>{item?.searchType?.replace('AD', '')?.replace('TD', 'DBX')?.replace('BD', 'PB')}</Text>
                             </View>
-                        : <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700' }}>{item?.searchType?.replace('TD', 'DBX')?.replace('BD', 'PB')}</Text>
+                        : <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700'}}>{item?.searchType?.replace('TD', 'DBX')?.replace('BD', 'PB')}</Text>
                     }
                 </View>
-                {item?.email && item?.email?.length > 0 && <Text style={styles.text}>{item?.email}</Text>}
+                {<View style={styles.nameLine}>
+                    <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 300 }}>Email: {item?.email ? item?.email : 'no info'}</Text>
+                    {!item.teamDataType && <Text>not in the DBX <Image style={{ width: 18, height: 18 }} source={require('../../../assets/no.png')} /></Text>}
+                </View>}
                 <View style={styles.nameLine}>
                     <View style={{display: 'flex', flexDirection: 'column'}}>
                     {isAsanaType && <Text style={styles.text}>Task created: {item?.taskCreated > 0 ? getStringDate(new Date(item?.taskCreated * 1000)) : 'no info'}</Text>}
                     {isAsanaType &&
                     <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                         <Text style={styles.text}>Due date: {item?.dueDate ? getStringDate(new Date(item?.dueDate * 1000)) : 'no info'}</Text>
-                        {item.taskCompleted ? <Image style={{ width: 16, height: 16, marginLeft: 5 }} source={require('../../../assets/yes.png')} />
-                                            : <Image style={{ width: 14, height: 14, marginLeft: 5 }} source={require('../../../assets/no.png')} />}
                     </View>
                     }
                     {isTeamType && item?.teamDate > 0 && <Text style={styles.text}>TD date: {item?.teamDate > 0 ? getStringDate(new Date(item?.teamDate * 1000)) : 'no info'}</Text>}

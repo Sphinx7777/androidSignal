@@ -206,7 +206,7 @@ class Details extends React.Component<IDetailsProps> {
                                 <DateChanged
                                 stateId={this.state.id}
                                 item={item}
-                                title='Due date'
+                                title='Asana due date'
                                 field={String(o)}
                                 handlePickerOkClick={this.handlePickerOkClick}
                                 containerStile={{marginVertical: 2}}/>
