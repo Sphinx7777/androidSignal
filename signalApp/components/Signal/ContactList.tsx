@@ -70,7 +70,7 @@ const ContactList = (props: IContactListProps) => {
                 </View>
                 {<View style={styles.nameLine}>
                     <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 300 }}>Email: {item?.email ? item?.email : 'no info'}</Text>
-                    {!item.teamDataType && <Text>not in the DBX <Image style={{ width: 18, height: 18 }} source={require('../../../assets/no.png')} /></Text>}
+                    {!item.teamDataType && <Text>not in the DBX <Image style={{ width: 16, height: 16 }} source={require('../../../assets/no.png')} /></Text>}
                 </View>}
                 <View style={styles.nameLine}>
                     <View style={{display: 'flex', flexDirection: 'column'}}>
