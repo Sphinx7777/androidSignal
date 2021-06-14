@@ -248,9 +248,9 @@ const CustomInput = (props: ICustomInputProps) => {
                         {currentElement?.get('asanaDataType')
                             ? <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                 <Image style={{ width: 25, height: 25 }} source={require('../../../assets/asana.png')} />
-                                <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700', marginHorizontal: 5 }}>{currentElement?.get('searchType').replace('AD', '')}</Text>
+                                <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700', marginHorizontal: 5 }}>{currentElement?.get('searchType').replace('AD', '')?.replace('TD', 'DBX')?.replace('BD', 'PB')}</Text>
                             </View>
-                            : <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700' }}>{currentElement?.get('searchType')}</Text>
+                            : <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700' }}>{currentElement?.get('searchType')?.replace('TD', 'DBX')?.replace('BD', 'PB')}</Text>
                         }
                     </View>
                     {currentElement?.get('email')?.length > 0 && <View style={styles.nameLine}>

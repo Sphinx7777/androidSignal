@@ -63,9 +63,9 @@ const ContactList = (props: IContactListProps) => {
                     {item?.asanaDataType
                         ? <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                             <Image style={{ width: 25, height: 25 }} source={require('../../../assets/asana.png')} />
-                            <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700', marginLeft: 5 }}>{item?.searchType.replace('AD', '')}</Text>
-                            </View> 
-                        : <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700' }}>{item?.searchType}</Text>
+                            <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700', marginLeft: 5 }}>{item?.searchType?.replace('AD', '')?.replace('TD', 'DBX')?.replace('BD', 'PB')}</Text>
+                            </View>
+                        : <Text style={{ ...styles.text, color: '#f77e59', fontWeight: '700' }}>{item?.searchType?.replace('TD', 'DBX')?.replace('BD', 'PB')}</Text>
                     }
                 </View>
                 {item?.email && item?.email?.length > 0 && <Text style={styles.text}>{item?.email}</Text>}
@@ -76,7 +76,7 @@ const ContactList = (props: IContactListProps) => {
                     <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                         <Text style={styles.text}>Due date: {item?.dueDate ? getStringDate(new Date(item?.dueDate * 1000)) : 'no info'}</Text>
                         {item.taskCompleted ? <Image style={{ width: 16, height: 16, marginLeft: 5 }} source={require('../../../assets/yes.png')} />
-                                            : <Image style={{ width: 14, height: 14, marginLeft: 5 }} source={require('../../../assets/no.png')} />} 
+                                            : <Image style={{ width: 14, height: 14, marginLeft: 5 }} source={require('../../../assets/no.png')} />}
                     </View>
                     }
                     {isTeamType && item?.teamDate > 0 && <Text style={styles.text}>TD date: {item?.teamDate > 0 ? getStringDate(new Date(item?.teamDate * 1000)) : 'no info'}</Text>}
