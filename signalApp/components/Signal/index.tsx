@@ -11,6 +11,7 @@ import ContactList from './ContactList';
 import CallDetectorManager from 'react-native-call-detection';
 import CallLogs from 'react-native-call-log';
 import { isNetworkAvailable, showToastWithGravityAndOffset, sleep } from '../../utils';
+import { INewRowValues } from 'signalApp/constants';
 const DirectSms = NativeModules.DirectSms;
 const DirectDial = NativeModules.DirectDial;
 
@@ -39,12 +40,13 @@ interface ISignalProps {
     getData?: (data: any) => void;
     reloadData?: (data: any) => void;
     setSubmitData?: (data: any) => void;
+    addToDBXSheet?: (submitData: {values: INewRowValues}) => void;
     clearSubmitData?: () => void;
     navigation?: any;
     submitData: any;
     route?: any;
 }
-@saga(DataEntity, ['getData', 'reloadData', 'setSubmitData', 'clearSubmitData'])
+@saga(DataEntity, ['getData', 'reloadData', 'setSubmitData', 'clearSubmitData', 'addToDBXSheet'])
 class Signal extends React.Component<ISignalProps> {
 
     state = {
@@ -250,14 +252,16 @@ class Signal extends React.Component<ISignalProps> {
                         if (response) {
                             showToastWithGravityAndOffset(`Message sent to number: ${one.phone}`)
                             count = count + 1
-                            this.props.setSubmitData({ id: one.id, needToSendSMS: false })
-                            this.props.setSubmitData(
-                                { id: one.id, smsSend: {
-                                    sendDate: Math.round(new Date().getTime() / 1000),
-                                    phoneNumber: one.phone,
-                                    smsBody: one.smsBody,
-                                    userId,
-                                    senderName } })
+                            this.props.setSubmitData({
+                                id: one.id,
+                                smsSend: {
+                                sendDate: Math.round(new Date().getTime() / 1000),
+                                phoneNumber: one.phone,
+                                smsBody: one.smsBody,
+                                userId,
+                                senderName },
+                                needToSendSMS: false
+                            })
                         } else {
                             showToastWithGravityAndOffset(`Message not sent to number: ${one.phone}`)
                         }
@@ -539,7 +543,7 @@ class Signal extends React.Component<ISignalProps> {
 
     render() {
         const { currentItemIndex, currentElement, responseDialog, pause, isInternet } = this.state;
-        const { dataItems, user, navigation, submitData, setSubmitData, clearSubmitData } = this.props;
+        const { dataItems, user, navigation, submitData, setSubmitData, clearSubmitData, addToDBXSheet } = this.props;
         // clearSubmitData()
         let dataSmsArray = null;
         if (dataItems && dataItems.size > 0) {
@@ -577,19 +581,6 @@ class Signal extends React.Component<ISignalProps> {
                     </View>
                 </View>)
         }
-        // if ((!dataItems || dataItems.size === 0) && isInternet) {
-        //     return (<View style={styles.loadContainer}>
-        //         <View style={{ ...styles.loadContainer, height: 200 }}>
-        //             <ActivityIndicator size='large' color='green' />
-        //             <TouchableOpacity
-        //                     activeOpacity={0.5}
-        //                     style={{marginTop: 20}}
-        //                     onPress={this.getSignalData}>
-        //                     <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#fc9fa8' }}>No data to download, click to try again</Text>
-        //             </TouchableOpacity>
-        //         </View>
-        //     </View>)
-        // }
         if (!isInternet) {
             return (<View style={styles.loadContainer}>
                 <View style={{ ...styles.loadContainer, height: 200 }}>
@@ -622,6 +613,7 @@ class Signal extends React.Component<ISignalProps> {
                             setNextElement={this.setNextElement}
                             onDetailsPress={onDetailsPress}
                             responseDialog={responseDialog}
+                            addToDBXSheet={addToDBXSheet}
                             submitData={submitData}
                             setSubmitData={setSubmitData}
                             clearSubmitData={clearSubmitData}

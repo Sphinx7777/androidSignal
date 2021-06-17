@@ -28,7 +28,7 @@ const MobileInput = (props: IMobileInputProps) => {
                     keyboardType={keyboardType}
                     value={value}
                     editable={editable}
-                    onEndEditing={(event) => onEndEditing(event, textKey)}
+                    onEndEditing={(event) => onEndEditing && onEndEditing(event, textKey)}
                     onChangeText={text => onChangeText(text, textKey)}
                     multiline={multiline} />
             </View>

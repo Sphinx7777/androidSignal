@@ -1,7 +1,7 @@
 import action from '../decoradors/action';
 import Entity, { CRUD, EntityMap } from './entity';
 import { call, put } from 'redux-saga/effects';
-import { ENTITY, HTTP_METHOD } from '../constants';
+import { ENTITY, HTTP_METHOD, INewRowValues } from '../constants';
 import { setSubmitData, defaultSubmitData, IMethod } from '../redux/actions';
 import { showToastWithGravityAndOffset, isNetworkAvailable } from 'signalApp/utils';
 import { ICallLog } from 'signalApp/components/Signal';
@@ -36,6 +36,11 @@ export type ISingleDataItem = EntityMap<{
     pastYearsComment?: string;
     price?: string;
     calledAbout?: string;
+    group?: string;
+    language?: string;
+    source?: string;
+    segment?: string;
+    highNetWorth?: string;
     }>;
 
 export interface IDataItem {
@@ -68,6 +73,11 @@ export interface IDataItem {
     pastYearsComment?: string;
     price?: string;
     calledAbout?: string;
+    group?: string;
+    language?: string;
+    source?: string;
+    segment?: string;
+    highNetWorth?: string;
 }
 
 class DataEntity extends Entity {
@@ -105,7 +115,8 @@ class DataEntity extends Entity {
         const isConnected = yield isNetworkAvailable()
         const crud: CRUD = submitData.crud === CRUD.DELETE ? CRUD.DELETE : CRUD.UPDATE
         if (isConnected.isConnected) {
-            yield call(this.xSave, 'http://ix.rebaltic.lt/api/signal', crud, submitData, HTTP_METHOD.PUT);
+            const { response } = yield call(this.xSave, 'http://ix.rebaltic.lt/api/signal', crud, submitData, HTTP_METHOD.PUT);
+            console.log('setSubmitData===', response.entities.signalData)
             if (!submitData.smsSend) {
                 showToastWithGravityAndOffset('Successfully submit !');
             }
@@ -115,6 +126,18 @@ class DataEntity extends Entity {
         // yield put(setSubmitData({ submitData }));
     }
 
+    @action()
+    public * addToDBXSheet(submitData: {values: INewRowValues}) {
+        const isConnected = yield isNetworkAvailable()
+        console.log('addToDBXSheet', submitData)
+        // if (isConnected.isConnected) {
+        //     const { response } = yield call(this.xSave, 'http://ix.rebaltic.lt/api/signal/create-row', CRUD.UPDATE, submitData, HTTP_METHOD.PUT);
+        //     console.log('addToDBXSheet===', response.entities.signalData)
+        //     showToastWithGravityAndOffset('Successfully submit !');
+        // } else {
+        //     showToastWithGravityAndOffset('No internet connect !!!');
+        // }
+    }
 
     @action()
     public * clearSubmitData() {

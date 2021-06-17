@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 
 interface IProps {
-    value: number;
+    value: number | string;
     onChange: (itemValue: number | string) => void;
     options: {label: string, value: number | string}[];
     mode?: 'dialog' | 'dropdown';

@@ -155,6 +155,19 @@ export interface IUserId {
     userId: string;
 }
 
+export interface INewRowValues {
+    group: string;
+    teamDate: number;
+    language: string;
+    reference: string;
+    email: string;
+    phone: string;
+    source: string;
+    details: string;
+    segment: string;
+    highNetWorth: string;
+}
+
 export interface IUser {
     userId?: string;
     firstName?: string;
@@ -309,3 +322,31 @@ export enum LIKES_TYPES {
     HEART = 'HEART',
     HA_HA = 'HA_HA'
 }
+
+export const groupOptions = [
+    { label: 'Živilė LT', value: 'Živilė LT' },
+    { label: 'Ignas LT', value: 'Ignas LT' },
+    { label: 'Ignas BI', value: 'Ignas BI' },
+    { label: 'Ignas EN', value: 'Ignas EN' },
+    { label: 'Ernesta LT', value: 'Ernesta LT' },
+    { label: 'Viktorija LT', value: 'Viktorija LT' },
+    { label: 'Greta LT', value: 'Greta LT' },
+    { label: 'Živilė EN', value: 'Živilė EN' },
+    { label: 'Egidijus LT', value: 'Egidijus LT' },
+    { label: 'Ernesta EN', value: 'Ernesta EN' },
+    { label: 'Viktorija EN', value: 'Viktorija EN' },
+    { label: 'Evelina LT', value: 'Evelina LT' },
+    { label: 'Evelina EN', value: 'Evelina EN' },
+    { label: 'Greta EN', value: 'Greta EN' }
+]
+
+export const segmentOptions = [
+    { label: 'A', value: 'A' },
+    { label: 'B', value: 'B' },
+    { label: 'C', value: 'C' },
+]
+
+export const highNetWorthOptions = [
+    { label: 'Yes', value: 'Yes' },
+    { label: 'no', value: 'no' },
+]

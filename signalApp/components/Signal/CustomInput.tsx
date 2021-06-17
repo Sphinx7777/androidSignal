@@ -10,6 +10,7 @@ import MobileDropdown from '../MobileDropdown';
 import MobileInput from '../MobileInput';
 import IsMobileDatePicker from '../DatePicker';
 import { count } from 'sms-length';
+import { INewRowValues, groupOptions, segmentOptions, highNetWorthOptions } from 'signalApp/constants';
 
 const dialogOptions = [
     { label: 'auto-dial ON', value: 1 },
@@ -33,6 +34,7 @@ interface ICustomInputProps {
     setNextElement: (a: any, b: any) => void;
     dataItems: EntityList<ISingleDataItem>;
     messagesUpload?: boolean;
+    addToDBXSheet: (submitData: { values: INewRowValues }) => void;
 }
 interface ICustomInputState {
     taskCreated: number;
@@ -52,8 +54,8 @@ interface ICustomInputState {
     calledAbout: string;
 }
 const CustomInput = (props: ICustomInputProps) => {
-    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress, setNextElement, dataItems, messagesUpload } = props;
-    const [finishedVisible, setFinishedVisible] = useState(false)
+    const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress,
+            setNextElement, dataItems, messagesUpload, addToDBXSheet } = props;
     const [sendCustomSMSVisible, setSendCustomSMSVisible] = useState(false)
     const currentElTaskCreated = currentElement?.get('taskCreated') || null;
     const currentElReference = currentElement?.get('reference') || '';
@@ -85,6 +87,14 @@ const CustomInput = (props: ICustomInputProps) => {
     const isAsanaType = currentElSearchType ? currentElSearchType.split(',').includes('AD') : false;
     const isTeamType = currentElSearchType ? currentElSearchType.split(',').includes('TD') : false;
     const isBrokersType = currentElSearchType ? currentElSearchType.split(',').includes('BD') : false;
+    const currentElGroup = currentElement?.get('group') ? String(currentElement?.get('group')) : 'Ignas LT';
+    const currentElADDTeamDate = currentElement?.get('teamDate') ? currentElement?.get('teamDate') : Math.round(new Date().getTime() / 1000);
+    const currentElLanguage = currentElement?.get('language') ? currentElement?.get('language') : 'LT';
+    const currentElEmail = currentElement?.get('email') ? currentElement?.get('email') : '';
+    const currentElName = currentElement?.get('name') ? currentElement?.get('name') : '';
+    const currentElSource = currentElement?.get('source') ? currentElement?.get('source') : 'past buyers';
+    const currentElSegment = currentElement?.get('segment') ? currentElement?.get('segment') : 'C';
+    const currentElHighNetWorth = currentElement?.get('highNetWorth') ? currentElement?.get('highNetWorth') : 'no';
 
     const [state, setState] = useState<ICustomInputState>({
         taskCreated: currentElTaskCreated,
@@ -102,6 +112,20 @@ const CustomInput = (props: ICustomInputProps) => {
         reference: currentElReference,
         price: currentElPBPrice,
         calledAbout: currentElPBCalledAbout
+    })
+    const [finishedVisible, setFinishedVisible] = useState(false)
+    const [showAddFields, setShowAddFields] = useState(false)
+    const [additionalFields, setAdditionalFields] = useState({
+        group: currentElGroup,
+        teamDate: currentElADDTeamDate,
+        language: currentElLanguage,
+        reference: currentElReference && currentElReference.length > 0 ? currentElReference : currentElName && currentElName.length > 0 ? currentElName : '',
+        email: currentElEmail,
+        phone: currentElPhone,
+        source: currentElSource,
+        details: currentElDetails,
+        segment: currentElSegment,
+        highNetWorth: currentElHighNetWorth,
     })
 
     useEffect(() => {
@@ -125,12 +149,39 @@ const CustomInput = (props: ICustomInputProps) => {
                 calledAbout: currentElPBCalledAbout
             }
         })
+        setAdditionalFields((prevState) => {
+            return {
+                ...prevState,
+                group: currentElGroup,
+                teamDate: currentElADDTeamDate,
+                language: currentElLanguage,
+                phone: currentElPhone,
+                reference: currentElReference && currentElReference.length > 0 ? currentElReference : currentElName && currentElName.length > 0 ? currentElName : '',
+                email: currentElEmail,
+                source: currentElSource,
+                details: currentElDetails,
+                segment: currentElSegment,
+                highNetWorth: currentElHighNetWorth,
+            }
+        })
+        setShowAddFields(false)
     }, [currentElement])
+
 
     const calling = () => currentElement && makeCall(currentElement?.get('phone'), 'disable')
 
     const handleInputChange = (text: string, name: string) => {
         setState((prevState) => {
+            return {
+                ...prevState,
+                [name]: text
+            }
+        })
+    }
+
+    const handleAdditionalFieldsChange = (text: string, name: string) => {
+        console.log('handleAdditionalFieldsChange', text, 'name', name)
+        setAdditionalFields((prevState) => {
             return {
                 ...prevState,
                 [name]: text
@@ -217,6 +268,15 @@ const CustomInput = (props: ICustomInputProps) => {
         }
     }
 
+    const handleAdditionalDropdown = (value: number | string, key: string) => {
+        setAdditionalFields((prevState) => {
+            return {
+                ...prevState,
+                [key]: value
+            }
+        })
+    }
+
     const handleDropdownSMS = (value: number | string) => {
         if (currentElement) {
             setSubmitData({ id: currentElement?.get('id'), needToSendSMS: value === 0 ? false : true })
@@ -228,6 +288,30 @@ const CustomInput = (props: ICustomInputProps) => {
         setSubmitData({ id: currentElement?.get('id'), [itemKey]: sendDate });
     }
 
+    const handlePickerAdditionalOkClick = (date: Date, itemKey: string) => {
+        const sendDate: string | number = Math.round(date.getTime() / 1000);
+        setAdditionalFields((prevState) => {
+            return {
+                ...prevState,
+                [itemKey]: sendDate
+            }
+        })
+    }
+
+    const handleAddFields = () => {
+        setShowAddFields(!showAddFields)
+    }
+
+    const handleCreateRow = () => {
+        const values = additionalFields
+        if (values && state && state.phone && state.phone.length >= 8) {
+            values['phone'] = state.phone
+            addToDBXSheet({ values })
+        } else {
+            showToastWithGravityAndOffset('Phone field cannot be empty or less than 8 characters !!!');
+        }
+    }
+
     const phone = currentElement?.get('phone') && currentElement?.get('phone')?.length > 0 ? currentElement?.get('phone') : '--------'
     const isPhone = currentElement?.get('phone') && currentElement?.get('phone').length >= 9;
     const currentElSMSBody = currentElement?.get('smsBody');
@@ -235,6 +319,7 @@ const CustomInput = (props: ICustomInputProps) => {
     const dialogDescription = `Do you want to send this sms ? Number: ${phone} sms body: ${state.smsBody}`
     const isCurrentElResDialog = currentElement?.get('responseDialog');
     const messagesCount = count(state.smsBody).messages
+    const isBtnDisable = !currentElement || !additionalFields || !state || !state.phone || state.phone.length < 8
     return (
         <>
             <View style={styles.container}>
@@ -255,9 +340,9 @@ const CustomInput = (props: ICustomInputProps) => {
                     </View>
                     {<View style={styles.nameLine}>
                         <Text numberOfLines={1} style={{ ...styles.text, maxWidth: 300 }}>Email: {currentElement?.get('email') ? currentElement?.get('email') : 'no info'}</Text>
-                        {!currentElement?.get('teamDataType') && <Text>not in the DBX <Image style={{ width: 16, height: 16 }} source={require('../../../assets/no.png')} /></Text>}
+                        {!currentElement?.get('teamDataType') && <Text> <Text>not in the DBX </Text> <Image style={{ width: 18, height: 18 }} source={require('../../../assets/no.png')} /></Text>}
                     </View>}
-                    {}
+                    { }
                     <View style={styles.nameLine}>
                         <View style={{ display: 'flex', flexDirection: 'column' }}>
                             {isAsanaType && <Text style={styles.text}>Task created: {currentElTaskCreated > 0 ? getStringDate(new Date(currentElTaskCreated * 1000)) : 'no info'}</Text>}
@@ -333,22 +418,22 @@ const CustomInput = (props: ICustomInputProps) => {
                         </View>
                         <MobileInput
                             value={state.reference}
-                            label='DBX_2 name (reference)'
-                            placeholder='DBX_2 reference'
+                            label='DBX name (reference)'
+                            placeholder='DBX reference'
                             textKey='reference'
                             onEndEditing={editSubmit}
                             onChangeText={handleInputChange} />
                         <MobileInput
                             value={state.currentComments}
-                            label='DBX_2 current comments'
-                            placeholder='DBX_2 current comments'
+                            label='DBX current comments'
+                            placeholder='DBX current comments'
                             textKey='currentComments'
                             onEndEditing={editSubmit}
                             onChangeText={handleInputChange} />
                         <MobileInput
                             value={state.details}
-                            label='DBX_2 details'
-                            placeholder='DBX_2 details'
+                            label='DBX details'
+                            placeholder='DBX details'
                             textKey='details'
                             onEndEditing={editSubmit}
                             onChangeText={handleInputChange} />
@@ -412,21 +497,97 @@ const CustomInput = (props: ICustomInputProps) => {
                 {(state.smsBody?.length > 0) ?
                     <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center' }}>
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center', marginRight: 6 }}>
-                            <Text style={{marginRight: 3}}>SMS count:</Text>
-                            <Text style={{fontWeight: '700', color: messagesCount > 1 ? 'red' : 'green'}}>{messagesCount}</Text>
+                            <Text style={{ marginRight: 3 }}>SMS count:</Text>
+                            <Text style={{ fontWeight: '700', color: messagesCount > 1 ? 'red' : 'green' }}>{messagesCount}</Text>
                         </View>
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center', marginRight: 6 }}>
-                            <Text style={{marginRight: 3}}> / Length:</Text>
-                            <Text style={{fontWeight: '700'}}>{count(state.smsBody).length}</Text>
+                            <Text style={{ marginRight: 3 }}> / Length:</Text>
+                            <Text style={{ fontWeight: '700' }}>{count(state.smsBody).length}</Text>
                         </View>
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center', marginRight: 6 }}>
-                            <Text style={{marginRight: 3}}> / Max length for 1 msg:</Text>
-                            <Text style={{fontWeight: '700'}}>{count(state.smsBody).characterPerMessage}</Text>
+                            <Text style={{ marginRight: 3 }}> / Max length for 1 msg:</Text>
+                            <Text style={{ fontWeight: '700' }}>{count(state.smsBody).characterPerMessage}</Text>
                         </View>
                     </View> : <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center', marginRight: 6 }}>
-                            <Text style={{marginRight: 3}}>Length:</Text>
-                            <Text style={{fontWeight: '700', color: 'red'}}>0</Text>
-                        </View>
+                        <Text style={{ marginRight: 3 }}>Length:</Text>
+                        <Text style={{ fontWeight: '700', color: 'red' }}>0</Text>
+                    </View>
+                }
+                {showAddFields &&
+                    <View>
+                        <Text style={{ color: 'black', fontSize: 16, fontWeight: '700', marginVertical: 2 }}>Additional fields for DBX</Text>
+                        <Text style={{ ...styles.label }}>DBX Grupė</Text>
+                        <MobileDropdown
+                            value={additionalFields.group}
+                            onChange={value => handleAdditionalDropdown(value, 'group')}
+                            options={groupOptions} />
+                        <IsMobileDatePicker
+                            elDate={additionalFields.teamDate}
+                            handleOkClick={handlePickerAdditionalOkClick}
+                            itemKey='teamDate'
+                            title='DBX - 1st contact date'
+                            containerStile={{ marginTop: 2 }} />
+                        <MobileInput
+                            value={additionalFields.language}
+                            label='DBX language (Kalba)'
+                            placeholder='DBX language (Kalba)'
+                            textKey='language'
+                            onChangeText={handleAdditionalFieldsChange} />
+                        <MobileInput
+                            value={additionalFields.reference}
+                            label='DBX name (Kreipinys)'
+                            placeholder='DBX name (Kreipinys)'
+                            textKey='reference'
+                            onChangeText={handleAdditionalFieldsChange} />
+                        <MobileInput
+                            value={additionalFields.email}
+                            label='DBX email'
+                            placeholder='DBX email'
+                            textKey='email'
+                            onChangeText={handleAdditionalFieldsChange} />
+                        <MobileInput
+                            value={additionalFields.source}
+                            label='DBX Šaltinis'
+                            placeholder='DBX Šaltinis'
+                            textKey='source'
+                            onChangeText={handleAdditionalFieldsChange} />
+                        <MobileInput
+                            value={additionalFields.details}
+                            label='DBX details'
+                            placeholder='DBX details'
+                            textKey='details'
+                            onChangeText={handleAdditionalFieldsChange} />
+                        <Text style={{ ...styles.label }}>DBX Segmentas</Text>
+                        <MobileDropdown
+                            value={additionalFields.segment}
+                            onChange={value => handleAdditionalDropdown(value, 'segment')}
+                            options={segmentOptions} />
+                        <Text style={{ ...styles.label }}>DBX High Net Worth</Text>
+                        <MobileDropdown
+                            value={additionalFields.highNetWorth}
+                            onChange={value => handleAdditionalDropdown(value, 'highNetWorth')}
+                            options={highNetWorthOptions} />
+                    </View>
+                }
+                {!currentElement?.get('teamDataType') &&
+                    <View style={styles.sendButtonContainer}>
+                        <TouchableOpacity
+                            style={{ ...styles.button, ...styles.sendButton, backgroundColor: currentElement ? '#31b7cc' : 'gray', borderColor: currentElement ? '#31b7cc' : 'gray' }}
+                            disabled={!currentElement}
+                            onPress={handleAddFields}>
+                            <Text style={styles.buttonText}>{!showAddFields ? 'Add to DBX' : 'Cancel'}</Text>
+                        </TouchableOpacity>
+                        {
+                            !showAddFields
+                                ? <Text></Text>
+                                : <TouchableOpacity
+                                    style={{ ...styles.button, ...styles.sendButton, backgroundColor: !isBtnDisable ? '#0ca823' : 'gray', borderColor: !isBtnDisable ? '#0ca823' : 'gray' }}
+                                    disabled={isBtnDisable}
+                                    onPress={handleCreateRow}>
+                                    <Text style={styles.buttonText}>Ok</Text>
+                                </TouchableOpacity>
+                        }
+                    </View>
                 }
                 <View style={styles.sendButtonContainer}>
                     <TouchableOpacity
