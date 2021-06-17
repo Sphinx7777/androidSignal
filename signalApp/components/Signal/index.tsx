@@ -12,6 +12,8 @@ import CallDetectorManager from 'react-native-call-detection';
 import CallLogs from 'react-native-call-log';
 import { isNetworkAvailable, showToastWithGravityAndOffset, sleep } from '../../utils';
 import { INewRowValues } from 'signalApp/constants';
+import { setFlagger } from '../../redux/actions';
+import Spinner from 'react-native-loading-spinner-overlay';
 const DirectSms = NativeModules.DirectSms;
 const DirectDial = NativeModules.DirectDial;
 
@@ -42,9 +44,11 @@ interface ISignalProps {
     setSubmitData?: (data: any) => void;
     addToDBXSheet?: (submitData: {values: INewRowValues}) => void;
     clearSubmitData?: () => void;
+    setFlagger: (key: string, value: any) => void;
     navigation?: any;
     submitData: any;
     route?: any;
+    createRowLoader?: boolean;
 }
 @saga(DataEntity, ['getData', 'reloadData', 'setSubmitData', 'clearSubmitData', 'addToDBXSheet'])
 class Signal extends React.Component<ISignalProps> {
@@ -543,7 +547,7 @@ class Signal extends React.Component<ISignalProps> {
 
     render() {
         const { currentItemIndex, currentElement, responseDialog, pause, isInternet } = this.state;
-        const { dataItems, user, navigation, submitData, setSubmitData, clearSubmitData, addToDBXSheet } = this.props;
+        const { dataItems, user, navigation, submitData, setSubmitData, clearSubmitData, addToDBXSheet, createRowLoader, setFlagger } = this.props;
         // clearSubmitData()
         let dataSmsArray = null;
         if (dataItems && dataItems.size > 0) {
@@ -597,6 +601,7 @@ class Signal extends React.Component<ISignalProps> {
 
         return (
             <View style={styles.container}>
+                <Spinner visible={createRowLoader} />
                 <View style={styles.viewContainer}>
                     <ContactList
                         currentElement={currentElement}
@@ -618,6 +623,7 @@ class Signal extends React.Component<ISignalProps> {
                             setSubmitData={setSubmitData}
                             clearSubmitData={clearSubmitData}
                             currentElement={currentElement}
+                            setFlagger={setFlagger}
                             makeCall={this.makeCall}
                             sendSMS={this.sendDirectSms} />
                         <CallMenu
@@ -662,14 +668,15 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state: any) => {
-    const dataItems = state.entities.get('signalData')?.sort() || null;
-    const user = state.identity.user || null
-    const submitData = state.submitData.data || []
+    const { entities, flagger, identity, submitData = [] } = state;
+    const dataItems = entities.get('signalData')?.sort() || null;
+    const user = identity.user || null
     return {
         dataItems,
         user,
-        submitData
+        submitData,
+        createRowLoader: flagger.createRowLoader
     };
 }
 
-export default connect(mapStateToProps, { ...DataEntity.actions })(Signal)
+export default connect(mapStateToProps, { ...DataEntity.actions, setFlagger })(Signal)

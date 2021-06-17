@@ -35,6 +35,7 @@ interface ICustomInputProps {
     dataItems: EntityList<ISingleDataItem>;
     messagesUpload?: boolean;
     addToDBXSheet: (submitData: { values: INewRowValues }) => void;
+    setFlagger: (key: string, value: any) => void;
 }
 interface ICustomInputState {
     taskCreated: number;
@@ -55,7 +56,7 @@ interface ICustomInputState {
 }
 const CustomInput = (props: ICustomInputProps) => {
     const { currentElement, makeCall, sendSMS, setSubmitData, clearSubmitData, submitData, responseDialog, onDetailsPress,
-            setNextElement, dataItems, messagesUpload, addToDBXSheet } = props;
+            setNextElement, dataItems, messagesUpload, addToDBXSheet, setFlagger } = props;
     const [sendCustomSMSVisible, setSendCustomSMSVisible] = useState(false)
     const currentElTaskCreated = currentElement?.get('taskCreated') || null;
     const currentElReference = currentElement?.get('reference') || '';
@@ -307,6 +308,7 @@ const CustomInput = (props: ICustomInputProps) => {
         if (values && state && state.phone && state.phone.length >= 8) {
             values['phone'] = state.phone
             addToDBXSheet({ values })
+            setFlagger('createRowLoader', true)
         } else {
             showToastWithGravityAndOffset('Phone field cannot be empty or less than 8 characters !!!');
         }

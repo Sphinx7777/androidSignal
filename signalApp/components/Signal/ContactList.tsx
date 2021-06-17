@@ -11,15 +11,9 @@ interface IContactListProps {
     setCurrentElement: (currentElement: ISingleDataItem) => void;
     currentElement?: ISingleDataItem | undefined;
 }
-interface IContactListState {
 
-}
 const ContactList = (props: IContactListProps) => {
     const { callData, setCurrentItemIndex, currentItemIndex, makeCall, setCurrentElement, currentElement } = props;
-
-    const [state, setState] = useState<IContactListState>({
-
-    })
 
     const handleLongPress = async (data: any) => {
         const { index } = data

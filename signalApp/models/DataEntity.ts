@@ -2,7 +2,7 @@ import action from '../decoradors/action';
 import Entity, { CRUD, EntityMap } from './entity';
 import { call, put } from 'redux-saga/effects';
 import { ENTITY, HTTP_METHOD, INewRowValues } from '../constants';
-import { setSubmitData, defaultSubmitData, IMethod } from '../redux/actions';
+import { setSubmitData, defaultSubmitData, IMethod, setFlagger } from '../redux/actions';
 import { showToastWithGravityAndOffset, isNetworkAvailable } from 'signalApp/utils';
 import { ICallLog } from 'signalApp/components/Signal';
 
@@ -129,14 +129,15 @@ class DataEntity extends Entity {
     @action()
     public * addToDBXSheet(submitData: {values: INewRowValues}) {
         const isConnected = yield isNetworkAvailable()
-        console.log('addToDBXSheet', submitData)
-        // if (isConnected.isConnected) {
-        //     const { response } = yield call(this.xSave, 'http://ix.rebaltic.lt/api/signal/create-row', CRUD.UPDATE, submitData, HTTP_METHOD.PUT);
-        //     console.log('addToDBXSheet===', response.entities.signalData)
-        //     showToastWithGravityAndOffset('Successfully submit !');
-        // } else {
-        //     showToastWithGravityAndOffset('No internet connect !!!');
-        // }
+        if (isConnected.isConnected) {
+            const { response } = yield call(this.xSave, 'http://ix.rebaltic.lt/api/signal/create-row', CRUD.UPDATE, submitData, HTTP_METHOD.PUT);
+            console.log('addToDBXSheet===', response.entities.signalData)
+            // showToastWithGravityAndOffset('Successfully submit !');
+            yield put(setFlagger('createRowLoader', null))
+        } else {
+            showToastWithGravityAndOffset('No internet connect !!!');
+            yield put(setFlagger('createRowLoader', null))
+        }
     }
 
     @action()
