@@ -94,7 +94,7 @@ const CustomInput = (props: ICustomInputProps) => {
     const currentElEmail = currentElement?.get('email') ? currentElement?.get('email') : '';
     const currentElName = currentElement?.get('name') ? currentElement?.get('name') : '';
     const currentElSource = currentElement?.get('source') ? currentElement?.get('source') : 'past buyers';
-    const currentElSegment = currentElement?.get('segment') ? currentElement?.get('segment') : 'C';
+    const currentElSegment = currentElement?.get('segment') ? currentElement?.get('segment') : '';
     const currentElHighNetWorth = currentElement?.get('highNetWorth') ? currentElement?.get('highNetWorth') : 'no';
 
     const [state, setState] = useState<ICustomInputState>({
