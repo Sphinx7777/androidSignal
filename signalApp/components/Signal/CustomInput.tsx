@@ -321,8 +321,7 @@ const CustomInput = (props: ICustomInputProps) => {
     const isCurrentElResDialog = currentElement?.get('responseDialog');
     const messagesCount = count(state.smsBody).messages
     const isBtnDisable = !currentElement || !additionalFields || !state || !state.phone || state.phone.length < 8;
-    console.log('currentElement_ID', currentElement?.get('id'));
-    
+
     return (
         <>
             <View style={styles.container}>
