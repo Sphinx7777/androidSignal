@@ -7,6 +7,7 @@ interface IMobileInputProps {
     multiline?: boolean;
     autoCorrect?: boolean;
     placeholder?: string;
+    autoCapitalize?: 'characters' | 'words' | 'sentences' | 'none';
     textKey?: string;
     editable?: boolean;
     keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad' | 'number-pad' | 'decimal-pad';
@@ -16,7 +17,7 @@ interface IMobileInputProps {
 
 
 const MobileInput = (props: IMobileInputProps) => {
-    const { value, onEndEditing, onChangeText, textKey, placeholder = '', autoCorrect = false, multiline = true, keyboardType = 'default', label, editable = true } = props;
+    const { value, onEndEditing, onChangeText, textKey, autoCapitalize = 'sentences', placeholder = '', autoCorrect = false, multiline = true, keyboardType = 'default', label, editable = true } = props;
     return (
         <>
             {label && <Text style={styles.label}>{label}</Text>}
@@ -25,6 +26,7 @@ const MobileInput = (props: IMobileInputProps) => {
                     style={styles.textInput}
                     autoCorrect={autoCorrect}
                     placeholder={placeholder}
+                    autoCapitalize={autoCapitalize}
                     keyboardType={keyboardType}
                     value={value}
                     editable={editable}

@@ -181,7 +181,6 @@ const CustomInput = (props: ICustomInputProps) => {
     }
 
     const handleAdditionalFieldsChange = (text: string, name: string) => {
-        console.log('handleAdditionalFieldsChange', text, 'name', name)
         setAdditionalFields((prevState) => {
             return {
                 ...prevState,
@@ -321,7 +320,9 @@ const CustomInput = (props: ICustomInputProps) => {
     const dialogDescription = `Do you want to send this sms ? Number: ${phone} sms body: ${state.smsBody}`
     const isCurrentElResDialog = currentElement?.get('responseDialog');
     const messagesCount = count(state.smsBody).messages
-    const isBtnDisable = !currentElement || !additionalFields || !state || !state.phone || state.phone.length < 8
+    const isBtnDisable = !currentElement || !additionalFields || !state || !state.phone || state.phone.length < 8;
+    console.log('currentElement_ID', currentElement?.get('id'));
+    
     return (
         <>
             <View style={styles.container}>
@@ -544,6 +545,8 @@ const CustomInput = (props: ICustomInputProps) => {
                         <MobileInput
                             value={additionalFields.email}
                             label='DBX email'
+                            autoCapitalize= 'none'
+                            keyboardType='email-address'
                             placeholder='DBX email'
                             textKey='email'
                             onChangeText={handleAdditionalFieldsChange} />

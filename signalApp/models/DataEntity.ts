@@ -131,8 +131,9 @@ class DataEntity extends Entity {
         const isConnected = yield isNetworkAvailable()
         if (isConnected.isConnected) {
             const { response } = yield call(this.xSave, 'http://ix.rebaltic.lt/api/signal/create-row', CRUD.UPDATE, submitData, HTTP_METHOD.PUT);
-            console.log('addToDBXSheet===', response.entities.signalData)
-            // showToastWithGravityAndOffset('Successfully submit !');
+            if (response && response.entities && response.entities.signalData) {
+                showToastWithGravityAndOffset('Successfully created row !');
+            }
             yield put(setFlagger('createRowLoader', null))
         } else {
             showToastWithGravityAndOffset('No internet connect !!!');
