@@ -88,7 +88,7 @@ const ContactList = (props: IContactListProps) => {
                         <Text style={{ ...styles.text, fontWeight: '700' }}>Last call:</Text>
                         <Text style={styles.text}>Type: {isCurrentElResDialog.type}</Text>
                         <Text style={styles.text}>Duration: {isCurrentElResDialog.duration}</Text>
-                        <Text style={styles.text}>Date: {getStringDate(new Date(isCurrentElResDialog.dateTime))}</Text>
+                        <Text style={styles.text}>Date: {getStringDate(new Date(Number(isCurrentElResDialog.timestamp)))}</Text>
                         </View>}
             </TouchableOpacity>
         )
@@ -110,7 +110,7 @@ const ContactList = (props: IContactListProps) => {
                 {
                     callData && callData.size > 0 && <FlatList
                         keyExtractor={keyExtractor}
-                        data={callData?.valueSeq()?.toJS() || []}
+                        data={callData?.valueSeq()?.toJS().sort((a, b) => a.taskCreated - b.taskCreated) || []}
                         renderItem={renderItem}
                     />
                 }

@@ -326,6 +326,7 @@ export enum LIKES_TYPES {
 export const groupOptions = [
     { label: 'Živilė LT', value: 'Živilė LT' },
     { label: 'Ignas LT', value: 'Ignas LT' },
+    { label: 'Ignas Revolution', value: 'Ignas Revolution' },
     { label: 'Ignas BI', value: 'Ignas BI' },
     { label: 'Ignas EN', value: 'Ignas EN' },
     { label: 'Ernesta LT', value: 'Ernesta LT' },
@@ -337,7 +338,11 @@ export const groupOptions = [
     { label: 'Viktorija EN', value: 'Viktorija EN' },
     { label: 'Evelina LT', value: 'Evelina LT' },
     { label: 'Evelina EN', value: 'Evelina EN' },
-    { label: 'Greta EN', value: 'Greta EN' }
+    { label: 'Greta EN', value: 'Greta EN' },
+    { label: 'Donatas Revolution', value: 'Donatas Revolution' },
+    { label: 'Egidijus Revolution', value: 'Egidijus Revolution' },
+    { label: 'Nerijus Revolution', value: 'Nerijus Revolution' },
+    { label: 'Vaidas Revolution', value: 'Vaidas Revolution' },
 ]
 
 export const segmentOptions = [

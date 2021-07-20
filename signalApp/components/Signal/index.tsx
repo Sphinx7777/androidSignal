@@ -395,8 +395,6 @@ class Signal extends React.Component<ISignalProps> {
                                 console.log('--------------------------------------------------------------------------------');
                                 this.setDialog(response, currentElement?.get('id'))
                             }
-
-
                             // this.makeNextDialogLogic(event, num, res);
                         }
                     } else if (event === 'Connected') {
@@ -414,10 +412,30 @@ class Signal extends React.Component<ISignalProps> {
                     } else if (event === 'Missed') {
                         console.log('event -> ',
                             event + (num ? ' - ' + num : ''));
-                        // const res = await this.fetchData();
-                        // if (res && res.length > 0 && res[0]['type'] === 'OUTGOING') {
-                        //     this.makeNextDialogLogic(event, num, res);
-                        // }
+                        const res = await this.fetchData();
+                        if (res && res.length > 0 && res[0]['type'] === 'OUTGOING') {
+                            const { currentElement } = this.state;
+                            const response = res && res.length > 0 && res[0] || null;
+                            console.log('event -> ',
+                            event + (num ? ' - ' + num : ''));
+                            if (response && response['phoneNumber'] === currentElement?.get('phone') && response['duration'] === 0) {
+                                console.log('--------------------------------------------------------------------------------');
+                                console.log('event -> ', event, 'num -> ', num, 'response -> ', response);
+                                console.log('--------------------------------------------------------------------------------');
+                                console.log('currentElementPhone -> ', currentElement.get('phone'));
+                                console.log('--------------------------------------------------------------------------------');
+                                this.setDialog(response, currentElement?.get('id'))
+                            }
+                            if (response && response['phoneNumber'] === currentElement?.get('phone') && response['duration'] > 0) {
+                                console.log('--------------------------------------------------------------------------------');
+                                console.log('event -> ', event, 'num -> ', num, 'response -> ', response);
+                                console.log('--------------------------------------------------------------------------------');
+                                console.log('currentElementPhone -> ', currentElement.get('phone'));
+                                console.log('--------------------------------------------------------------------------------');
+                                this.setDialog(response, currentElement?.get('id'))
+                            }
+                                // this.makeNextDialogLogic(event, num, res);
+                        }
                     }
                 },
                 true, // To detect incoming calls [ANDROID]

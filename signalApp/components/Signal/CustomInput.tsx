@@ -367,7 +367,7 @@ const CustomInput = (props: ICustomInputProps) => {
                             <Text style={{ ...styles.text, fontWeight: '700' }}>Last call:</Text>
                             <Text style={styles.text}>Type: {isCurrentElResDialog?.get('type')}</Text>
                             <Text style={styles.text}>Duration: {isCurrentElResDialog?.get('duration')}</Text>
-                            <Text style={styles.text}>Date: {getStringDate(new Date(isCurrentElResDialog?.get('dateTime')))}</Text>
+                            <Text style={styles.text}>Date: {getStringDate(new Date(Number(isCurrentElResDialog?.get('timestamp'))))}</Text>
                         </View>}
                 </TouchableOpacity>}
                 <MobileDropdown
