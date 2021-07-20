@@ -687,7 +687,13 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state: any) => {
     const { entities, flagger, identity, submitData = [] } = state;
-    const dataItems = entities.get('signalData')?.sort() || null;
+    // const dataItems = entities.get('signalData')?.sort() || null;
+    const dataItems = entities.get('signalData')?.sort(o => {
+        if (o.get('taskCreated')) {
+            return -1
+        }
+        return 1
+    }).sort((a, b) => a.get('taskCreated') - b.get('taskCreated')) || null;
     const user = identity.user || null
     return {
         dataItems,

@@ -110,7 +110,7 @@ const ContactList = (props: IContactListProps) => {
                 {
                     callData && callData.size > 0 && <FlatList
                         keyExtractor={keyExtractor}
-                        data={callData?.valueSeq()?.toJS().sort((a, b) => a.taskCreated - b.taskCreated) || []}
+                        data={callData?.valueSeq()?.toJS() || []}
                         renderItem={renderItem}
                     />
                 }
