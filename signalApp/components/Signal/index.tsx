@@ -689,11 +689,11 @@ const mapStateToProps = (state: any) => {
     const { entities, flagger, identity, submitData = [] } = state;
     // const dataItems = entities.get('signalData')?.sort() || null;
     const dataItems = entities.get('signalData')?.sort(o => {
-        if (o.get('taskCreated')) {
+        if (o.get('taskOrder')) {
             return -1
         }
         return 1
-    }).sort((a, b) => a.get('taskCreated') - b.get('taskCreated')) || null;
+    }).sort((a, b) => a.get('taskOrder') - b.get('taskOrder')) || null;
     const user = identity.user || null
     return {
         dataItems,
