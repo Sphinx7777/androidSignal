@@ -283,7 +283,7 @@ class Signal extends React.Component<ISignalProps> {
 
     senOneSms = async (phone: string, smsBody: string) => {
         const response = await DirectSms.sendDirectSms(phone, smsBody);
-        await sleep(10000)
+        await sleep(20000)
         return response;
     }
 
