@@ -120,9 +120,13 @@ class Details extends React.Component<IDetailsProps> {
         'smsBody', 'currentYearComment', 'group', 'calledAbout', 'pastYearsComment', 'comments1', 'comments2', 'comments3', 'comments4', 'memberRating',
         'additionalPhones', 'additionalPhoneNames', 'additionalPhoneDetails', 'relativesPhones', 'relativesRelationship', 'highNetWorth'
         ]
-        const viewArr = ['agentID', 'searchType', 'year', 'source', 'id', 'language', 'brokersTabId',
-        'language', 'totalDialAtt', 'totalSmsSent',
-        'totalSuccessContact']
+        const revDateArr = ['skPropRentDate', 'skPropSaleDate', 'revLastPropRentedOutDate', 'revLastPropListSaleDate', 'revFirstPropListSaleDate',
+        'revLastPropListedRentDate', 'revFirstPropListedRentDate', 'revLastPropSoldDate']
+        const viewArr = ['agentID', 'searchType', 'year', 'source', 'id', 'language', 'brokersTabId','language', 'totalDialAtt', 'totalSmsSent',
+        'totalSuccessContact', 'additionalPhones', 'additionalPhoneNames', 'additionalEmails', 'skPropRentMaxPrice', 'skPropRentStreet', 'skPropSaleMaxPrice',
+        'skPropSaleStreet', 'revLastPropListSaleStreet', 'revLastPropListSalePrice', 'revFirstPropListSaleStreet', 'revFirstPropListSalePrice', 'revLastPropListedRentStreet',
+        'revLastPropListedRentPrice', 'revFirstPropListedRentStreet', 'revFirstPropListedRentPrice', 'revLastPropSoldPrice', 'revLastPropSoldStreet', 'revTotalPropListSale',
+        'revTotalPropListedRent', 'revLastPropRentedOutPrice', 'revLastPropRentedOutStreet']
         const pBInputsArr = ['name', 'phone', 'smsBody', 'currentYearComment', 'calledAbout', 'pastYearsComment', 'price']
         if (!item.searchType.includes('TD') && !item.searchType.includes('AD')) {
             inputsArr = inputsArr.filter(field => pBInputsArr.includes(field))
@@ -156,11 +160,17 @@ class Details extends React.Component<IDetailsProps> {
                     {Object.keys(item).sort().map(o => {
                         return (
                             <View key={item['id'] + o}>
-                                {viewArr.includes(String(o)) &&
-                                    <View style={styles.itemLine}>
+                                {viewArr.includes(String(o)) && item[o] !== null &&
+                                    (<View style={styles.itemLine}>
                                         <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
                                         <Text style={styles.text}>{String(item[o])}</Text>
-                                    </View>
+                                    </View>)
+                                }
+                                {revDateArr.includes(String(o)) && item[o] !== null &&
+                                    (<View style={styles.itemLine}>
+                                        <Text style={{ ...styles.text, ...styles.textTitle }}>{String(o)}:</Text>
+                                        <Text style={styles.text}>{Number(item[o]) > 0 ? getStringDate(new Date(Number(item[o] * 1000))) : 'no info'}</Text>
+                                    </View>)
                                 }
                                 {inputsArr.includes(String(o)) &&
                                     <>
