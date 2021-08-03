@@ -38,6 +38,7 @@
     "react-native-date-picker": "^3.2.10",
     "react-native-dialog": "^6.2.0",
     "react-native-gesture-handler": "~1.8.0",
+    "react-native-get-sms-android": "^2.1.0",
     "react-native-loading-spinner-overlay": "^2.0.0",
     "react-native-localize": "^2.0.2",
     "react-native-paper": "^4.0.1",

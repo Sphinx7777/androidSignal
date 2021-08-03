@@ -19,6 +19,7 @@ interface ICallMenuProps {
     currentElement: ISingleDataItem;
     getData?: (data: any) => void;
     messagesUpload?: boolean;
+    submitData: any;
 }
 interface ICallMenuState {
     callStart: boolean;
@@ -27,7 +28,7 @@ interface ICallMenuState {
 
 const CallMenu = (props: ICallMenuProps) => {
     const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, pausePress,
-            pause, getDataSignal, currentElement, getData, messagesUpload } = props;
+            pause, getDataSignal, currentElement, getData, messagesUpload, submitData } = props;
     const [sendAllSMSVisible, setSendAllSMSVisible] = useState(false)
 
 
@@ -154,6 +155,9 @@ const CallMenu = (props: ICallMenuProps) => {
                         <Text style={{marginBottom: 2, color: countSms > 0 ? 'red' : 'black'}}>{`${countSms || 0} sms have incorrect number format or empty sms body`}</Text>
                         <Text style={{marginBottom: 2, color: isDialCount?.size > 0 ? 'green' : 'black'}}>{`Need to make ${isDialCount?.size || 0} calls`}</Text>
                         <Text style={{color: phoneCount > 0 ? 'red' : 'black'}}>{`${phoneCount || 0} items have incorrect number format`}</Text>
+                        {submitData && submitData.data && submitData.data.length > 0 &&
+                        (<Text style={{color: 'red'}}>{`${submitData.data.length} server request${submitData.data.length > 1 ? 's' : ''} failed, check your internet connection`}</Text>)
+                        }
                         <TouchableOpacity
                             style={{ ...styles.button, maxWidth: 100, marginTop: 5 }}
                             onPress={getDataSignal}>

@@ -18,10 +18,13 @@ export const GET_IDENTITY = 'GET_IDENTITY';
 export const SET_DEFAULT_IDENTITY = 'SET_DEFAULT_IDENTITY';
 export const SET_SUBMIT_DATA = 'SET_SUBMIT_DATA';
 export const SET_DEFAULT_SUBMIT_DATA = 'SET_DEFAULT_SUBMIT_DATA';
+export const UPDATE_SUBMIT_DATA = 'UPDATE_SUBMIT_DATA';
+export const SET_RESPONSE_DIALOG = 'SET_RESPONSE_DIALOG';
 export const CLEAR_IDENTITY = 'CLEAR_IDENTITY';
 export const SET_SSR_DATA = 'QUERY_DATA';
 export const CLEAR_SSR_DATA = 'CLEAR_QUERY';
 export const DELETE_ITEM = 'DELETE_ITEM';
+export const SET_SMS_FALSE = 'SET_SMS_FALSE';
 
 
 
@@ -31,6 +34,7 @@ export enum IMethod {
     UPDATE = 'UPDATE',
     DELETE = 'DELETE',
     CLEAR = 'CLEAR',
+    CHANGE = 'CHANGE'
 }
 
 export enum IResult {
@@ -86,6 +90,11 @@ export const logoutUserAction = () => action(SET_DEFAULT_IDENTITY, {});
 export const clearIdentity = () => action(CLEAR_IDENTITY, {});
 
 export const setSubmitData = (data: any) => action(SET_SUBMIT_DATA, data);
+export const updateSubmitData = (id: string) => action(UPDATE_SUBMIT_DATA, {id});
+
+export const setSendSmsFalse = (data: any) => action(SET_SMS_FALSE, data);
+export const setResponseDialog = (data: any) => action(SET_RESPONSE_DIALOG, data);
+
 export const deleteItem = (data: any) => action(DELETE_ITEM, data);
 export const defaultSubmitData = () => action(SET_DEFAULT_SUBMIT_DATA, {});
 

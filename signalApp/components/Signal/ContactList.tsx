@@ -86,9 +86,10 @@ const ContactList = (props: IContactListProps) => {
                 { isCurrentElResDialog &&
                         <View style={{ ...styles.inputContainer, marginTop: 2, borderTopColor: '#1b6b2f', borderTopWidth: 1}}>
                         <Text style={{ ...styles.text, fontWeight: '700' }}>Last call:</Text>
-                        <Text style={styles.text}>Type: {isCurrentElResDialog.type}</Text>
+                        {/* <Text style={styles.text}>Type: {isCurrentElResDialog.type}</Text> */}
                         <Text style={styles.text}>Duration: {isCurrentElResDialog.duration}</Text>
-                        <Text style={styles.text}>Date: {getStringDate(new Date(Number(isCurrentElResDialog.timestamp)))}</Text>
+                        {/* <Text style={styles.text}>Date: {getStringDate(new Date(Number(isCurrentElResDialog.timestamp)))}</Text> */}
+                        <Text style={styles.text}>{isCurrentElResDialog.dateTime ? isCurrentElResDialog.dateTime : 'no info'}</Text>
                         </View>}
             </TouchableOpacity>
         )

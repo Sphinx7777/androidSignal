@@ -365,9 +365,10 @@ const CustomInput = (props: ICustomInputProps) => {
                     {isCurrentElResDialog &&
                         <View style={{ ...styles.inputContainer, marginTop: 2, borderTopColor: '#1b6b2f', borderTopWidth: 1, justifyContent: 'space-between', paddingHorizontal: 2 }}>
                             <Text style={{ ...styles.text, fontWeight: '700' }}>Last call:</Text>
-                            <Text style={styles.text}>Type: {isCurrentElResDialog?.get('type')}</Text>
+                            {/* <Text style={styles.text}>Type: {isCurrentElResDialog?.get('type')}</Text> */}
                             <Text style={styles.text}>Duration: {isCurrentElResDialog?.get('duration')}</Text>
-                            <Text style={styles.text}>Date: {getStringDate(new Date(Number(isCurrentElResDialog?.get('timestamp'))))}</Text>
+                            {/* <Text style={styles.text}>Date: {getStringDate(new Date(Number(isCurrentElResDialog?.get('timestamp'))))}</Text> */}
+                            <Text style={styles.text}>{isCurrentElResDialog?.get('dateTime') ? isCurrentElResDialog?.get('dateTime') : 'no info'}</Text>
                         </View>}
                 </TouchableOpacity>}
                 <MobileDropdown

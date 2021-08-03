@@ -23,6 +23,9 @@ import {
     GET_IDENTITY,
     SET_DEFAULT_IDENTITY,
     SET_SUBMIT_DATA,
+    UPDATE_SUBMIT_DATA,
+    SET_SMS_FALSE,
+    SET_RESPONSE_DIALOG,
     SET_DEFAULT_SUBMIT_DATA
 } from './actions';
 import { IMessageBlock } from '../constants';
@@ -34,7 +37,6 @@ const initialEntities = fromJS({
 
 // Updates an entity cache in response to any action with response.entities.
 function entities(state = initialEntities, action: any) {
-
     if ('glob' in action) {
         const { glob: { crud, entity } } = action;
         switch (crud) {
@@ -70,6 +72,32 @@ function entities(state = initialEntities, action: any) {
             }
             break;
         }
+    }
+    if (action['type'] === SET_SMS_FALSE) {
+        let list = state?.get('signalData');
+        if (list && list.size > 0) {
+            list = list.map(one => {
+                if (one.get('id') === action.id) {
+                    one = one.set('needToSendSMS', false)
+                }
+                return one
+            })
+        }
+        state = state.set('signalData', list);
+    }
+    if (action['type'] === SET_RESPONSE_DIALOG) {
+        console.log('SET_RESPONSE_DIALOG===', action)
+        let list = state?.get('signalData');
+        if (list && list.size > 0) {
+            list = list.map(one => {
+                if (one.get('id') === action.id) {
+                    one = one.setIn(['responseDialog', 'dateTime'], action.responseDialog.dateTime)
+                    one = one.setIn(['responseDialog', 'duration'], action.responseDialog.duration)
+                }
+                return one
+            })
+        }
+        state = state.set('signalData', list);
     }
     return state;
 }
@@ -165,15 +193,18 @@ const initialSubmitData: ISubmitData = {
 function submitData(state: ISubmitData = initialSubmitData, action: any) {
     switch (action.type) {
     case SET_SUBMIT_DATA:
-        const update = state.data.find(o => o.id === action.submitData.id);
+        const update = state.data.find(o => JSON.stringify(o) === JSON.stringify(action.submitData));
         let data = [];
         data = !update ? [...state.data, action.submitData] : [...state.data.filter(o => o.id !== action.submitData.id), action.submitData];
         return {
                 ...state,
                 data
             };
-            case SET_DEFAULT_SUBMIT_DATA:
-            return { ...initialSubmitData };
+    case SET_DEFAULT_SUBMIT_DATA:
+    return { ...initialSubmitData };
+    case UPDATE_SUBMIT_DATA:
+        state = {...state, data: state.data.filter(o => o.id !== action.id) }
+        break;
     }
     return state;
 }

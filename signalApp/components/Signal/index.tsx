@@ -9,6 +9,7 @@ import saga from '../../decoradors/saga';
 import { EntityList } from '../../models/entity';
 import ContactList from './ContactList';
 import CallDetectorManager from 'react-native-call-detection';
+import SmsAndroid from 'react-native-get-sms-android';
 import CallLogs from 'react-native-call-log';
 import { isNetworkAvailable, showToastWithGravityAndOffset, sleep } from '../../utils';
 import { INewRowValues } from 'signalApp/constants';
@@ -42,6 +43,7 @@ interface ISignalProps {
     getData?: (data: any) => void;
     reloadData?: (data: any) => void;
     setSubmitData?: (data: any) => void;
+    checkSMS?: (checkSMSData: any) => void;
     addToDBXSheet?: (submitData: {values: INewRowValues}) => void;
     clearSubmitData?: () => void;
     setFlagger: (key: string, value: any) => void;
@@ -50,7 +52,7 @@ interface ISignalProps {
     route?: any;
     createRowLoader?: boolean;
 }
-@saga(DataEntity, ['getData', 'reloadData', 'setSubmitData', 'clearSubmitData', 'addToDBXSheet'])
+@saga(DataEntity, ['getData', 'reloadData', 'setSubmitData', 'clearSubmitData', 'addToDBXSheet', 'checkSMS'])
 class Signal extends React.Component<ISignalProps> {
 
     state = {
@@ -103,10 +105,15 @@ class Signal extends React.Component<ISignalProps> {
         })
     }
 
-    getDataSignal = () => {
+    getDataSignal = async () => {
         const { reloadData } = this.props;
-        reloadData({ pageName: 'signal', perPage: 200, filter: { mobileInfo: ['needToDialog', 'needToSendSMS'] } })
-        this.setCurrentElement(null)
+        const internet = await this.checkSubmitData()
+        if (internet.isConnected) {
+            reloadData({ pageName: 'signal', perPage: 200, filter: { mobileInfo: ['needToDialog', 'needToSendSMS'] } })
+            this.setCurrentElement(null)
+        } else {
+            showToastWithGravityAndOffset(`NO INTERNET CONNECTION`)
+        }
     }
 
     setIsStart = (isStart: boolean) => {
@@ -252,20 +259,23 @@ class Signal extends React.Component<ISignalProps> {
                 let count = 0
                 for await (const one of dataSmsArray) {
                     if (one.phone && one.phone.length >= 9 && one.smsBody && one.smsBody.length > 0 && one.smsBody.length < 900) {
-                        const response = await this.senOneSms(one.phone, one.smsBody)
+                        const response = await this.senOneSms(one.phone, one.smsBody, one.id)
                         if (response) {
                             showToastWithGravityAndOffset(`Message sent to number: ${one.phone}`)
                             count = count + 1
-                            this.props.setSubmitData({
+                            const submitData = {
                                 id: one.id,
+                                mobileUpdate: true,
+                                needToSendSMS: false,
                                 smsSend: {
-                                sendDate: Math.round(new Date().getTime() / 1000),
-                                phoneNumber: one.phone,
-                                smsBody: one.smsBody,
-                                userId,
-                                senderName },
-                                needToSendSMS: false
-                            })
+                                    sendDate: Math.round(new Date().getTime() / 1000),
+                                    phoneNumber: one.phone,
+                                    smsBody: one.smsBody,
+                                    userId,
+                                    senderName
+                                }
+                            }
+                            this.props.setSubmitData(submitData)
                         } else {
                             showToastWithGravityAndOffset(`Message not sent to number: ${one.phone}`)
                         }
@@ -281,9 +291,11 @@ class Signal extends React.Component<ISignalProps> {
         }
     }
 
-    senOneSms = async (phone: string, smsBody: string) => {
+    senOneSms = async (phone: string, smsBody: string, id: string) => {
         const response = await DirectSms.sendDirectSms(phone, smsBody);
-        await sleep(20000)
+        await sleep(5000)
+        this.props.setSubmitData({id, needToSendSMS: false})
+        await sleep(10000)
         return response;
     }
 
@@ -341,7 +353,7 @@ class Signal extends React.Component<ISignalProps> {
             userId = user.userId
             senderName = `${user.firstName ? user.firstName : ''} ${user.lastName ? user.lastName : ''}`
         }
-
+        responseDialog['mobileUpdate'] = true;
         responseDialog['userId'] = userId;
         responseDialog['senderName'] = senderName;
         this.setState((prevState) => {
@@ -520,12 +532,33 @@ class Signal extends React.Component<ISignalProps> {
         })
     }
 
+    checkSubmitData = async () => {
+        const { submitData: { data = [] } } = this.props;
+        const internet = await isNetworkAvailable()
+        if (internet.isConnected && data.length) {
+            for await (const one of data) {
+                this.props.setSubmitData(one);
+                await sleep(1000);
+            }
+        }
+        if (!internet.isConnected) {
+            showToastWithGravityAndOffset(`ERROR, NO INTERNET CONNECTION`)
+        }
+        return Promise.resolve(internet);
+    }
+
     componentDidMount() {
-        const { user } = this.props;
+        const { user, submitData: { data = [] } } = this.props;
+        let time = 1000
+        if (data.length > 0) {
+            time = time * data.length
+        }
         this.startStopListener();
         const validUser = user && user?.token && user?.token?.length > 0;
         if (validUser) {
-            this.getSignalData();
+            // this.props.clearSubmitData()
+            this.checkSubmitData()
+            setTimeout(this.getSignalData, time)
         }
     }
 
@@ -563,10 +596,44 @@ class Signal extends React.Component<ISignalProps> {
         })
     }
 
+    getCheckAllSms = () => {
+        const { user, checkSMS } = this.props;
+        const today = new Date();
+        const maxDate = today.valueOf();
+        const minDate = maxDate - 2667921326
+        console.log('maxDate', maxDate)
+        console.log('minDate', minDate)
+        let userId = null
+        if (user) {
+            userId = user.userId
+        }
+        const filter = {
+            box: 'sent', // 'inbox' (default), 'sent', 'draft', 'outbox', 'failed', 'queued', and '' for all
+            minDate, // timestamp (in milliseconds since UNIX epoch)
+            maxDate // timestamp (in milliseconds since UNIX epoch)
+        };
+        SmsAndroid.list(
+            JSON.stringify(filter),
+            (err: any) => {
+                console.log('Failed with this error: ' + err)
+                return null;
+            },
+            (count: any, smsList: any) => {
+                const response = JSON.parse(smsList);
+                if (count && count > 0 && response && response.length) {
+                    checkSMS({ data: [...response], userId})
+                }
+            },
+        )
+    }
+
+
     render() {
         const { currentItemIndex, currentElement, responseDialog, pause, isInternet } = this.state;
         const { dataItems, user, navigation, submitData, setSubmitData, clearSubmitData, addToDBXSheet, createRowLoader, setFlagger } = this.props;
-        // clearSubmitData()
+
+        console.log('submitData======', submitData)
+
         let dataSmsArray = null;
         if (dataItems && dataItems.size > 0) {
             dataSmsArray = dataItems.filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0)
@@ -621,6 +688,13 @@ class Signal extends React.Component<ISignalProps> {
             <View style={styles.container}>
                 <Spinner visible={createRowLoader} />
                 <View style={styles.viewContainer}>
+                <View style={{}}>
+                    <TouchableOpacity
+                        style={{}}
+                        onPress={this.getCheckAllSms}>
+                        <Text style={{}}>test</Text>
+                    </TouchableOpacity>
+                </View>
                     <ContactList
                         currentElement={currentElement}
                         currentItemIndex={currentItemIndex}
@@ -651,6 +725,7 @@ class Signal extends React.Component<ISignalProps> {
                             getDataSignal={this.getDataSignal}
                             pausePress={this.pausePress}
                             sendAllSMS={this.sendDirectSms}
+                            submitData={submitData}
                             currentElement={currentElement}
                             dataSmsArray={dataSmsArray}
                             setCurrentItemIndex={this.setCurrentItemIndex}
@@ -688,8 +763,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: any) => {
     const { entities, flagger, identity, submitData = [] } = state;
     // const dataItems = entities.get('signalData')?.sort() || null;
-    const dataItems = entities.get('signalData')?.sort(o => {
-        if (o.get('taskOrder')) {
+    const dataItems = entities.get('signalData')?.filter(o => o.get('needToDialog') || o.get('needToSendSMS')).sort(o => {
+        if (o.get('taskOrder') >= 0) {
             return -1
         }
         return 1

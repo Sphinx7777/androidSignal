@@ -2,8 +2,8 @@ import action from '../decoradors/action';
 import Entity, { CRUD, EntityMap } from './entity';
 import { call, put } from 'redux-saga/effects';
 import { ENTITY, HTTP_METHOD, INewRowValues } from '../constants';
-import { setSubmitData, defaultSubmitData, IMethod, setFlagger } from '../redux/actions';
-import { showToastWithGravityAndOffset, isNetworkAvailable } from 'signalApp/utils';
+import { setSubmitData, defaultSubmitData, IMethod, setFlagger, setSendSmsFalse, updateSubmitData, setResponseDialog } from '../redux/actions';
+import { showToastWithGravityAndOffset, isNetworkAvailable, isEmpty } from 'signalApp/utils';
 import { ICallLog } from 'signalApp/components/Signal';
 
 export type ISingleDataItem = EntityMap<{
@@ -89,7 +89,12 @@ class DataEntity extends Entity {
     @action()
     public * getData(data: any) {
         const isConnected = yield isNetworkAvailable()
-        if (isConnected.isConnected) {
+        .catch(err => {
+            console.log('setSubmitData_internet_error', err)
+            return null
+        })
+        // const isConnected = null
+        if (isConnected && isConnected.isConnected) {
             const { response } = yield call(this.xRead, 'http://ix.rebaltic.lt/api/signal', data, HTTP_METHOD.POST);
             showToastWithGravityAndOffset(`${response?.pager?.count > 0 ? 'Successfully get data !' : 'No data for the Signal APP'}`);
         } else {
@@ -100,7 +105,12 @@ class DataEntity extends Entity {
     @action()
     public * reloadData(data: any) {
         const isConnected = yield isNetworkAvailable()
-        if (isConnected.isConnected) {
+        .catch(err => {
+            console.log('setSubmitData_internet_error', err)
+            return null
+        })
+        // const isConnected = null
+        if (isConnected && isConnected.isConnected) {
             const glob = { entity: this,  crud: IMethod.CLEAR }
             yield put({type: ENTITY.SIGNAL_DATA, glob});
             const { response } = yield call(this.xRead, 'http://ix.rebaltic.lt/api/signal', data, HTTP_METHOD.POST);
@@ -112,32 +122,79 @@ class DataEntity extends Entity {
 
     @action()
     public * setSubmitData(submitData: any) {
+        console.log('SAGA____setSubmitData=====', submitData)
         const isConnected = yield isNetworkAvailable()
+        .catch(err => {
+            console.log('setSubmitData_internet_error', err)
+            return null
+        })
+        // const isConnected = null
         const crud: CRUD = submitData.crud === CRUD.DELETE ? CRUD.DELETE : CRUD.UPDATE
-        if (isConnected.isConnected) {
+        if (isConnected && isConnected.isConnected) {
             const { response } = yield call(this.xSave, 'http://ix.rebaltic.lt/api/signal', crud, submitData, HTTP_METHOD.PUT);
-            console.log('setSubmitData===', response.entities.signalData)
-            if (!submitData.smsSend) {
-                showToastWithGravityAndOffset('Successfully submit !');
+            const success = response && response.entities && response.entities.signalData && !isEmpty(response.entities.signalData[submitData.id])
+            // const success = null
+            if (!success) {
+                yield put(setSubmitData({ submitData }));
+                if (submitData.smsSend) {
+                    yield put(setSendSmsFalse({ id: submitData.id }));
+                }
+                if (submitData.responseDialog) {
+                    yield put(setResponseDialog({ id: submitData.id, responseDialog: submitData.responseDialog}));
+                }
+            }
+            if (success) {
+                yield put(updateSubmitData(submitData.id));
+                if (!submitData.smsSend && !submitData.hasOwnProperty('mobileUpdate') && !submitData.hasOwnProperty('needToSendSMS')) {
+                    showToastWithGravityAndOffset('Successfully submit !');
+                }
             }
         } else {
-            showToastWithGravityAndOffset('No internet connect !!!');
+            showToastWithGravityAndOffset('NO INTERNET CONNECTION !!!');
+            yield put(setSubmitData({ submitData }));
+            if (submitData.smsSend) {
+                yield put(setSendSmsFalse({ id: submitData.id }));
+            }
+            if (submitData.responseDialog) {
+                yield put(setResponseDialog({ id: submitData.id, responseDialog: submitData.responseDialog}));
+            }
         }
-        // yield put(setSubmitData({ submitData }));
     }
 
     @action()
     public * addToDBXSheet(submitData: {values: INewRowValues}) {
         const isConnected = yield isNetworkAvailable()
-        if (isConnected.isConnected) {
+        .catch(err => {
+            console.log('setSubmitData_internet_error', err)
+            return null
+        })
+        if (isConnected && isConnected.isConnected) {
             const { response } = yield call(this.xSave, 'http://ix.rebaltic.lt/api/signal/create-row', CRUD.UPDATE, submitData, HTTP_METHOD.PUT);
             if (response && response.entities && response.entities.signalData) {
                 showToastWithGravityAndOffset('Successfully created row !');
             }
             yield put(setFlagger('createRowLoader', null))
         } else {
-            showToastWithGravityAndOffset('No internet connect !!!');
+            showToastWithGravityAndOffset('NO INTERNET CONNECTION !!!');
             yield put(setFlagger('createRowLoader', null))
+        }
+    }
+
+    @action()
+    public * checkSMS(checkSMSData: any) {
+        console.log('checkSMSData==================', checkSMSData)
+        const isConnected = yield isNetworkAvailable()
+        .catch(err => {
+            console.log('setSubmitData_internet_error', err)
+            return null
+        })
+        if (isConnected && isConnected.isConnected) {
+            const { response } = yield call(this.xFetch, 'http://ix.rebaltic.lt/api/signal/checkSMS', HTTP_METHOD.PUT, checkSMSData);
+            if (response && response.success) {
+                showToastWithGravityAndOffset('Successfully check SMS !');
+            }
+        } else {
+            showToastWithGravityAndOffset('NO INTERNET CONNECTION !!!');
         }
     }
 

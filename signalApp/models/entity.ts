@@ -105,12 +105,13 @@ export default class Entity {
     protected xFetch(endpoint: string,  method: HTTP_METHOD, data = {}, token?: string) {
         // let fullUrl = BASE_URL + '/api' + endpoint;
         let fullUrl = endpoint;
-
+        const identity = Entity.store.getState().identity;
+        const t = identity && identity.user && identity.user.token;
         const params: any = {
             method,
             credentials: 'include',
             headers: {
-                Authorization: 'bearer ' + token, // get token from cookies
+                Authorization: 'bearer ' + token ? token : t, // get token from cookies
             },
         };
 
@@ -121,7 +122,6 @@ export default class Entity {
             const opts = Object.entries(data).map(([key, val]) => key + '=' + val).join('&');
             fullUrl += (opts.length > 0 ? '?' + opts : '');
         }
-
         return fetch(fullUrl, params).then((response) => {
             return response.json().then((json) => ({ json, response }));
         },
@@ -137,7 +137,7 @@ export default class Entity {
         return new Entity().fetch(uri, data, method);
     }
 
-    public async fetch(uri: string, data?: any, method: HTTP_METHOD = HTTP_METHOD.POST) {
+    fetch = async (uri: string, data?: any, method: HTTP_METHOD = HTTP_METHOD.POST) => {
         const dispatch = Entity && Entity.store && Entity.store.dispatch;
 
         // tslint:disable-next-line: no-shadowed-variable
