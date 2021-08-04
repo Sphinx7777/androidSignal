@@ -135,6 +135,7 @@ class DataEntity extends Entity {
             const success = response && response.entities && response.entities.signalData && !isEmpty(response.entities.signalData[submitData.id])
             // const success = null
             if (!success) {
+                submitData['mobileErrorType'] = 'bad_request'
                 yield put(setSubmitData({ submitData }));
                 if (submitData.smsSend) {
                     yield put(setSendSmsFalse({ id: submitData.id }));
@@ -151,6 +152,7 @@ class DataEntity extends Entity {
             }
         } else {
             showToastWithGravityAndOffset('NO INTERNET CONNECTION !!!');
+            submitData['mobileErrorType'] = 'no_internet_connect'
             yield put(setSubmitData({ submitData }));
             if (submitData.smsSend) {
                 yield put(setSendSmsFalse({ id: submitData.id }));

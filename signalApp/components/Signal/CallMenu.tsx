@@ -37,6 +37,8 @@ const CallMenu = (props: ICallMenuProps) => {
         mobileSearch: ''
     })
 
+    const [errShow, setErrShow] = useState(false)
+
     const calling = () => currentElement && makeCall(currentElement?.get('phone'), 'disable')
 
     const handleNextPress = async () => {
@@ -130,6 +132,13 @@ const CallMenu = (props: ICallMenuProps) => {
         }
     }
 
+    const showErrors = () => setErrShow(true)
+    const closeErrors = () => {
+        if (errShow) {
+            setErrShow(false)
+        }
+    }
+
     const isSMSCount = callData?.filter(obj => obj.get('needToSendSMS'));
     const isDialCount = callData?.filter(obj => obj.get('needToDialog'));
     const isAllCount = callData?.filter(obj => obj.get('needToDialog') || obj.get('needToSendSMS'));
@@ -144,8 +153,22 @@ const CallMenu = (props: ICallMenuProps) => {
         const tempPhoneCount = isAllCount?.size - isValidPhones?.size;
         phoneCount = tempPhoneCount >= 0 ? tempPhoneCount : 0
     }
+    const noInternetConnectErrors = []
+    const badRequestErrors = []
+    if (submitData && submitData.data &&  submitData.data.length > 0) {
+        for (const one of submitData.data) {
+            if (one['mobileErrorType'] && one['mobileErrorType'] === 'no_internet_connect') {
+                noInternetConnectErrors.push(one)
+            }
+            if (one['mobileErrorType'] && one['mobileErrorType'] === 'bad_request') {
+                badRequestErrors.push(one)
+            }
+        }
+    }
+    // JSON.stringify(submitData.data, null, 2)
     const dialogDescription = `You confirm the sending of messages ? ${isValidSMS?.size} SMS will be sent. ${countSms && countSms > 0 ? countSms === 1 ? countSms + ' message' + ' have incorrect number format or message body' : countSms + ' messages' + ' have incorrect number format or message body' : ''}`
-
+    const noInternetErrText = `No internet connection. ${noInternetConnectErrors.length} request${noInternetConnectErrors.length > 1 ? 's' : ''} failed, check your internet connection`
+    const badRequestErrText = `${badRequestErrors.length} server request${badRequestErrors.length > 1 ? 's' : ''} failed, check web logs`
     return (
         <>
             <View style={styles.wrapper}>
@@ -155,8 +178,23 @@ const CallMenu = (props: ICallMenuProps) => {
                         <Text style={{marginBottom: 2, color: countSms > 0 ? 'red' : 'black'}}>{`${countSms || 0} sms have incorrect number format or empty sms body`}</Text>
                         <Text style={{marginBottom: 2, color: isDialCount?.size > 0 ? 'green' : 'black'}}>{`Need to make ${isDialCount?.size || 0} calls`}</Text>
                         <Text style={{color: phoneCount > 0 ? 'red' : 'black'}}>{`${phoneCount || 0} items have incorrect number format`}</Text>
-                        {submitData && submitData.data && submitData.data.length > 0 &&
-                        (<Text style={{color: 'red'}}>{`${submitData.data.length} server request${submitData.data.length > 1 ? 's' : ''} failed, check your internet connection`}</Text>)
+                        {noInternetConnectErrors.length > 0 &&
+                            <TouchableOpacity
+                            style={{}}
+                            onLongPress={showErrors}
+                            onPress={closeErrors}
+                            >
+                            <Text style={{color: 'red'}}>{noInternetErrText}</Text>
+                            </TouchableOpacity>
+                        }
+                        {badRequestErrors.length > 0 &&
+                                                    <TouchableOpacity
+                                                    style={{}}
+                                                    onLongPress={showErrors}
+                                                    onPress={closeErrors}
+                                                    >
+                                                    <Text style={{color: 'red'}}>{badRequestErrText}</Text>
+                                                    </TouchableOpacity>
                         }
                         <TouchableOpacity
                             style={{ ...styles.button, maxWidth: 100, marginTop: 5 }}
@@ -222,6 +260,11 @@ const CallMenu = (props: ICallMenuProps) => {
                         <Image style={{ width: 20, height: 20, padding: 10, backgroundColor: 'white' }}  source={require('../../../assets/search.png')} />
                     </TouchableOpacity>
                 </View>
+                { errShow &&
+                    <View style={styles.inputContainer}>
+                        <Text>{JSON.stringify(submitData.data, null, 2)}</Text>
+                    </View>
+                }
             </View>
             <ModalDialog
                 handleCancel={handleCancel}

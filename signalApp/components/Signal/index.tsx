@@ -293,9 +293,7 @@ class Signal extends React.Component<ISignalProps> {
 
     senOneSms = async (phone: string, smsBody: string, id: string) => {
         const response = await DirectSms.sendDirectSms(phone, smsBody);
-        await sleep(5000)
-        this.props.setSubmitData({id, needToSendSMS: false})
-        await sleep(10000)
+        await sleep(15000)
         return response;
     }
 
@@ -363,7 +361,7 @@ class Signal extends React.Component<ISignalProps> {
             }
         })
         console.log('responseDialog', responseDialog)
-        this.props.setSubmitData({ id, responseDialog })
+        this.props.setSubmitData({ id, responseDialog, mobileUpdate: true })
     }
 
     startStopListener = async () => {
@@ -537,8 +535,9 @@ class Signal extends React.Component<ISignalProps> {
         const internet = await isNetworkAvailable()
         if (internet.isConnected && data.length) {
             for await (const one of data) {
+                delete one['mobileErrorType']
                 this.props.setSubmitData(one);
-                await sleep(1000);
+                await sleep(2000);
             }
         }
         if (!internet.isConnected) {
