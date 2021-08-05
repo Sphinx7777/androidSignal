@@ -177,8 +177,8 @@ class DataEntity extends Entity {
             }
             yield put(setFlagger('createRowLoader', null))
         } else {
-            showToastWithGravityAndOffset('NO INTERNET CONNECTION !!!');
             yield put(setFlagger('createRowLoader', null))
+            showToastWithGravityAndOffset('NO INTERNET CONNECTION !!!');
         }
     }
 
@@ -195,7 +195,9 @@ class DataEntity extends Entity {
             if (response && response.success) {
                 showToastWithGravityAndOffset('Successfully check SMS !');
             }
+            yield put(setFlagger('checkSMSLoader', null))
         } else {
+            yield put(setFlagger('checkSMSLoader', null))
             showToastWithGravityAndOffset('NO INTERNET CONNECTION !!!');
         }
     }

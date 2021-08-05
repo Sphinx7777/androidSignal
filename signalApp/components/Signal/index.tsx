@@ -47,6 +47,7 @@ interface ISignalProps {
     addToDBXSheet?: (submitData: {values: INewRowValues}) => void;
     clearSubmitData?: () => void;
     setFlagger: (key: string, value: any) => void;
+    checkSMSLoader?: boolean;
     navigation?: any;
     submitData: any;
     route?: any;
@@ -72,7 +73,7 @@ class Signal extends React.Component<ISignalProps> {
 
     getSignalData = async () => {
         const isConnected = await isNetworkAvailable();
-        if (isConnected.isConnected) {
+        if (isConnected && isConnected.isConnected) {
             this.getDataSignal()
             this.setState((prevState) => {
                 return {
@@ -81,7 +82,7 @@ class Signal extends React.Component<ISignalProps> {
                 }
             })
         } else {
-            showToastWithGravityAndOffset('No internet connect !!!');
+            showToastWithGravityAndOffset('NO INTERNET CONNECTION !!!');
             this.setState((prevState) => {
                 return {
                     ...prevState,
@@ -92,7 +93,7 @@ class Signal extends React.Component<ISignalProps> {
         this.setState((prevState) => {
             return {
                 ...prevState,
-                internetConnect: isConnected.isConnected,
+                internetConnect: isConnected && isConnected.isConnected ? true : false,
             }
         })
     }
@@ -105,14 +106,26 @@ class Signal extends React.Component<ISignalProps> {
         })
     }
 
+    // getDataSignal = async () => {
+    //     const { reloadData } = this.props;
+    //     const internet = await this.checkSubmitData()
+    //     if (internet.isConnected) {
+    //         reloadData({ pageName: 'signal', perPage: 200, filter: { mobileInfo: ['needToDialog', 'needToSendSMS'] } })
+    //         this.setCurrentElement(null)
+    //     } else {
+    //         showToastWithGravityAndOffset(`NO INTERNET CONNECTION`)
+    //     }
+    // }
+
     getDataSignal = async () => {
         const { reloadData } = this.props;
-        const internet = await this.checkSubmitData()
-        if (internet.isConnected) {
+        const isConnected = await isNetworkAvailable();
+        if (isConnected && isConnected.isConnected) {
+            this.checkSubmitData()
             reloadData({ pageName: 'signal', perPage: 200, filter: { mobileInfo: ['needToDialog', 'needToSendSMS'] } })
             this.setCurrentElement(null)
         } else {
-            showToastWithGravityAndOffset(`NO INTERNET CONNECTION`)
+            showToastWithGravityAndOffset('NO INTERNET CONNECTION !!!');
         }
     }
 
@@ -285,6 +298,7 @@ class Signal extends React.Component<ISignalProps> {
                 this.setState({messagesUpload: false})
             } else {
                 console.log('SMS permission denied');
+                showToastWithGravityAndOffset('SMS permission denied')
             }
         } catch (err) {
             console.warn('SMS permission_ERROR', err);
@@ -532,32 +546,30 @@ class Signal extends React.Component<ISignalProps> {
 
     checkSubmitData = async () => {
         const { submitData: { data = [] } } = this.props;
-        const internet = await isNetworkAvailable()
-        if (internet.isConnected && data.length) {
+        console.log('submitData======', data)
+        if (data.length > 0) {
             for await (const one of data) {
                 delete one['mobileErrorType']
                 this.props.setSubmitData(one);
-                await sleep(2000);
+                await sleep(3000);
             }
         }
-        if (!internet.isConnected) {
-            showToastWithGravityAndOffset(`ERROR, NO INTERNET CONNECTION`)
-        }
-        return Promise.resolve(internet);
+        return Promise.resolve(data);
     }
 
     componentDidMount() {
-        const { user, submitData: { data = [] } } = this.props;
-        let time = 1000
-        if (data.length > 0) {
-            time = time * data.length
-        }
+        const { user } = this.props;
+        // let time = 1000
+        // if (data.length > 0) {
+        //     time = time * data.length
+        // }
         this.startStopListener();
         const validUser = user && user?.token && user?.token?.length > 0;
         if (validUser) {
             // this.props.clearSubmitData()
-            this.checkSubmitData()
-            setTimeout(this.getSignalData, time)
+            // this.checkSubmitData()
+            this.getSignalData()
+            // setTimeout(this.getSignalData, time)
         }
     }
 
@@ -595,45 +607,80 @@ class Signal extends React.Component<ISignalProps> {
         })
     }
 
-    getCheckAllSms = () => {
-        const { user, checkSMS } = this.props;
-        const today = new Date();
-        const maxDate = today.valueOf();
-        const minDate = maxDate - 2667921326
-        console.log('maxDate', maxDate)
-        console.log('minDate', minDate)
-        let userId = null
-        if (user) {
-            userId = user.userId
-        }
-        const filter = {
-            box: 'sent', // 'inbox' (default), 'sent', 'draft', 'outbox', 'failed', 'queued', and '' for all
-            minDate, // timestamp (in milliseconds since UNIX epoch)
-            maxDate // timestamp (in milliseconds since UNIX epoch)
-        };
-        SmsAndroid.list(
-            JSON.stringify(filter),
-            (err: any) => {
-                console.log('Failed with this error: ' + err)
-                return null;
-            },
-            (count: any, smsList: any) => {
-                const response = JSON.parse(smsList);
-                if (count && count > 0 && response && response.length) {
-                    checkSMS({ data: [...response], userId})
+    getCheckAllSms = async () => {
+        const { user, checkSMS, setFlagger } = this.props;
+        try {
+            const grantedSendSms = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.SEND_SMS,
+                {
+                    title: 'YourProject App Sms Permission',
+                    message: 'YourProject App needs access to your inbox so you can send messages in background.',
+                    buttonNeutral: 'Ask Me Later',
+                    buttonNegative: 'Cancel',
+                    buttonPositive: 'OK',
+                },
+            );
+            const grantedReadSms = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.READ_SMS,
+                {
+                    title: 'YourProject App Sms Permission',
+                    message: 'YourProject App needs access to your inbox so you can send messages in background.',
+                    buttonNeutral: 'Ask Me Later',
+                    buttonNegative: 'Cancel',
+                    buttonPositive: 'OK',
+                },
+            );
+            if (grantedSendSms === PermissionsAndroid.RESULTS.GRANTED && grantedReadSms === PermissionsAndroid.RESULTS.GRANTED) {
+                const today = new Date();
+                const maxDate = today.valueOf();
+                const minDate = maxDate - 2667921326
+                const lastCheckSMSDate = Math.round(today.getTime() / 1000)
+                let userId = null
+                if (user) {
+                    userId = user.userId
                 }
-            },
-        )
+                const filter = {
+                    box: 'sent', // 'inbox' (default), 'sent', 'draft', 'outbox', 'failed', 'queued', and '' for all
+                    minDate, // timestamp (in milliseconds since UNIX epoch)
+                    maxDate // timestamp (in milliseconds since UNIX epoch)
+                };
+                const isConnected = await isNetworkAvailable();
+                if (isConnected && isConnected.isConnected) {
+                    SmsAndroid.list(
+                        JSON.stringify(filter),
+                        (err: any) => {
+                            showToastWithGravityAndOffset('unrecognized Sms Android application ERROR !!!')
+                            console.log('Failed with this error: ' + err)
+                            return null;
+                        },
+                        (count: any, smsList: any) => {
+                            const response = JSON.parse(smsList);
+                            if (count && count > 0 && response && response.length) {
+                                setFlagger('checkSMSLoader', true)
+                                checkSMS({ data: [...response], userId, lastCheckSMSDate})
+                                console.log('checkSMS_user===', user)
+                                console.log('lastCheckSMSDate', lastCheckSMSDate)
+                            }
+                        },
+                    )
+                } else {
+                    showToastWithGravityAndOffset('NO INTERNET CONNECTION !!!');
+                }
+            } else {
+                console.log('SMS permission denied');
+                showToastWithGravityAndOffset('SMS permission denied')
+            }
+        } catch (error) {
+            console.warn('SMS permission_ERROR', error);
+        }
     }
 
 
     render() {
         const { currentItemIndex, currentElement, responseDialog, pause, isInternet } = this.state;
-        const { dataItems, user, navigation, submitData, setSubmitData, clearSubmitData, addToDBXSheet, createRowLoader, setFlagger } = this.props;
-
-        console.log('submitData======', submitData)
-
+        const { dataItems, user, navigation, submitData, setSubmitData, clearSubmitData, addToDBXSheet, createRowLoader, setFlagger, checkSMSLoader } = this.props;
         let dataSmsArray = null;
+        console.log('checkSMSLoader', checkSMSLoader)
         if (dataItems && dataItems.size > 0) {
             dataSmsArray = dataItems.filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0)
         }
@@ -669,31 +716,31 @@ class Signal extends React.Component<ISignalProps> {
                     </View>
                 </View>)
         }
-        if (!isInternet) {
-            return (<View style={styles.loadContainer}>
-                <View style={{ ...styles.loadContainer, height: 200 }}>
-                    <ActivityIndicator size='large' color='green' />
-                    <TouchableOpacity
-                        activeOpacity={0.5}
-                        style={{ marginTop: 20 }}
-                        onPress={this.getSignalData}>
-                        <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#fc9fa8' }}>No internet connection, click to try again</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>)
-        }
+        // if (!isInternet) {
+        //     return (<View style={styles.loadContainer}>
+        //         <View style={{ ...styles.loadContainer, height: 200 }}>
+        //             <ActivityIndicator size='large' color='green' />
+        //             <TouchableOpacity
+        //                 activeOpacity={0.5}
+        //                 style={{ marginTop: 20 }}
+        //                 onPress={this.getSignalData}>
+        //                 <Text style={{ color: '#bf0416', fontSize: 20, marginTop: 30, padding: 20, borderRadius: 20, backgroundColor: '#fc9fa8' }}>No internet connection, click to try again</Text>
+        //             </TouchableOpacity>
+        //         </View>
+        //     </View>)
+        // }
 
         return (
             <View style={styles.container}>
-                <Spinner visible={createRowLoader} />
+                <Spinner visible={createRowLoader || checkSMSLoader} />
                 <View style={styles.viewContainer}>
-                <View style={{}}>
+                {/* <View style={{}}>
                     <TouchableOpacity
                         style={{}}
                         onPress={this.getCheckAllSms}>
                         <Text style={{}}>test</Text>
                     </TouchableOpacity>
-                </View>
+                </View> */}
                     <ContactList
                         currentElement={currentElement}
                         currentItemIndex={currentItemIndex}
@@ -719,8 +766,10 @@ class Signal extends React.Component<ISignalProps> {
                             sendSMS={this.sendDirectSms} />
                         <CallMenu
                             pause={pause}
+                            user={this.props.user}
                             messagesUpload={this.state.messagesUpload}
                             getData={this.props.getData}
+                            getCheckAllSms={this.getCheckAllSms}
                             getDataSignal={this.getDataSignal}
                             pausePress={this.pausePress}
                             sendAllSMS={this.sendDirectSms}
@@ -760,7 +809,7 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state: any) => {
-    const { entities, flagger, identity, submitData = [] } = state;
+    const { entities, flagger: {createRowLoader, checkSMSLoader}, identity, submitData = [] } = state;
     // const dataItems = entities.get('signalData')?.sort() || null;
     const dataItems = entities.get('signalData')?.filter(o => o.get('needToDialog') || o.get('needToSendSMS')).sort(o => {
         if (o.get('taskOrder') >= 0) {
@@ -773,7 +822,8 @@ const mapStateToProps = (state: any) => {
         dataItems,
         user,
         submitData,
-        createRowLoader: flagger.createRowLoader
+        createRowLoader,
+        checkSMSLoader
     };
 }
 

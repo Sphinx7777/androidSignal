@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput } from 'react-native';
-import { showToastWithGravityAndOffset } from 'signalApp/utils';
+import { getStringDate, showToastWithGravityAndOffset } from 'signalApp/utils';
 import { ISingleDataItem } from '../../models/DataEntity';
 import { EntityList } from '../../models/entity';
 import ModalDialog from '../Dialog';
@@ -12,7 +12,9 @@ interface ICallMenuProps {
     makeCall: (phone: string, pauseDisable: string) => Promise<any>;
     setCurrentElement: (currentElement: ISingleDataItem) => void;
     sendAllSMS: () => void;
+    getCheckAllSms: () => void;
     dataSmsArray: any;
+    user?: any;
     pausePress: (pause?: boolean) => void;
     pause: boolean;
     getDataSignal?: () => void;
@@ -28,9 +30,8 @@ interface ICallMenuState {
 
 const CallMenu = (props: ICallMenuProps) => {
     const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, pausePress,
-            pause, getDataSignal, currentElement, getData, messagesUpload, submitData } = props;
+            pause, getDataSignal, currentElement, getData, messagesUpload, submitData, getCheckAllSms, user } = props;
     const [sendAllSMSVisible, setSendAllSMSVisible] = useState(false)
-
 
     const [state, setState] = useState<ICallMenuState>({
         callStart: false,
@@ -38,7 +39,6 @@ const CallMenu = (props: ICallMenuProps) => {
     })
 
     const [errShow, setErrShow] = useState(false)
-
     const calling = () => currentElement && makeCall(currentElement?.get('phone'), 'disable')
 
     const handleNextPress = async () => {
@@ -155,7 +155,7 @@ const CallMenu = (props: ICallMenuProps) => {
     }
     const noInternetConnectErrors = []
     const badRequestErrors = []
-    if (submitData && submitData.data &&  submitData.data.length > 0) {
+    if (submitData && submitData.data && submitData.data.length > 0) {
         for (const one of submitData.data) {
             if (one['mobileErrorType'] && one['mobileErrorType'] === 'no_internet_connect') {
                 noInternetConnectErrors.push(one)
@@ -165,7 +165,7 @@ const CallMenu = (props: ICallMenuProps) => {
             }
         }
     }
-    // JSON.stringify(submitData.data, null, 2)
+    const errors = errShow && (noInternetConnectErrors.length || badRequestErrors.length)
     const dialogDescription = `You confirm the sending of messages ? ${isValidSMS?.size} SMS will be sent. ${countSms && countSms > 0 ? countSms === 1 ? countSms + ' message' + ' have incorrect number format or message body' : countSms + ' messages' + ' have incorrect number format or message body' : ''}`
     const noInternetErrText = `No internet connection. ${noInternetConnectErrors.length} request${noInternetConnectErrors.length > 1 ? 's' : ''} failed, check your internet connection`
     const badRequestErrText = `${badRequestErrors.length} server request${badRequestErrors.length > 1 ? 's' : ''} failed, check web logs`
@@ -188,18 +188,26 @@ const CallMenu = (props: ICallMenuProps) => {
                             </TouchableOpacity>
                         }
                         {badRequestErrors.length > 0 &&
-                                                    <TouchableOpacity
-                                                    style={{}}
-                                                    onLongPress={showErrors}
-                                                    onPress={closeErrors}
-                                                    >
-                                                    <Text style={{color: 'red'}}>{badRequestErrText}</Text>
-                                                    </TouchableOpacity>
+                            <TouchableOpacity
+                            style={{}}
+                            onLongPress={showErrors}
+                            onPress={closeErrors}
+                            >
+                            <Text style={{color: 'red'}}>{badRequestErrText}</Text>
+                            </TouchableOpacity>
                         }
                         <TouchableOpacity
                             style={{ ...styles.button, maxWidth: 100, marginTop: 5 }}
                             onPress={getDataSignal}>
                             <Text style={{ ...styles.buttonText, marginTop: 5 }}>Reload data</Text>
+                        </TouchableOpacity>
+                        <Text style={{ marginVertical: 2, color: 'black'}}>Last check:
+                        <Text style={{ marginVertical: 2, color: 'black', fontWeight: '700' }}> {user?.lastCheckSMSDate ? getStringDate(new Date(Number(user?.lastCheckSMSDate * 1000))) : 'no info'}</Text>
+                        </Text>
+                        <TouchableOpacity
+                            style={{ ...styles.button, maxWidth: 100, marginTop: 2, backgroundColor: '#31b7cc', borderColor: '#31b7cc' }}
+                            onPress={getCheckAllSms}>
+                            <Text style={{ ...styles.buttonText, marginTop: 5 }}>Check sms</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.buttonsBlock}>
@@ -260,10 +268,11 @@ const CallMenu = (props: ICallMenuProps) => {
                         <Image style={{ width: 20, height: 20, padding: 10, backgroundColor: 'white' }}  source={require('../../../assets/search.png')} />
                     </TouchableOpacity>
                 </View>
-                { errShow &&
-                    <View style={styles.inputContainer}>
+                { errors ?
+                    (<View style={styles.inputContainer}>
                         <Text>{JSON.stringify(submitData.data, null, 2)}</Text>
-                    </View>
+                    </View>)
+                    : null
                 }
             </View>
             <ModalDialog

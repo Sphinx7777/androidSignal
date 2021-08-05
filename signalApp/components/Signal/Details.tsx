@@ -117,12 +117,12 @@ class Details extends React.Component<IDetailsProps> {
     renderItem = (data: any) => {
         const item: IDataItem = data.item
         let inputsArr = ['email', 'name', 'taskName', 'details', 'phone', 'segment', 'taskDescription', 'reference', 'currentComments', 'price',
-        'smsBody', 'currentYearComment', 'group', 'calledAbout', 'pastYearsComment', 'comments1', 'comments2', 'comments3', 'comments4', 'memberRating',
-        'additionalPhones', 'additionalPhoneNames', 'additionalPhoneDetails', 'relativesPhones', 'relativesRelationship', 'highNetWorth'
+        'smsBody', 'currentYearComment', 'group', 'calledAbout', 'pastYearsComment', 'comments1', 'comments2', 'comments3', 'comments4', 'memberRating', 'additionalPhoneDetails',
+        'relativesPhones', 'relativesRelationship', 'highNetWorth'
         ]
         const revDateArr = ['skPropRentDate', 'skPropSaleDate', 'revLastPropRentedOutDate', 'revLastPropListSaleDate', 'revFirstPropListSaleDate',
         'revLastPropListedRentDate', 'revFirstPropListedRentDate', 'revLastPropSoldDate']
-        const viewArr = ['agentID', 'searchType', 'year', 'source', 'id', 'language', 'brokersTabId','language', 'totalDialAtt', 'totalSmsSent',
+        const viewArr = ['agentID', 'searchType', 'year', 'source', 'id', 'language', 'brokersTabId', 'language', 'totalDialAtt', 'totalSmsSent',
         'totalSuccessContact', 'additionalPhones', 'additionalPhoneNames', 'additionalEmails', 'skPropRentMaxPrice', 'skPropRentStreet', 'skPropSaleMaxPrice',
         'skPropSaleStreet', 'revLastPropListSaleStreet', 'revLastPropListSalePrice', 'revFirstPropListSaleStreet', 'revFirstPropListSalePrice', 'revLastPropListedRentStreet',
         'revLastPropListedRentPrice', 'revFirstPropListedRentStreet', 'revFirstPropListedRentPrice', 'revLastPropSoldPrice', 'revLastPropSoldStreet', 'revTotalPropListSale',

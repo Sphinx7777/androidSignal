@@ -193,9 +193,15 @@ const initialSubmitData: ISubmitData = {
 function submitData(state: ISubmitData = initialSubmitData, action: any) {
     switch (action.type) {
     case SET_SUBMIT_DATA:
-        const update = state.data.find(o => JSON.stringify(o) === JSON.stringify(action.submitData));
+        const update = state.data.find(o => o.id === action.submitData.id);
         let data = [];
-        data = !update ? [...state.data, action.submitData] : [...state.data.filter(o => o.id !== action.submitData.id), action.submitData];
+        data = !update ? [...state.data, action.submitData]
+        : [...state.data.map(o => {
+            if (o.id === action.submitData.id) {
+                o = {...o, ...action.submitData}
+            }
+            return o
+        })];
         return {
                 ...state,
                 data
