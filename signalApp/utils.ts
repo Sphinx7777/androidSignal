@@ -14,13 +14,13 @@ export const getStringDate: (date: Date) => string = (date: Date) => {
     return `${date.getFullYear()}-${(m < 10 ? '0' : '') + m}-${(d < 10 ? '0' : '') + d}`;
 }
 
-export const showToastWithGravityAndOffset = (text: string, duration = ToastAndroid.SHORT) => {
+export const showToastWithGravityAndOffset = (text: string = '', duration = ToastAndroid.LONG, position = ToastAndroid.BOTTOM, xOffset = 50, yOffset = 120) => {
     ToastAndroid.showWithGravityAndOffset(
-        text,
+        text.toLocaleUpperCase(text),
         duration,
-        ToastAndroid.BOTTOM,
-        50,
-        150
+        position,
+        xOffset,
+        yOffset
     );
 }
 

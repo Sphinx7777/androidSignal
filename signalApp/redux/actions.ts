@@ -15,6 +15,7 @@ export const CLEAR_REQUEST_RESULT = 'CLEAR_REQUEST_RESULT';
 export const MODEL_CLEAR = 'CLEAR';
 export const PAGE_SET_FILTER = 'PAGE_SET_FILTER';
 export const GET_IDENTITY = 'GET_IDENTITY';
+export const UPDATE_IDENTITY = 'UPDATE_IDENTITY';
 export const SET_DEFAULT_IDENTITY = 'SET_DEFAULT_IDENTITY';
 export const SET_SUBMIT_DATA = 'SET_SUBMIT_DATA';
 export const SET_DEFAULT_SUBMIT_DATA = 'SET_DEFAULT_SUBMIT_DATA';
@@ -87,6 +88,7 @@ export const clearSSRData = (name: string) => action(CLEAR_SSR_DATA, { name });
 
 export const getIdentity = (data: any) => action(GET_IDENTITY, data);
 export const logoutUserAction = () => action(SET_DEFAULT_IDENTITY, {});
+export const updateIdentity = (data: any) => action(UPDATE_IDENTITY, data);
 export const clearIdentity = () => action(CLEAR_IDENTITY, {});
 
 export const setSubmitData = (data: any) => action(SET_SUBMIT_DATA, data);

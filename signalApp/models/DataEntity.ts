@@ -2,7 +2,7 @@ import action from '../decoradors/action';
 import Entity, { CRUD, EntityMap } from './entity';
 import { call, put } from 'redux-saga/effects';
 import { ENTITY, HTTP_METHOD, INewRowValues } from '../constants';
-import { setSubmitData, defaultSubmitData, IMethod, setFlagger, setSendSmsFalse, updateSubmitData, setResponseDialog } from '../redux/actions';
+import { setSubmitData, defaultSubmitData, IMethod, setFlagger, setSendSmsFalse, updateSubmitData, setResponseDialog, updateIdentity } from '../redux/actions';
 import { showToastWithGravityAndOffset, isNetworkAvailable, isEmpty } from 'signalApp/utils';
 import { ICallLog } from 'signalApp/components/Signal';
 
@@ -192,7 +192,9 @@ class DataEntity extends Entity {
         })
         if (isConnected && isConnected.isConnected) {
             const { response } = yield call(this.xFetch, 'http://ix.rebaltic.lt/api/signal/checkSMS', HTTP_METHOD.PUT, checkSMSData);
-            if (response && response.success) {
+            console.log('checkSMS__response==', response)
+            if (response?.success) {
+                yield put(updateIdentity({ lastCheckSMSDate: response?.data?.lastCheckSMSDate }));
                 showToastWithGravityAndOffset('Successfully check SMS !');
             }
             yield put(setFlagger('checkSMSLoader', null))

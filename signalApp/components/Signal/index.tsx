@@ -559,17 +559,10 @@ class Signal extends React.Component<ISignalProps> {
 
     componentDidMount() {
         const { user } = this.props;
-        // let time = 1000
-        // if (data.length > 0) {
-        //     time = time * data.length
-        // }
         this.startStopListener();
         const validUser = user && user?.token && user?.token?.length > 0;
         if (validUser) {
-            // this.props.clearSubmitData()
-            // this.checkSubmitData()
             this.getSignalData()
-            // setTimeout(this.getSignalData, time)
         }
     }
 
@@ -631,14 +624,12 @@ class Signal extends React.Component<ISignalProps> {
                 },
             );
             if (grantedSendSms === PermissionsAndroid.RESULTS.GRANTED && grantedReadSms === PermissionsAndroid.RESULTS.GRANTED) {
+                const userId = user?.userId
+                const userLastCheckSMSDate = user?.lastCheckSMSDate
                 const today = new Date();
                 const maxDate = today.valueOf();
-                const minDate = maxDate - 2667921326
-                const lastCheckSMSDate = Math.round(today.getTime() / 1000)
-                let userId = null
-                if (user) {
-                    userId = user.userId
-                }
+                const minDate = userLastCheckSMSDate ? (userLastCheckSMSDate) : (maxDate - 8003763978)
+                const lastCheckSMSDate = maxDate
                 const filter = {
                     box: 'sent', // 'inbox' (default), 'sent', 'draft', 'outbox', 'failed', 'queued', and '' for all
                     minDate, // timestamp (in milliseconds since UNIX epoch)
@@ -656,10 +647,13 @@ class Signal extends React.Component<ISignalProps> {
                         (count: any, smsList: any) => {
                             const response = JSON.parse(smsList);
                             if (count && count > 0 && response && response.length) {
+                                const smsData = [...response].sort((a, b) => b.date - a.date)
+                                const request = { smsData, userId, lastCheckSMSDate}
                                 setFlagger('checkSMSLoader', true)
-                                checkSMS({ data: [...response], userId, lastCheckSMSDate})
-                                console.log('checkSMS_user===', user)
-                                console.log('lastCheckSMSDate', lastCheckSMSDate)
+                                checkSMS({ smsData: [...response], userId, lastCheckSMSDate})
+                                console.log('request===', request)
+                            }else {
+                                showToastWithGravityAndOffset('no unverified sms found');
                             }
                         },
                     )
@@ -680,7 +674,6 @@ class Signal extends React.Component<ISignalProps> {
         const { currentItemIndex, currentElement, responseDialog, pause, isInternet } = this.state;
         const { dataItems, user, navigation, submitData, setSubmitData, clearSubmitData, addToDBXSheet, createRowLoader, setFlagger, checkSMSLoader } = this.props;
         let dataSmsArray = null;
-        console.log('checkSMSLoader', checkSMSLoader)
         if (dataItems && dataItems.size > 0) {
             dataSmsArray = dataItems.filter(obj => obj.get('needToSendSMS') && obj.get('smsBody') && obj.get('smsBody').length > 0)
         }

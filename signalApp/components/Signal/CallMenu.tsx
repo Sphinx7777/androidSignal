@@ -202,7 +202,7 @@ const CallMenu = (props: ICallMenuProps) => {
                             <Text style={{ ...styles.buttonText, marginTop: 5 }}>Reload data</Text>
                         </TouchableOpacity>
                         <Text style={{ marginVertical: 2, color: 'black'}}>Last check:
-                        <Text style={{ marginVertical: 2, color: 'black', fontWeight: '700' }}> {user?.lastCheckSMSDate ? getStringDate(new Date(Number(user?.lastCheckSMSDate * 1000))) : 'no info'}</Text>
+                        <Text style={{ marginVertical: 2, color: 'black', fontWeight: '700' }}> {user?.lastCheckSMSDate ? getStringDate(new Date(Number(user?.lastCheckSMSDate))) : 'no info'}</Text>
                         </Text>
                         <TouchableOpacity
                             style={{ ...styles.button, maxWidth: 100, marginTop: 2, backgroundColor: '#31b7cc', borderColor: '#31b7cc' }}

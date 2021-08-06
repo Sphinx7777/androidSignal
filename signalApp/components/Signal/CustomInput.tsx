@@ -208,7 +208,7 @@ const CustomInput = (props: ICustomInputProps) => {
             setSubmitData(data);
             setNextElement(null, null);
         } else {
-            showToastWithGravityAndOffset('No internet connect !!!');
+            showToastWithGravityAndOffset('NO INTERNET CONNECTION !!!');
         }
     };
     const editSubmit = async (e: any, name: any) => {
@@ -224,7 +224,7 @@ const CustomInput = (props: ICustomInputProps) => {
             setSubmitData(data)
         } else {
             if (!isConnected.isConnected) {
-                showToastWithGravityAndOffset('No internet connect !!!');
+                showToastWithGravityAndOffset('NO INTERNET CONNECTION !!!');
             }
             if (!currentElement) {
                 showToastWithGravityAndOffset('No data for submit !!!');

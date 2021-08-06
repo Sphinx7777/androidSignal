@@ -26,6 +26,7 @@ import {
     UPDATE_SUBMIT_DATA,
     SET_SMS_FALSE,
     SET_RESPONSE_DIALOG,
+    UPDATE_IDENTITY,
     SET_DEFAULT_SUBMIT_DATA
 } from './actions';
 import { IMessageBlock } from '../constants';
@@ -171,13 +172,18 @@ const initialIdentity: StateIdentity = {
 function identity(state: StateIdentity = initialIdentity, action: any) {
     switch (action.type) {
     case GET_IDENTITY:
-            return {
-                user: action.identity.user,
-                roles: action.identity.roles,
-                rules: action.identity.rules,
-            };
-            case SET_DEFAULT_IDENTITY:
-            return { ...initialIdentity};
+        state =  {
+            user: action.identity.user,
+            roles: action.identity.roles,
+            rules: action.identity.rules,
+        };
+        break;
+    case UPDATE_IDENTITY:
+        state = {...state, user: {...state.user, lastCheckSMSDate: action.lastCheckSMSDate}};
+        break;
+    case SET_DEFAULT_IDENTITY:
+        state =  { ...initialIdentity};
+        break;
     }
     return state;
 }
