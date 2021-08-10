@@ -32,6 +32,7 @@ const CallMenu = (props: ICallMenuProps) => {
     const { setCurrentItemIndex, currentItemIndex, callData, makeCall, setCurrentElement, dataSmsArray, sendAllSMS, pausePress,
             pause, getDataSignal, currentElement, getData, messagesUpload, submitData, getCheckAllSms, user } = props;
     const [sendAllSMSVisible, setSendAllSMSVisible] = useState(false)
+    const [checkSMSVisible, setCheckSMSVisible] = useState(false)
 
     const [state, setState] = useState<ICallMenuState>({
         callStart: false,
@@ -75,19 +76,22 @@ const CallMenu = (props: ICallMenuProps) => {
         }
     }
 
-    const handlePausePress = () => pausePress()
-    const handleContinuePress = () => {
-        if (callData) {
-            const phone = callData?.valueSeq()?.getIn([currentItemIndex, 'phone'])
-            pausePress(false)
-            makeCall(phone, 'disable')
-        }
-    }
+    // const handlePausePress = () => pausePress()
+    // const handleContinuePress = () => {
+    //     if (callData) {
+    //         const phone = callData?.valueSeq()?.getIn([currentItemIndex, 'phone'])
+    //         pausePress(false)
+    //         makeCall(phone, 'disable')
+    //     }
+    // }
     const handleSendAllSMS = () => sendAllSMS()
 
     const showDialog = (dialogKey: string) => {
         if (dialogKey === 'sendAllSMS') {
             setSendAllSMSVisible(true);
+        }
+        if (dialogKey === 'checkSMS') {
+            setCheckSMSVisible(true);
         }
     };
 
@@ -95,12 +99,19 @@ const CallMenu = (props: ICallMenuProps) => {
         if (dialogKey === 'sendAllSMS') {
             setSendAllSMSVisible(false);
         }
+        if (dialogKey === 'checkSMS') {
+            setCheckSMSVisible(false);
+        }
     };
 
     const handleConfirm = async (dialogKey: string) => {
         if (dialogKey === 'sendAllSMS') {
             handleSendAllSMS();
             setSendAllSMSVisible(false);
+        }
+        if (dialogKey === 'checkSMS') {
+            getCheckAllSms();
+            setCheckSMSVisible(false);
         }
     };
 
@@ -169,6 +180,7 @@ const CallMenu = (props: ICallMenuProps) => {
     const dialogDescription = `You confirm the sending of messages ? ${isValidSMS?.size} SMS will be sent. ${countSms && countSms > 0 ? countSms === 1 ? countSms + ' message' + ' have incorrect number format or message body' : countSms + ' messages' + ' have incorrect number format or message body' : ''}`
     const noInternetErrText = `No internet connection. ${noInternetConnectErrors.length} request${noInternetConnectErrors.length > 1 ? 's' : ''} failed, check your internet connection`
     const badRequestErrText = `${badRequestErrors.length} server request${badRequestErrors.length > 1 ? 's' : ''} failed, check web logs`
+    const checkSmsText = user?.lastCheckSMSDate ?  `Do you want to check SMS from ${getStringDate(new Date(Number(user?.lastCheckSMSDate)))} ?` : `Do you want to check SMS for the last 3 months ?`
     return (
         <>
             <View style={styles.wrapper}>
@@ -206,7 +218,7 @@ const CallMenu = (props: ICallMenuProps) => {
                         </Text>
                         <TouchableOpacity
                             style={{ ...styles.button, maxWidth: 100, marginTop: 2, backgroundColor: '#31b7cc', borderColor: '#31b7cc' }}
-                            onPress={getCheckAllSms}>
+                            onPress={() => showDialog('checkSMS')}>
                             <Text style={{ ...styles.buttonText, marginTop: 5 }}>Check sms</Text>
                         </TouchableOpacity>
                     </View>
@@ -284,6 +296,16 @@ const CallMenu = (props: ICallMenuProps) => {
                 title={countSms > 0 ? 'Not all sms will be sent' : 'Send all sms'}
                 description={dialogDescription}
                 confirmButtonText='Send'
+            />
+                <ModalDialog
+                handleCancel={handleCancel}
+                handleConfirm={handleConfirm}
+                // wrong={countSms > 0 ? true : false}
+                dialogKey='checkSMS'
+                visible={checkSMSVisible}
+                title={'Checking your messages'}
+                description={checkSmsText}
+                confirmButtonText='check'
             />
         </>
     );
